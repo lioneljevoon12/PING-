@@ -11,17 +11,25 @@
   
   <style>
     :root {
+      /* PALET WARNA SESUAI SWATCH */
       --bg-krem: #FAF5EC;
       --bg-krem-card: #FFFDF9;
-      --brown-btn: #5C4033;
-      --brown-btn-dark: #432E24;
-      --brown-btn-hover: #704F3F;
-      --mint-green: #6DBE92;
-      --mint-green-dark: #4B9B70;
-      --baby-blue: #6FAEC9;
-      --baby-blue-light: #EBF4F8;
-      --soft-coral: #F28482;
-      --butter-yellow: #F6BD60;
+      
+      /* UTAMA: SKY BLUE */
+      --sky-blue: #9CD4FA;
+      --sky-blue-dark: #6DB7EB;
+      --sky-blue-shadow: #4A97CB;
+      --sky-blue-light: #EAF5FD;
+      
+      /* PASTEL SWATCH */
+      --blush-pink: #F8C8D4;
+      --soft-peach: #FBD3B6;
+      --butter-yellow: #FDF08F;
+      --butter-yellow-dark: #E6C84B;
+      --lavendel: #D6C7EC;
+      --mind-cream: #C8DEC2;
+      --mind-cream-dark: #8DB882;
+      
       --text-dark: #3E3835;
       --text-muted: #7D726D;
       --border-soft: #E8DCCB;
@@ -83,12 +91,13 @@
     }
 
     .badge-pill {
-      background: var(--brown-btn);
+      background: var(--sky-blue-dark);
       color: white;
-      padding: 2px 8px;
+      padding: 2px 10px;
       border-radius: 10px;
       font-size: 0.7rem;
       font-weight: 700;
+      box-shadow: 0 2px 6px rgba(109, 183, 235, 0.3);
     }
 
     .device-switcher {
@@ -113,15 +122,15 @@
     }
 
     .ctrl-btn:hover {
-      background: var(--butter-yellow);
+      background: var(--sky-blue-light);
       transform: translateY(-1px);
     }
 
     .ctrl-btn.active {
-      background: var(--brown-btn);
+      background: var(--sky-blue-dark);
       color: white;
-      border-color: var(--brown-btn-dark);
-      box-shadow: 0 3px 8px rgba(92, 64, 51, 0.3);
+      border-color: var(--sky-blue-shadow);
+      box-shadow: 0 3px 8px rgba(109, 183, 235, 0.35);
     }
 
     /* DEVICE WRAPPER & PHONE FRAME */
@@ -134,7 +143,6 @@
       max-width: 880px;
     }
 
-    /* Landscape Mode (Auto-Fit & Responsive 16:9) */
     .phone-frame.landscape {
       width: min(860px, 94vw);
       height: min(470px, 68vh);
@@ -148,7 +156,6 @@
       transition: all 0.3s ease;
     }
 
-    /* Portrait Mode */
     .phone-frame.portrait {
       width: min(390px, 92vw);
       height: min(720px, 78vh);
@@ -200,7 +207,6 @@
       transform: translateX(-50%);
     }
 
-    /* PHONE SCREEN */
     .phone-screen {
       width: 100%;
       height: 100%;
@@ -230,7 +236,7 @@
 
     .screens-container {
       flex: 1;
-      min-height: 0; /* CRITICAL: prevents child overflow */
+      min-height: 0;
       position: relative;
       width: 100%;
       height: 100%;
@@ -255,14 +261,14 @@
     }
 
     /* =========================================================
-       1. HALAMAN AWAL (TITLE SCREEN - FIT & BALANCED)
+       1. HALAMAN AWAL (LOGO PING! SKY BLUE & TOMBOL SKY BLUE)
        ========================================================= */
     #page-halaman-awal {
       background: var(--bg-krem);
       background-image: 
-        radial-gradient(circle at 50% 35%, rgba(246, 189, 96, 0.18) 0%, transparent 60%),
-        radial-gradient(circle at 15% 85%, rgba(109, 190, 146, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 85% 85%, rgba(242, 132, 130, 0.1) 0%, transparent 45%);
+        radial-gradient(circle at 50% 35%, rgba(156, 212, 250, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 15% 85%, rgba(200, 222, 194, 0.2) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(248, 200, 212, 0.2) 0%, transparent 45%);
       align-items: center;
       justify-content: center;
       padding: 12px;
@@ -271,7 +277,6 @@
       height: 100%;
     }
 
-    /* Sukulen Atas Kiri */
     .shelf-decor-top {
       position: absolute;
       top: 8px;
@@ -284,7 +289,6 @@
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
     }
 
-    /* Kabel UTP Kanan Bawah */
     .cable-decor-bottom {
       position: absolute;
       bottom: -6px;
@@ -297,7 +301,6 @@
       z-index: 4;
     }
 
-    /* Switch Kiri Bawah */
     .switch-decor-bottom {
       position: absolute;
       bottom: 12px;
@@ -309,7 +312,6 @@
       z-index: 4;
     }
 
-    /* Mascot Router & Paket Data */
     .mascot-left-router {
       position: absolute;
       left: clamp(16px, 6vw, 55px);
@@ -329,7 +331,7 @@
       transform: translateY(-50%);
       width: clamp(55px, 11vw, 85px);
       object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(242, 132, 130, 0.25));
+      filter: drop-shadow(0 4px 8px rgba(248, 200, 212, 0.35));
       animation: floatFlap 2.4s ease-in-out infinite alternate;
       z-index: 6;
     }
@@ -341,8 +343,8 @@
       animation: twinkle 2s ease-in-out infinite alternate;
       z-index: 5;
     }
-    .star-1 { top: 25px; right: 140px; color: var(--butter-yellow); }
-    .star-2 { bottom: 30px; left: 140px; color: var(--soft-coral); font-size: 0.85rem; }
+    .star-1 { top: 25px; right: 140px; color: var(--sky-blue-dark); }
+    .star-2 { bottom: 30px; left: 140px; color: var(--blush-pink); font-size: 0.85rem; }
 
     @keyframes twinkle {
       0% { transform: scale(0.8); opacity: 0.4; }
@@ -359,7 +361,6 @@
       100% { transform: translateY(-50%) translateY(-10px) rotate(-3deg); }
     }
 
-    /* Center Box */
     .title-center-group {
       display: flex;
       flex-direction: column;
@@ -371,12 +372,14 @@
       max-height: 100%;
     }
 
+    /* LOGO PING! ASSET DENGAN WARNA BIRU SKY BLUE */
     .ping-logo-img {
-      max-width: min(220px, 45vw);
-      max-height: min(90px, 22vh);
+      max-width: min(320px, 55vw);
+      max-height: min(130px, 30vh);
+      width: 100%;
       height: auto;
       object-fit: contain;
-      filter: brightness(0) saturate(100%) invert(24%) sepia(18%) saturate(1300%) hue-rotate(345deg) brightness(88%) contrast(92%) drop-shadow(0 4px 6px rgba(62, 56, 53, 0.15));
+      filter: drop-shadow(0 4px 10px rgba(74, 151, 203, 0.3));
     }
 
     .title-buttons-group {
@@ -386,9 +389,10 @@
       width: min(200px, 48vw);
     }
 
-    .btn-brown-action {
+    /* TOMBOL ENTER (SKY BLUE) */
+    .btn-sky-action {
       width: 100%;
-      background: linear-gradient(180deg, var(--brown-btn) 0%, var(--brown-btn-dark) 100%);
+      background: linear-gradient(180deg, var(--sky-blue) 0%, var(--sky-blue-dark) 100%);
       color: #FFFDF9;
       border: none;
       padding: 10px 18px;
@@ -402,34 +406,36 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      box-shadow: 0 4px 0 #2E1F18, 0 6px 12px rgba(67, 46, 36, 0.25);
+      box-shadow: 0 4px 0 var(--sky-blue-shadow), 0 6px 14px rgba(109, 183, 235, 0.35);
       transition: all 0.12s ease;
     }
 
-    .btn-brown-action:hover {
-      background: linear-gradient(180deg, var(--brown-btn-hover) 0%, var(--brown-btn) 100%);
+    .btn-sky-action:hover {
+      background: linear-gradient(180deg, #AEE0FF 0%, var(--sky-blue) 100%);
       transform: translateY(-2px);
-      box-shadow: 0 6px 0 #2E1F18, 0 8px 14px rgba(67, 46, 36, 0.3);
+      box-shadow: 0 6px 0 var(--sky-blue-shadow), 0 8px 16px rgba(109, 183, 235, 0.4);
     }
 
-    .btn-brown-action:active {
+    .btn-sky-action:active {
       transform: translateY(3px);
-      box-shadow: 0 1px 0 #2E1F18;
+      box-shadow: 0 1px 0 var(--sky-blue-shadow);
     }
 
-    .btn-brown-secondary {
+    /* TOMBOL EXIT (SKY BLUE SECONDARY) */
+    .btn-sky-secondary {
       background: #FFFDF9;
-      color: var(--brown-btn);
-      border: 2px solid var(--brown-btn);
+      color: #3B7FA8;
+      border: 2px solid var(--sky-blue);
       box-shadow: 0 3px 0 var(--border-card);
     }
 
-    .btn-brown-secondary:hover {
-      background: #F5EDE3;
+    .btn-sky-secondary:hover {
+      background: var(--sky-blue-light);
       transform: translateY(-2px);
+      box-shadow: 0 5px 0 var(--border-card);
     }
 
-    .btn-brown-secondary:active {
+    .btn-sky-secondary:active {
       transform: translateY(2px);
       box-shadow: 0 1px 0 var(--border-card);
     }
@@ -479,18 +485,24 @@
 
     .btn-back-home {
       background: var(--bg-krem-card);
-      border: 1.5px solid var(--border-soft);
+      border: 1.5px solid var(--sky-blue);
       padding: 4px 12px;
       border-radius: 12px;
       font-family: 'Fredoka', sans-serif;
       font-size: 0.75rem;
       font-weight: 700;
-      color: var(--text-dark);
+      color: #3B7FA8;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
       box-shadow: 0 2px 0 var(--border-card);
+      transition: all 0.15s ease;
+    }
+
+    .btn-back-home:hover {
+      background: var(--sky-blue-light);
+      transform: translateY(-1px);
     }
 
     .dash-grid-layout {
@@ -565,12 +577,12 @@
       top: 0;
       bottom: 0;
       width: 4px;
-      background: var(--baby-blue);
+      background: var(--sky-blue);
     }
 
-    .card-box.box-green::before { background: var(--mint-green); }
-    .card-box.box-yellow::before { background: var(--butter-yellow); }
-    .card-box.box-coral::before { background: var(--soft-coral); }
+    .card-box.box-mindcream::before { background: var(--mind-cream-dark); }
+    .card-box.box-peach::before { background: var(--soft-peach); }
+    .card-box.box-pink::before { background: var(--blush-pink); }
 
     .card-box-title {
       font-size: 0.72rem;
@@ -590,7 +602,7 @@
     .card-box-sub {
       font-size: 0.6rem;
       font-weight: 600;
-      color: var(--mint-green-dark);
+      color: var(--sky-blue-dark);
       margin-top: 2px;
     }
 
@@ -618,7 +630,8 @@
 
     .menu-row-button:hover {
       transform: translateX(3px);
-      border-color: var(--brown-btn);
+      border-color: var(--sky-blue);
+      box-shadow: 0 4px 10px rgba(156, 212, 250, 0.3);
     }
 
     .menu-row-content-left {
@@ -631,12 +644,12 @@
       width: 30px;
       height: 30px;
       border-radius: 10px;
-      background: var(--baby-blue-light);
+      background: var(--sky-blue-light);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1rem;
-      border: 1.5px solid #D6E8F0;
+      border: 1.5px solid #C8E5FA;
     }
 
     .menu-row-text-group {
@@ -659,7 +672,7 @@
     .menu-row-arrow {
       font-size: 1rem;
       font-weight: 700;
-      color: #C0B5A7;
+      color: #A0C5DE;
     }
 
     .screen-dock {
@@ -683,9 +696,9 @@
     }
 
     .dock-btn.active {
-      background: var(--brown-btn);
+      background: var(--sky-blue-dark);
       color: white;
-      border-color: var(--brown-btn-dark);
+      border-color: var(--sky-blue-shadow);
     }
 
     .phone-frame.portrait .dash-grid-layout {
@@ -700,7 +713,7 @@
   <header class="top-controller">
     <div class="top-title">
       <span>🕹️ PING! UI/UX Wireframe</span>
-      <span class="badge-pill">Cozy Edition</span>
+      <span class="badge-pill">Sky Blue Edition</span>
     </div>
     
     <div class="device-switcher">
@@ -710,7 +723,6 @@
     </div>
   </header>
 
-  <!-- PHONE CONTAINER -->
   <main class="device-wrapper">
     <div class="phone-frame landscape" id="phone-frame">
       <div class="phone-notch"></div>
@@ -725,43 +737,37 @@
 
         <div class="screens-container">
 
-          <!-- 1. HALAMAN AWAL (PAS & PROPORSIONAL) -->
+          <!-- 1. HALAMAN AWAL (LOGO PING! BIRU SKY BLUE) -->
           <section class="screen-page active" id="page-halaman-awal">
             
-            <!-- Sukulen Kiri Atas -->
             <div class="shelf-decor-top">
               <svg class="plant-pot-svg" width="32" height="32" viewBox="0 0 100 100" fill="none">
-                <path d="M25 55 L35 90 L65 90 L75 55 Z" fill="#E8A598" stroke="#3E3835" stroke-width="4"/>
-                <rect x="20" y="50" width="60" height="8" rx="3" fill="#D88A7B" stroke="#3E3835" stroke-width="4"/>
-                <path d="M50 50 C45 35 30 40 40 50 Z" fill="#74C69D" stroke="#3E3835" stroke-width="3"/>
-                <path d="M50 50 C55 35 70 40 60 50 Z" fill="#74C69D" stroke="#3E3835" stroke-width="3"/>
-                <path d="M50 50 C50 30 50 30 50 50 Z" fill="#52B788" stroke="#3E3835" stroke-width="3"/>
+                <path d="M25 55 L35 90 L65 90 L75 55 Z" fill="#FBD3B6" stroke="#3E3835" stroke-width="4"/>
+                <rect x="20" y="50" width="60" height="8" rx="3" fill="#F8C8D4" stroke="#3E3835" stroke-width="4"/>
+                <path d="M50 50 C45 35 30 40 40 50 Z" fill="#C8DEC2" stroke="#3E3835" stroke-width="3"/>
+                <path d="M50 50 C55 35 70 40 60 50 Z" fill="#C8DEC2" stroke="#3E3835" stroke-width="3"/>
+                <path d="M50 50 C50 30 50 30 50 50 Z" fill="#8DB882" stroke="#3E3835" stroke-width="3"/>
               </svg>
             </div>
 
-            <!-- Kabel Kanan Bawah -->
             <img src="image/kabel_utp-removebg-preview.png" alt="Kabel" class="cable-decor-bottom" onerror="this.src='image/kabel utp.png';" />
-
-            <!-- Switch Kiri Bawah -->
             <img src="image/switch-removebg-preview.png" alt="Switch" class="switch-decor-bottom" onerror="this.src='image/switch.png';" />
 
-            <!-- Mascot Kiri & Kanan -->
             <img src="image/router1-removebg-preview.png" alt="Router" class="mascot-left-router" onerror="this.src='image/router1.png';" />
             <img src="image/Paket_data-removebg-preview.png" alt="Paket Data" class="mascot-right-packet" onerror="this.src='image/Paket data.png';" />
 
-            <!-- Sparkles -->
             <span class="sparkle-star star-1">✨</span>
             <span class="sparkle-star star-2">⭐</span>
 
-            <!-- Center Content -->
             <div class="title-center-group">
-              <img src="image/logo-ping-cropped.png" alt="PING!" class="ping-logo-img" onerror="this.src='image/logo-ping.png';" />
+              <!-- LOGO ASSET PING! DIUBAH MENJADI WARNA BIRU SKY BLUE -->
+              <img src="image/logo-ping-blue.png" alt="PING!" class="ping-logo-img" onerror="this.src='image/logo-ping.png'; this.style.filter='brightness(0) saturate(100%) invert(56%) sepia(55%) saturate(700%) hue-rotate(170deg) brightness(98%) contrast(92%) drop-shadow(0 4px 8px rgba(74, 151, 203, 0.3))';" />
 
               <div class="title-buttons-group">
-                <button class="btn-brown-action" onclick="switchPage('page-dashboard')">
+                <button class="btn-sky-action" onclick="switchPage('page-dashboard')">
                   ENTER
                 </button>
-                <button class="btn-brown-action btn-brown-secondary" onclick="alert('Keluar dari aplikasi')">
+                <button class="btn-sky-action btn-sky-secondary" onclick="alert('Keluar dari aplikasi')">
                   EXIT
                 </button>
               </div>
@@ -786,45 +792,45 @@
                 <div class="dash-quick-stats">
                   <div class="mini-stat-card">
                     <span class="mini-stat-label">Progres</span>
-                    <span class="mini-stat-val" style="color: var(--mint-green-dark);">1 / 5</span>
+                    <span class="mini-stat-val" style="color: #3B7FA8;">1 / 5</span>
                   </div>
                   <div class="mini-stat-card">
                     <span class="mini-stat-label">Bintang</span>
-                    <span class="mini-stat-val" style="color: #D4A316;">⭐ 3</span>
+                    <span class="mini-stat-val" style="color: #C79A0B;">⭐ 3</span>
                   </div>
                   <div class="mini-stat-card">
                     <span class="mini-stat-label">Level</span>
-                    <span class="mini-stat-val" style="color: var(--baby-blue);">1.2</span>
+                    <span class="mini-stat-val" style="color: var(--sky-blue-dark);">1.2</span>
                   </div>
                   <div class="mini-stat-card">
                     <span class="mini-stat-label">Status</span>
-                    <span class="mini-stat-val" style="color: var(--mint-green-dark);">UP</span>
+                    <span class="mini-stat-val" style="color: var(--mind-cream-dark);">UP</span>
                   </div>
                 </div>
 
                 <div class="dash-summary-cards">
-                  <div class="card-box box-green">
+                  <div class="card-box">
                     <div class="card-box-title"><span>👤</span> Profil Teknisi</div>
                     <div class="card-box-desc">Teknisi Muda (NOC 01)</div>
                     <div class="card-box-sub">Status: Siap Bertugas</div>
                   </div>
 
-                  <div class="card-box">
+                  <div class="card-box box-mindcream">
                     <div class="card-box-title"><span>📦</span> Stage Terakhir</div>
                     <div class="card-box-desc">Gudang Hardware</div>
-                    <div class="card-box-sub" style="color: var(--baby-blue);">Urutan Pin T568B</div>
+                    <div class="card-box-sub" style="color: var(--mind-cream-dark);">Urutan Pin T568B</div>
                   </div>
 
-                  <div class="card-box box-yellow">
+                  <div class="card-box box-peach">
                     <div class="card-box-title"><span>⚡</span> Rekor Waktu</div>
                     <div class="card-box-desc">Tercepat: 32 Detik</div>
-                    <div class="card-box-sub" style="color: #B58500;">Skor: 9,850 Pts</div>
+                    <div class="card-box-sub" style="color: #C07945;">Skor: 9,850 Pts</div>
                   </div>
 
-                  <div class="card-box box-coral">
+                  <div class="card-box box-pink">
                     <div class="card-box-title"><span>🎖️</span> Lencana</div>
                     <div class="card-box-desc">Master Crimping UTP</div>
-                    <div class="card-box-sub" style="color: var(--soft-coral);">1 / 8 Terbuka</div>
+                    <div class="card-box-sub" style="color: #D4758E;">1 / 8 Terbuka</div>
                   </div>
                 </div>
               </div>
