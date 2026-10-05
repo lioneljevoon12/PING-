@@ -441,6 +441,258 @@
     }
 
     /* =========================================================
+       MODAL AUTH (LOGIN / SIGN-UP)
+       ========================================================= */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(62, 56, 53, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .auth-modal-card {
+      background: var(--bg-krem-card);
+      border: 2px solid #FFF;
+      outline: 2px solid var(--border-soft);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 320px;
+      max-height: 94%;
+      overflow-y: auto;
+      padding: 14px 16px;
+      box-shadow: 0 10px 25px rgba(62, 56, 53, 0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transform: scale(0.92);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .auth-modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .btn-close-modal {
+      background: #F0EAE1;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-close-modal:hover {
+      background: var(--blush-pink);
+      color: #9C334E;
+    }
+
+    .btn-google-play {
+      background: #FFFFFF;
+      border: 1.5px solid #C5E5CF;
+      color: #1A5930;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #BDDEB7, 0 3px 8px rgba(30, 107, 56, 0.08);
+      transition: all 0.12s ease;
+    }
+
+    .btn-google-play:hover {
+      background: #F3FAF5;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 #BDDEB7;
+    }
+
+    .btn-google-play:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #BDDEB7;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      margin: 2px 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px dashed var(--border-soft);
+    }
+
+    .auth-divider span {
+      padding: 0 8px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: #EFE6D8;
+      border-radius: 12px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 5px 0;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .auth-tab-btn.active {
+      background: #FFFFFF;
+      color: #3B7FA8;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-align: left;
+    }
+
+    .form-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .form-input {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-card);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text-dark);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--sky-blue-dark);
+      box-shadow: 0 0 0 2.5px rgba(156, 212, 250, 0.35);
+    }
+
+    .form-footer-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin: 1px 0;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .link-forgot {
+      color: #3B7FA8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link-forgot:hover {
+      text-decoration: underline;
+    }
+
+    .auth-submit-btn {
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+
+    .auth-toast {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #3E3835;
+      color: #FFFDF9;
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 150;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .auth-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* =========================================================
        2. DASHBOARD
        ========================================================= */
     #page-dashboard {
@@ -765,10 +1017,10 @@
 
               <div class="title-buttons-group">
                 <button class="btn-sky-action" onclick="switchPage('page-dashboard')">
-                  ENTER
+                  PLAY
                 </button>
-                <button class="btn-sky-action btn-sky-secondary" onclick="alert('Keluar dari aplikasi')">
-                  EXIT
+                <button class="btn-sky-action btn-sky-secondary" onclick="openAuthModal()">
+                  LOG-IN
                 </button>
               </div>
             </div>
@@ -885,6 +1137,70 @@
           </section>
 
         </div>
+        
+        <!-- TOAST NOTIFICATION -->
+        <div class="auth-toast" id="auth-toast"></div>
+
+        <!-- AUTH MODAL (LOGIN / SIGN-UP) -->
+        <div class="modal-overlay" id="modal-auth" onclick="closeAuthModal(event)">
+          <div class="modal-card auth-modal-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <div class="modal-title-group">
+                <span>🔐</span>
+                <span id="auth-modal-title">Masuk ke PING!</span>
+              </div>
+              <button class="btn-close-modal" onclick="closeAuthModal()">✕</button>
+            </div>
+
+            <!-- CONTINUE WITH GOOGLE PLAY -->
+            <button class="btn-google-play" type="button" onclick="handleGooglePlayAuth()">
+              <svg class="gp-icon" viewBox="0 0 24 24" width="18" height="18">
+                <path fill="#0F9D58" d="M19.5,6H4.5C3.12,6,2,7.12,2,8.5v7C2,16.88,3.12,18,4.5,18h15c1.38,0,2.5-1.12,2.5-2.5v-7 C22,7.12,20.88,6,19.5,6z M7,13H6v2H5v-2H4v-1h1v-2h1v2h1V13z M15.5,14.5c-0.83,0-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5 s1.5,0.67,1.5,1.5S16.33,14.5,15.5,14.5z M18.5,11.5c-0.83,0-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5 S19.33,11.5,18.5,11.5z"/>
+              </svg>
+              <span>Continue with Google Play</span>
+            </button>
+
+            <div class="auth-divider">
+              <span>atau akun PING!</span>
+            </div>
+
+            <!-- TAB SWITCHER -->
+            <div class="auth-tabs">
+              <button class="auth-tab-btn active" id="tab-login" type="button" onclick="setAuthMode('login')">Log-In</button>
+              <button class="auth-tab-btn" id="tab-signup" type="button" onclick="setAuthMode('signup')">Sign-Up</button>
+            </div>
+
+            <!-- FORM LOGIN / SIGN-UP -->
+            <form class="auth-form" onsubmit="handleAuthSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="auth-email">Username / Email</label>
+                <input type="text" id="auth-email" class="form-input" placeholder="contoh: teknisi_muda" required autocomplete="username" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="auth-password">Password</label>
+                <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+              </div>
+
+              <div class="form-group" id="group-confirm-pwd" style="display: none;">
+                <label class="form-label" for="auth-confirm-pwd">Konfirmasi Password</label>
+                <input type="password" id="auth-confirm-pwd" class="form-input" placeholder="••••••••" autocomplete="new-password" />
+              </div>
+
+              <div class="form-footer-options" id="auth-options-row">
+                <label class="remember-me">
+                  <input type="checkbox" checked /> <span>Ingat saya</span>
+                </label>
+                <a href="#" class="link-forgot" onclick="event.preventDefault(); showToast('Fitur reset kata sandi segera hadir!');">Lupa sandi?</a>
+              </div>
+
+              <button type="submit" class="btn-sky-action auth-submit-btn" id="btn-auth-submit">
+                MASUK
+              </button>
+            </form>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -897,6 +1213,7 @@
   <script>
     let soundEnabled = true;
     let audioCtx = null;
+    let currentAuthMode = 'login';
 
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -942,6 +1259,77 @@
 
       document.getElementById('dock-btn-awal').classList.toggle('active', pageId === 'page-halaman-awal');
       document.getElementById('dock-btn-dash').classList.toggle('active', pageId === 'page-dashboard');
+    }
+
+    /* AUTH MODAL HANDLERS */
+    function openAuthModal() {
+      playCutePop();
+      const modal = document.getElementById('modal-auth');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeAuthModal(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('btn-close-modal')) return;
+      playCutePop();
+      const modal = document.getElementById('modal-auth');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function setAuthMode(mode) {
+      playCutePop();
+      currentAuthMode = mode;
+      document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+      document.getElementById('auth-modal-title').innerText = mode === 'login' ? 'Masuk ke PING!' : 'Daftar Akun Baru';
+      document.getElementById('btn-auth-submit').innerText = mode === 'login' ? 'MASUK' : 'DAFTAR SEKARANG';
+      
+      const confirmGroup = document.getElementById('group-confirm-pwd');
+      const confirmInput = document.getElementById('auth-confirm-pwd');
+      const optRow = document.getElementById('auth-options-row');
+      
+      if (mode === 'signup') {
+        confirmGroup.style.display = 'flex';
+        confirmInput.required = true;
+        optRow.style.display = 'none';
+      } else {
+        confirmGroup.style.display = 'none';
+        confirmInput.required = false;
+        optRow.style.display = 'flex';
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('auth-toast');
+      if (!toast) return;
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    function handleGooglePlayAuth() {
+      playCutePop();
+      showToast('🎮 Terhubung dengan Google Play Games!');
+      setTimeout(() => {
+        closeAuthModal();
+        switchPage('page-dashboard');
+      }, 800);
+    }
+
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      playCutePop();
+      const username = document.getElementById('auth-email').value || 'Teknisi';
+      if (currentAuthMode === 'signup') {
+        showToast(`🎉 Akun "${username}" berhasil dibuat!`);
+      } else {
+        showToast(`✨ Selamat datang kembali, ${username}!`);
+      }
+      setTimeout(() => {
+        closeAuthModal();
+        switchPage('page-dashboard');
+      }, 900);
     }
   </script>
 </body>
