@@ -8,6 +8,9 @@ extends Control
 @onready var star_top_right: Label = %StarTopRight
 @onready var star_bottom_left: Label = %StarBottomLeft
 @onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
+@onready var auth_modal: Control = %AuthModal
+@onready var user_greeting_label: Label = %UserGreetingLabel
+@onready var greeting_badge: PanelContainer = %GreetingBadge
 
 # Animation state variables
 var time_passed: float = 0.0
@@ -22,6 +25,31 @@ func _ready() -> void:
 	# Connect button events
 	_setup_button(play_button, "PLAY")
 	_setup_button(login_button, "LOG-IN")
+	
+	# Update User Greeting
+	_update_greeting(PlayerData.current_username)
+	PlayerData.user_changed.connect(_update_greeting)
+	
+	# Greeting badge click to log in
+	if greeting_badge:
+		greeting_badge.gui_input.connect(_on_greeting_badge_gui_input)
+
+func _update_greeting(username: String) -> void:
+	if user_greeting_label:
+		user_greeting_label.text = "Hello, %s!" % username
+		
+		# Animate small bounce on name update
+		if greeting_badge:
+			greeting_badge.pivot_offset = greeting_badge.size / 2.0
+			var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tween.tween_property(greeting_badge, "scale", Vector2(1.15, 1.15), 0.15)
+			tween.tween_property(greeting_badge, "scale", Vector2(1.0, 1.0), 0.15)
+
+func _on_greeting_badge_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		play_sfx(659.25)
+		if auth_modal:
+			auth_modal.open("login")
 
 func _init_positions_and_pivots() -> void:
 	if router_mascot:
@@ -43,22 +71,25 @@ func _setup_button(btn: TextureButton, btn_name: String) -> void:
 	btn.pivot_offset = btn.size / 2.0
 	
 	btn.mouse_entered.connect(func():
+		btn.pivot_offset = btn.size / 2.0
 		_animate_button_scale(btn, Vector2(1.05, 1.05))
 		play_sfx(659.25) # E5 note
 	)
 	btn.mouse_exited.connect(func():
+		btn.pivot_offset = btn.size / 2.0
 		_animate_button_scale(btn, Vector2(1.0, 1.0))
 	)
 	btn.button_down.connect(func():
+		btn.pivot_offset = btn.size / 2.0
 		_animate_button_scale(btn, Vector2(0.95, 0.95))
 		play_sfx(880.0) # A5 note
 	)
 	btn.button_up.connect(func():
+		btn.pivot_offset = btn.size / 2.0
 		var target = Vector2(1.05, 1.05) if btn.is_hovered() else Vector2(1.0, 1.0)
 		_animate_button_scale(btn, target)
 	)
 	btn.pressed.connect(func():
-		print("Tombol %s ditekan!" % btn_name)
 		_on_button_clicked(btn_name)
 	)
 
@@ -90,9 +121,10 @@ func _process(delta: float) -> void:
 func _on_button_clicked(button_name: String) -> void:
 	match button_name:
 		"PLAY":
-			print("Memulai Game / Buka Dashboard...")
+			print("Memulai Game untuk user: %s" % PlayerData.current_username)
 		"LOG-IN":
-			print("Membuka Layar/Modal Log-In...")
+			if auth_modal:
+				auth_modal.open("login")
 
 # Procedural Audio Synth for cute pop sounds
 func play_sfx(freq: float) -> void:
@@ -111,7 +143,7 @@ func play_sfx(freq: float) -> void:
 	
 	for i in range(num_samples):
 		var t = float(i) / sample_rate
-		var envelope = exp(-t * 40.0) # fast decay
+		var envelope = exp(-t * 40.0)
 		var sample_val = sin(t * freq * TAU) * envelope * 0.4
 		var int_val = int(clamp(sample_val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, int_val)

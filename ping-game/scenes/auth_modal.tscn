@@ -1,0 +1,386 @@
+[gd_scene load_steps=12 format=3 uid="uid://b3y7kx8v4pq2n"]
+
+[ext_resource type="Script" path="res://scenes/auth_modal.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://2b0j6ww185b1" path="res://fonts/MADE Tommy Soft Bold PERSONAL USE.otf" id="2_font_bold"]
+[ext_resource type="FontFile" uid="uid://dyvkugdedh0xm" path="res://fonts/MADE Tommy Soft Regular PERSONAL USE.otf" id="3_font_reg"]
+[ext_resource type="Texture2D" uid="uid://1ts4rqqvwb0a" path="res://art/ui-ux/close-removebg-preview.png" id="4_close_btn"]
+[ext_resource type="Texture2D" uid="uid://cru5tdc844esc" path="res://art/ui-ux/lanjut_googleplay.png" id="5_google_btn"]
+[ext_resource type="Texture2D" uid="uid://k1irk35jes4f" path="res://art/ui-ux/masuk-left-button.png" id="6_tab_tex"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(1, 0.992157, 0.976471, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.909804, 0.862745, 0.796078, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.243137, 0.219608, 0.207843, 0.18)
+shadow_size = 16
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.894118, 0.843137, 0.764706, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input_focus"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.533333, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0, 0.533333, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 5
+border_color = Color(0.12, 0.12, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0.533333, 1, 0.3)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.12, 0.6, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 5
+border_color = Color(0.12, 0.12, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0.533333, 1, 0.45)
+shadow_size = 8
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 16.0
+content_margin_top = 13.0
+content_margin_right = 16.0
+content_margin_bottom = 7.0
+bg_color = Color(0, 0.45, 0.88, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.12, 0.12, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="AuthModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.243137, 0.219608, 0.207843, 0.45)
+
+[node name="CenterBox" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ModalCard" type="PanelContainer" parent="CenterBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 520)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterBox/ModalCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="CenterBox/ModalCard/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderHBox" type="HBoxContainer" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="IconLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 18
+text = "🔐 "
+
+[node name="TitleLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 18
+text = "Masuk ke PING!"
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_close_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="GooglePlayButton" type="TextureButton" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(310, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("5_google_btn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="DividerHBox" type="HBoxContainer" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LineLeft" type="ColorRect" parent="CenterBox/ModalCard/MarginContainer/VBox/DividerHBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+color = Color(0.909804, 0.862745, 0.796078, 1)
+
+[node name="DividerLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/DividerHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.490196, 0.447059, 0.427451, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 11
+text = "atau akun PING!"
+
+[node name="LineRight" type="ColorRect" parent="CenterBox/ModalCard/MarginContainer/VBox/DividerHBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+color = Color(0.909804, 0.862745, 0.796078, 1)
+
+[node name="TabSwitcher" type="Control" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+custom_minimum_size = Vector2(310, 42)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="TabTextureRect" type="TextureRect" parent="CenterBox/ModalCard/MarginContainer/VBox/TabSwitcher"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6_tab_tex")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BtnTabLogin" type="Button" parent="CenterBox/ModalCard/MarginContainer/VBox/TabSwitcher"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.5
+anchor_bottom = 1.0
+mouse_default_cursor_shape = 2
+flat = true
+
+[node name="BtnTabSignup" type="Button" parent="CenterBox/ModalCard/MarginContainer/VBox/TabSwitcher"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_default_cursor_shape = 2
+flat = true
+
+[node name="FormVBox" type="VBoxContainer" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="UsernameLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "Username / Email"
+
+[node name="UsernameInput" type="LineEdit" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_placeholder_color = Color(0.65, 0.62, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_font_reg")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input_focus")
+placeholder_text = "contoh: teknisi_muda"
+context_menu_enabled = false
+caret_blink = true
+
+[node name="PasswordLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "Password"
+
+[node name="PasswordInput" type="LineEdit" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_placeholder_color = Color(0.65, 0.62, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_font_reg")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input_focus")
+placeholder_text = "••••••••"
+secret = true
+context_menu_enabled = false
+caret_blink = true
+
+[node name="ConfirmPwdContainer" type="VBoxContainer" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ConfirmPwdLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox/ConfirmPwdContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "Konfirmasi Password"
+
+[node name="ConfirmPwdInput" type="LineEdit" parent="CenterBox/ModalCard/MarginContainer/VBox/FormVBox/ConfirmPwdContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_placeholder_color = Color(0.65, 0.62, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_font_reg")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input_focus")
+placeholder_text = "••••••••"
+secret = true
+context_menu_enabled = false
+caret_blink = true
+
+[node name="OptionsRow" type="HBoxContainer" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RememberCheck" type="CheckBox" parent="CenterBox/ModalCard/MarginContainer/VBox/OptionsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_pressed_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_hover_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_colors/font_focus_color = Color(0.243137, 0.219608, 0.207843, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 12
+button_pressed = true
+text = "Ingat saya"
+
+[node name="Spacer" type="Control" parent="CenterBox/ModalCard/MarginContainer/VBox/OptionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ForgotLink" type="Button" parent="CenterBox/ModalCard/MarginContainer/VBox/OptionsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.533333, 1, 1)
+theme_override_colors/font_hover_color = Color(0, 0.4, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.35, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 11
+text = "Lupa sandi?"
+flat = true
+
+[node name="SubmitButton" type="Button" parent="CenterBox/ModalCard/MarginContainer/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(310, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+
+[node name="SubmitBtnLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/SubmitButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 16
+text = "MASUK"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="gui_input" from="DimOverlay" to="." method="_on_bg_gui_input"]
+[connection signal="pressed" from="CenterBox/ModalCard/MarginContainer/VBox/TabSwitcher/BtnTabLogin" to="." method="_on_tab_login_clicked"]
+[connection signal="pressed" from="CenterBox/ModalCard/MarginContainer/VBox/TabSwitcher/BtnTabSignup" to="." method="_on_tab_signup_clicked"]
