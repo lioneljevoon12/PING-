@@ -1,0 +1,688 @@
+[gd_scene load_steps=22 format=3 uid="uid://cxvdshbrd001a"]
+
+[ext_resource type="Script" path="res://scenes/dashboard.gd" id="1_dash_script"]
+[ext_resource type="Texture2D" uid="uid://bvqylweq5fgyd" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="2_bg"]
+[ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="3_font_black"]
+[ext_resource type="FontFile" uid="uid://dwd0sb6ffhlic" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="4_font_extrabold"]
+[ext_resource type="FontFile" uid="uid://dsqq4nxtdx5u7" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="5_font_bold"]
+[ext_resource type="FontFile" uid="uid://ttjv12iqtqdn" path="res://art/assets/PING! Assets/Fonts/Nunito-SemiBold.ttf" id="6_font_semibold"]
+[ext_resource type="Texture2D" uid="uid://cx0s8jpigwkm4" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/Cardatas.png" id="7_cardatas"]
+[ext_resource type="Texture2D" uid="uid://csiin1clqjdw1" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/cardprofil.png" id="8_cardprofil"]
+[ext_resource type="Texture2D" uid="uid://byf5xu7k303l2" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/cardbintang.png" id="9_cardbintang"]
+[ext_resource type="Texture2D" uid="uid://bfbsjo5t5iouh" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/cardsistem.png" id="10_cardsistem"]
+[ext_resource type="Texture2D" uid="uid://b7wiuxiq8e47l" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/vectorprofil.png" id="11_vectorprofil"]
+[ext_resource type="Texture2D" uid="uid://cq0rxpu5e8rhk" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/vectorbintang.png" id="12_vectorbintang"]
+[ext_resource type="Texture2D" uid="uid://dp2sysqox0gx6" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/vectorsistem.png" id="13_vectorsistem"]
+[ext_resource type="Texture2D" uid="uid://do7oefq6fxuvr" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/CardKarakter.png" id="14_cardkarakter"]
+[ext_resource type="Texture2D" uid="uid://d1kjkwqdi8dbc" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/CardBukuPanduan.png" id="15_cardbukupanduan"]
+[ext_resource type="Texture2D" uid="uid://bdqo0aokev0xj" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/Grid_3_Peringkat.png" id="16_gridperingkat"]
+[ext_resource type="Texture2D" uid="uid://7mv84gcgggoc" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/Grid_4_Latihan.png" id="17_gridlatihan"]
+[ext_resource type="Texture2D" uid="uid://bwpgkah34ldgo" path="res://art/ui-ux/dashboard/icon_stage1_plug.png" id="18_icon_plug"]
+[ext_resource type="Texture2D" uid="uid://dcjvrp86fyhej" path="res://art/ui-ux/dashboard/icon_stage2_packet.png" id="19_icon_packet"]
+[ext_resource type="Texture2D" uid="uid://cjd73nwo61gms" path="res://art/ui-ux/dashboard/icon_stage3_router.png" id="20_icon_router"]
+[ext_resource type="Texture2D" uid="uid://b5ynpfee8uslk" path="res://art/ui-ux/dashboard/btn_play_circle.png" id="21_btn_play"]
+[ext_resource type="Texture2D" uid="uid://dxvgedypa307o" path="res://art/ui-ux/dashboard/btn_chevron_down.png" id="22_btn_chevron"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage1"]
+bg_color = Color(1, 0.847059, 0.690196, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.290196, 0.180392, 0.168627, 0.18)
+shadow_size = 4
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage2"]
+bg_color = Color(1, 0.796078, 0.756863, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.290196, 0.180392, 0.168627, 0.18)
+shadow_size = 4
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage3"]
+bg_color = Color(0.862745, 0.933333, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.290196, 0.180392, 0.168627, 0.18)
+shadow_size = 4
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
+bg_color = Color(0.290196, 0.180392, 0.168627, 0.92)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_btn"]
+bg_color = Color(1, 0.988235, 0.968627, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.290196, 0.180392, 0.168627, 0.12)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[node name="Dashboard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dash_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HeaderContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 58.0
+offset_top = 26.0
+offset_right = 620.0
+offset_bottom = 118.0
+
+[node name="TitleLabel" type="Label" parent="HeaderContainer"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 300.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("3_font_black")
+theme_override_font_sizes/font_size = 46
+text = "PING!"
+
+[node name="SubtitleLabel" type="Label" parent="HeaderContainer"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 56.0
+offset_right = 450.0
+offset_bottom = 86.0
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 18
+text = "Pusat Kendali Teknisi Jaringan"
+
+[node name="BackButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 1170.0
+offset_top = 34.0
+offset_right = 1221.0
+offset_bottom = 78.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_colors/font_hover_color = Color(0.19, 0.12, 0.11, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_back_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back_btn")
+text = "◀"
+
+[node name="Cardatas" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 130.0
+offset_right = 621.0
+offset_bottom = 222.0
+texture = ExtResource("7_cardatas")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="ProfileButton" type="TextureButton" parent="Cardatas"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 7.0
+offset_top = 10.0
+offset_right = 185.0
+offset_bottom = 76.0
+texture_normal = ExtResource("8_cardprofil")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="IconProfil" type="TextureRect" parent="Cardatas/ProfileButton"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+texture = ExtResource("11_vectorprofil")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextVBox" type="VBoxContainer" parent="Cardatas/ProfileButton"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 15.0
+offset_right = 172.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_constants/separation = -2
+
+[node name="LabelTop" type="Label" parent="Cardatas/ProfileButton/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "PROFIL"
+
+[node name="UsernameLabel" type="Label" parent="Cardatas/ProfileButton/TextVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 14
+text = "AKUN"
+
+[node name="StarsButton" type="TextureButton" parent="Cardatas"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 192.0
+offset_top = 10.0
+offset_right = 370.0
+offset_bottom = 76.0
+texture_normal = ExtResource("9_cardbintang")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="IconBintang" type="TextureRect" parent="Cardatas/StarsButton"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+texture = ExtResource("12_vectorbintang")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextVBox" type="VBoxContainer" parent="Cardatas/StarsButton"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 15.0
+offset_right = 170.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_constants/separation = -2
+
+[node name="LabelTop" type="Label" parent="Cardatas/StarsButton/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "BINTANG"
+
+[node name="StarsLabel" type="Label" parent="Cardatas/StarsButton/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 14
+text = "12 / 57"
+
+[node name="SettingsButton" type="TextureButton" parent="Cardatas"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 378.0
+offset_top = 10.0
+offset_right = 556.0
+offset_bottom = 76.0
+texture_normal = ExtResource("10_cardsistem")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="IconSistem" type="TextureRect" parent="Cardatas/SettingsButton"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+texture = ExtResource("13_vectorsistem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextVBox" type="VBoxContainer" parent="Cardatas/SettingsButton"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 15.0
+offset_right = 172.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_constants/separation = -2
+
+[node name="LabelTop" type="Label" parent="Cardatas/SettingsButton/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 12
+text = "SISTEM"
+
+[node name="SettingsLabel" type="Label" parent="Cardatas/SettingsButton/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 12.5
+text = "PENGATURAN"
+
+[node name="GridCards" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CharacterButton" type="TextureButton" parent="GridCards"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 58.0
+offset_top = 240.0
+offset_right = 331.0
+offset_bottom = 403.0
+texture_normal = ExtResource("14_cardkarakter")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="LabelTitle" type="Label" parent="GridCards/CharacterButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 96.0
+offset_right = 260.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 22
+text = "Karakter"
+
+[node name="LabelSub" type="Label" parent="GridCards/CharacterButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 128.0
+offset_right = 260.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 13
+text = "Kustomisasi Teknisi"
+
+[node name="GuidebookButton" type="TextureButton" parent="GridCards"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 348.0
+offset_top = 240.0
+offset_right = 621.0
+offset_bottom = 403.0
+texture_normal = ExtResource("15_cardbukupanduan")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="LabelTitle" type="Label" parent="GridCards/GuidebookButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 96.0
+offset_right = 260.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 22
+text = "Buku Panduan"
+
+[node name="LabelSub" type="Label" parent="GridCards/GuidebookButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 128.0
+offset_right = 260.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 13
+text = "Modul Materi Jaringan"
+
+[node name="LeaderboardButton" type="TextureButton" parent="GridCards"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 58.0
+offset_top = 420.0
+offset_right = 331.0
+offset_bottom = 583.0
+texture_normal = ExtResource("16_gridperingkat")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="LabelTitle" type="Label" parent="GridCards/LeaderboardButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 96.0
+offset_right = 260.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 22
+text = "Papan Peringkat"
+
+[node name="LabelSub" type="Label" parent="GridCards/LeaderboardButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 128.0
+offset_right = 260.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 13
+text = "Rekor Waktu Tercepat"
+
+[node name="PracticeButton" type="TextureButton" parent="GridCards"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 348.0
+offset_top = 420.0
+offset_right = 621.0
+offset_bottom = 583.0
+texture_normal = ExtResource("17_gridlatihan")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="LabelTitle" type="Label" parent="GridCards/PracticeButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 96.0
+offset_right = 260.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 22
+text = "Mode Latihan"
+
+[node name="LabelSub" type="Label" parent="GridCards/PracticeButton"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 128.0
+offset_right = 260.0
+offset_bottom = 152.0
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 13
+text = "Simulasi Bebas Waktu"
+
+[node name="StagesContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Stage1Card" type="PanelContainer" parent="StagesContainer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 658.0
+offset_top = 130.0
+offset_right = 1221.0
+offset_bottom = 258.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage1")
+
+[node name="Content" type="Control" parent="StagesContainer/Stage1Card"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="IconStage1" type="TextureRect" parent="StagesContainer/Stage1Card/Content"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 22.0
+offset_right = 78.0
+offset_bottom = 104.0
+mouse_filter = 2
+texture = ExtResource("18_icon_plug")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="StagesContainer/Stage1Card/Content"]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 20.0
+offset_right = 485.0
+offset_bottom = 108.0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="StagesContainer/Stage1Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 21
+text = "Stage 1: Gudang Hardware"
+
+[node name="Sub1" type="Label" parent="StagesContainer/Stage1Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.270588, 0.254902, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 14
+text = "Physical & Data Link"
+
+[node name="Sub2" type="Label" parent="StagesContainer/Stage1Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 12
+text = "Perakitan Kabel UTP & Switch"
+
+[node name="Stage1PlayButton" type="TextureButton" parent="StagesContainer/Stage1Card/Content"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 496.0
+offset_top = 42.0
+offset_right = 540.0
+offset_bottom = 86.0
+texture_normal = ExtResource("21_btn_play")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Stage2Card" type="PanelContainer" parent="StagesContainer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 658.0
+offset_top = 274.0
+offset_right = 1221.0
+offset_bottom = 402.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage2")
+
+[node name="Content" type="Control" parent="StagesContainer/Stage2Card"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="IconStage2" type="TextureRect" parent="StagesContainer/Stage2Card/Content"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 28.0
+offset_right = 84.0
+offset_bottom = 98.0
+mouse_filter = 2
+texture = ExtResource("19_icon_packet")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="StagesContainer/Stage2Card/Content"]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 20.0
+offset_right = 485.0
+offset_bottom = 108.0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="StagesContainer/Stage2Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 21
+text = "Stage 2: Koridor Server Utama"
+
+[node name="Sub1" type="Label" parent="StagesContainer/Stage2Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.270588, 0.254902, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 14
+text = "Network & Addressing"
+
+[node name="Sub2" type="Label" parent="StagesContainer/Stage2Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 12
+text = "Mekanisme IPv4, Firewall & ARP"
+
+[node name="Stage2PlayButton" type="TextureButton" parent="StagesContainer/Stage2Card/Content"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 496.0
+offset_top = 42.0
+offset_right = 540.0
+offset_bottom = 86.0
+texture_normal = ExtResource("21_btn_play")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Stage3Card" type="PanelContainer" parent="StagesContainer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 658.0
+offset_top = 418.0
+offset_right = 1221.0
+offset_bottom = 546.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage3")
+
+[node name="Content" type="Control" parent="StagesContainer/Stage3Card"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="IconStage3" type="TextureRect" parent="StagesContainer/Stage3Card/Content"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 82.0
+offset_bottom = 106.0
+mouse_filter = 2
+texture = ExtResource("20_icon_router")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBox" type="VBoxContainer" parent="StagesContainer/Stage3Card/Content"]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 20.0
+offset_right = 485.0
+offset_bottom = 108.0
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="StagesContainer/Stage3Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("4_font_extrabold")
+theme_override_font_sizes/font_size = 21
+text = "Stage 3: Ruang Kontrol Subnet"
+
+[node name="Sub1" type="Label" parent="StagesContainer/Stage3Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.360784, 0.270588, 0.254902, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 14
+text = "Subnetting & Routing"
+
+[node name="Sub2" type="Label" parent="StagesContainer/Stage3Card/Content/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.490196, 0.400000, 0.376471, 1)
+theme_override_fonts/font = ExtResource("6_font_semibold")
+theme_override_font_sizes/font_size = 12
+text = "Konfigurasi NetID, CIDR & Tabel Routing"
+
+[node name="Stage3PlayButton" type="TextureButton" parent="StagesContainer/Stage3Card/Content"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 496.0
+offset_top = 42.0
+offset_right = 540.0
+offset_bottom = 86.0
+texture_normal = ExtResource("21_btn_play")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ChevronButton" type="TextureButton" parent="StagesContainer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 907.0
+offset_top = 566.0
+offset_right = 973.0
+offset_bottom = 632.0
+texture_normal = ExtResource("22_btn_chevron")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ToastPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -68.0
+offset_right = 220.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_toast")
+
+[node name="ToastLabel" type="Label" parent="ToastPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("5_font_bold")
+theme_override_font_sizes/font_size = 14
+text = "Pesan Notifikasi"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

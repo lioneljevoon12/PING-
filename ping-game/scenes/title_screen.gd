@@ -122,6 +122,7 @@ func _on_button_clicked(button_name: String) -> void:
 	match button_name:
 		"PLAY":
 			print("Memulai Game untuk user: %s" % PlayerData.current_username)
+			get_tree().change_scene_to_file("res://scenes/dashboard.tscn")
 		"LOG-IN":
 			if auth_modal:
 				auth_modal.open("login")
