@@ -6,7 +6,8 @@ var current_username: String = "Tamu"
 var is_logged_in: bool = false
 
 func _ready() -> void:
-	DisplayServer.screen_set_orientation(DisplayServer.SCREEN_LANDSCAPE)
+	if OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios"):
+		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_LANDSCAPE)
 
 func login(user: String) -> void:
 	if user.strip_edges() != "":

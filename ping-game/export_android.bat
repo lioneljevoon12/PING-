@@ -4,23 +4,14 @@ echo ===================================================
 echo   PING! - Android APK Export Script
 echo ===================================================
 
-set "GODOT_BIN=C:\Users\ASUS\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe"
-set "JAVA_HOME=C:\Program Files\Android\Android Studio\jbr"
-set "ANDROID_HOME=C:\Users\ASUS\AppData\Local\Android\Sdk"
-set "PATH=%JAVA_HOME%\bin;%ANDROID_HOME%\platform-tools;%PATH%"
-
-if not exist "build\android" (
-    mkdir "build\android"
-)
-
-echo [1/2] Menyiapkan environment & mengekspor APK...
-"%GODOT_BIN%" --headless --export-debug "Android" "build/android/ping-game.apk"
+cd /d "%~dp0"
+python "%~dp0..\..\Users\ASUS\.gemini\antigravity\brain\287da06b-d551-4e51-abda-63eb9590f470\scratch\export_and_copy.py"
 
 if %ERRORLEVEL% equ 0 (
     echo.
     echo ===================================================
-    echo   [SUKSES] APK Berhasil dibuat!
-    echo   Lokasi: %CD%\build\android\ping-game.apk
+    echo   [SUKSES] APK Berhasil dibuat dan disalin!
+    echo   Lokasi: %~dp0..\ping-game.apk
     echo ===================================================
 ) else (
     echo.

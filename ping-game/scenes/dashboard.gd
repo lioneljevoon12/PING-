@@ -12,6 +12,7 @@ extends Control
 @onready var guidebook_btn: TextureButton = %GuidebookButton
 @onready var leaderboard_btn: TextureButton = %LeaderboardButton
 @onready var practice_btn: TextureButton = %PracticeButton
+@onready var guidebook_modal: Control = %GuidebookModal
 
 # Stage buttons
 @onready var stage1_card: PanelContainer = %Stage1Card
@@ -60,7 +61,10 @@ func _ready() -> void:
 		_setup_button(back_btn, _on_back_pressed)
 		
 	_setup_button(character_btn, func(): show_toast("Karakter: Kustomisasi Teknisi segera hadir!"))
-	_setup_button(guidebook_btn, func(): show_toast("Buku Panduan: Modul Materi Jaringan terbuka!"))
+	_setup_button(guidebook_btn, func():
+		if guidebook_modal:
+			guidebook_modal.open()
+	)
 	_setup_button(leaderboard_btn, func(): show_toast("Papan Peringkat: Memuat rekor tercepat..."))
 	_setup_button(practice_btn, func(): show_toast("Mode Latihan: Simulasi bebas waktu dimulai!"))
 	
