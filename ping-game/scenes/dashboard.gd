@@ -68,9 +68,9 @@ func _ready() -> void:
 	_setup_button(leaderboard_btn, func(): show_toast("Papan Peringkat: Memuat rekor tercepat..."))
 	_setup_button(practice_btn, func(): show_toast("Mode Latihan: Simulasi bebas waktu dimulai!"))
 	
-	_setup_stage_card(stage1_card, stage1_play_btn, "Stage 1: Gudang Hardware")
-	_setup_stage_card(stage2_card, stage2_play_btn, "Stage 2: Koridor Server Utama")
-	_setup_stage_card(stage3_card, stage3_play_btn, "Stage 3: Ruang Kontrol Subnet")
+	_setup_stage_card(stage1_card, stage1_play_btn, 1, "Stage 1: Gudang Hardware")
+	_setup_stage_card(stage2_card, stage2_play_btn, 2, "Stage 2: Koridor Server Utama")
+	_setup_stage_card(stage3_card, stage3_play_btn, 3, "Stage 3: Ruang Kontrol Subnet")
 	
 	_setup_button(chevron_btn, func(): show_toast("Menampilkan stage berikutnya..."))
 
@@ -119,7 +119,7 @@ func _setup_button(btn: Control, on_click: Callable) -> void:
 		)
 		btn.pressed.connect(on_click)
 
-func _setup_stage_card(card: PanelContainer, play_btn: TextureButton, stage_name: String) -> void:
+func _setup_stage_card(card: PanelContainer, play_btn: TextureButton, stage_id: int, stage_name: String) -> void:
 	if not card:
 		return
 		
@@ -127,11 +127,15 @@ func _setup_stage_card(card: PanelContainer, play_btn: TextureButton, stage_name
 	
 	var on_select = func():
 		play_sfx(784.0) # G5 note
-		show_toast("Memilih %s..." % stage_name)
 		# Pulse animation on card
 		var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(card, "scale", Vector2(1.03, 1.03), 0.1)
+		t.tween_property(card, "scale", Vector2(1.04, 1.04), 0.1)
 		t.tween_property(card, "scale", Vector2(1.0, 1.0), 0.1)
+		t.chain().tween_callback(func():
+			if PlayerData:
+				PlayerData.current_stage = stage_id
+			get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+		)
 		
 	card.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
