@@ -33,6 +33,13 @@ func _ready() -> void:
 	# Greeting badge click to log in
 	if greeting_badge:
 		greeting_badge.gui_input.connect(_on_greeting_badge_gui_input)
+		
+	if "--screenshot-title" in OS.get_cmdline_args():
+		await get_tree().process_frame
+		await get_tree().create_timer(0.2).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/title_render.png")
+		get_tree().quit()
 
 func _update_greeting(username: String) -> void:
 	if user_greeting_label:

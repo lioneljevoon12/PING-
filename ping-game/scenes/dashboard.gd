@@ -46,6 +46,10 @@ func _ready() -> void:
 		toast_panel.modulate.a = 0.0
 		toast_panel.scale = Vector2(0.9, 0.9)
 		
+	# Responsive layout centering
+	_reposition_responsive()
+	get_viewport().size_changed.connect(_reposition_responsive)
+	
 	if "--screenshot" in OS.get_cmdline_args():
 		await get_tree().process_frame
 		await get_tree().process_frame
@@ -208,3 +212,23 @@ func play_sfx(freq: float) -> void:
 	stream.data = data
 	audio_player.stream = stream
 	audio_player.play()
+
+func _reposition_responsive() -> void:
+	var screen_w = get_viewport_rect().size.x
+	var content_w = 1163.0
+	var target_left = max(24.0, (screen_w - content_w) / 2.0)
+	var dx = target_left - 58.0
+	
+	if has_node("HeaderContainer"):
+		$HeaderContainer.position.x = 58.0 + dx
+	if has_node("Cardatas"):
+		$Cardatas.position.x = 58.0 + dx
+	if has_node("GridCards"):
+		$GridCards.position.x = dx
+	if has_node("StagesContainer"):
+		$StagesContainer.position.x = dx
+	if back_btn:
+		back_btn.position.x = screen_w - back_btn.size.x - 36.0
+	if toast_panel:
+		toast_panel.position.x = (screen_w - toast_panel.size.x) / 2.0
+

@@ -24,7 +24,7 @@ var tex_router: Texture2D = preload("res://art/assets/PING! Assets/Character/mai
 var tex_star_gold: Texture2D = preload("res://art/ui-ux/levelpath/star_gold.png")
 var tex_star_gray: Texture2D = preload("res://art/ui-ux/levelpath/star_gray.png")
 var tex_alert: Texture2D = preload("res://art/ui-ux/levelpath/crisp_alert.png")
-var tex_desk: Texture2D = preload("res://art/ui-ux/levelpath/crisp_desk.png")
+var tex_desk: Texture2D = preload("res://art/ui-ux/levelpath/desk_station_new.png")
 
 var font_black: Font = preload("res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf")
 var font_extrabold: Font = preload("res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf")
@@ -34,6 +34,13 @@ var font_semibold: Font = preload("res://art/assets/PING! Assets/Fonts/Nunito-Se
 # Stage data
 var current_stage: int = 1
 var selected_level_index: int = 0
+var current_char_desk_idx: int = 0
+var is_walking: bool = false
+var walk_anim_timer: float = 0.0
+var walk_frames: Array[Texture2D] = []
+var step_timer: float = 0.0
+var step_toggle: bool = false
+var footstep_player: AudioStreamPlayer = null
 var time_passed: float = 0.0
 var active_alert_node: TextureRect = null
 var char_tween: Tween
@@ -66,24 +73,27 @@ var stages_info: Dictionary = {
 		"levels": [
 			{
 				"num": 1,
-				"name": "Kabel UTP & Konektor RJ-45",
-				"desc": "Kenali struktur 8 pin kawat tembaga kabel LAN dan fungsinya untuk mentransmisikan bit data digital secara handal.",
-				"target": "Identifikasi urutan kabel dan pinout RJ-45",
-				"char_offset": Vector2(-50, 40)
+				"tag": "1.1",
+				"name": "Kabel Straight vs Cross",
+				"desc": "Fokus pada infrastruktur fisik. Pemain belajar membedakan kabel Straight dan Cross untuk menghubungkan perangkat jaringan yang tepat.",
+				"target": "Identifikasi perbedaan kabel Straight dan Cross",
+				"char_offset": Vector2(-55, 35)
 			},
 			{
 				"num": 2,
-				"name": "Standar Pengkabelan T568B",
-				"desc": "Susun urutan warna standar EIA/TIA-568B: Putih-Oranye, Oranye, Putih-Hijau, Biru, Putih-Biru, Hijau, Putih-Cokelat, Cokelat.",
-				"target": "Selesaikan susunan 8 pin warna tanpa salah",
-				"char_offset": Vector2(-50, 40)
+				"tag": "1.2",
+				"name": "Perakitan Pin TIA/EIA 568A/B",
+				"desc": "Merakit urutan pin warna standar TIA/EIA 568A/B dengan batasan waktu untuk memastikan kualitas transmisi data.",
+				"target": "Rakit 8 pin warna kabel standar TIA/EIA tepat waktu",
+				"char_offset": Vector2(-55, 35)
 			},
 			{
 				"num": 3,
-				"name": "Praktik Crimping Mandiri",
-				"desc": "Kupas jaket kabel, ratakan ujung kawat, dorong ke pin konektor, lalu kunci rapat dengan tang crimping!",
-				"target": "Rakit kabel Straight & Crossover yang berfungsi 100%",
-				"char_offset": Vector2(-50, 40)
+				"tag": "1.3",
+				"name": "Switch vs Hub (Anti-Collision)",
+				"desc": "Memilih penggunaan Switch ketimbang Hub untuk merutekan paket data Unicast agar terhindar dari Collision pada jaringan.",
+				"target": "Rutekan paket Unicast via Switch tanpa collision",
+				"char_offset": Vector2(-55, 35)
 			}
 		]
 	},
@@ -94,24 +104,27 @@ var stages_info: Dictionary = {
 		"levels": [
 			{
 				"num": 1,
-				"name": "Struktur IPv4 & 4 Oktet",
-				"desc": "Pelajari format 32-bit IPv4 yang terbagi menjadi 4 oktet desimal (0-255) serta Network ID dan Host ID.",
-				"target": "Pahami pembagian Network ID dan Host ID",
-				"char_offset": Vector2(-50, 40)
+				"tag": "2.1",
+				"name": "Klasifikasi Kelas IPv4",
+				"desc": "Fokus pada pemahaman IP Address. Pemain menyortir masuknya alamat IPv4 ke kelas A, B, atau C secara akurat.",
+				"target": "Sortir paket alamat IPv4 ke kelas A, B, atau C",
+				"char_offset": Vector2(-55, 35)
 			},
 			{
 				"num": 2,
-				"name": "Klasifikasi Kelas IP (A, B, C)",
-				"desc": "Kelompokkan alamat IP privat dan publik untuk jaringan lokal kantor dan koneksi internet publik.",
-				"target": "Tentukan subnet mask default tiap kelas IP",
-				"char_offset": Vector2(-50, 40)
+				"tag": "2.2",
+				"name": "Firewall Manual: IP Publik vs Privat",
+				"desc": "Bertindak sebagai Firewall manual untuk memblokir IP Publik berbahaya dan mengizinkan aliran IP Privat aman.",
+				"target": "Blokir IP Publik berbahaya & izinkan IP Privat",
+				"char_offset": Vector2(-55, 35)
 			},
 			{
 				"num": 3,
-				"name": "Default Gateway & NAT",
-				"desc": "Konfigurasi router gateway untuk menerjemahkan IP privat lokal menjadi IP publik resmi.",
-				"target": "Kirim paket uji coba PING ke server gateway",
-				"char_offset": Vector2(-50, 40)
+				"tag": "2.3",
+				"name": "Protokol ARP: Request & Reply",
+				"desc": "Mengawal langsung perjalanan amplop bersayap (ARP-Request) dan menuntun balasan MAC-Address (ARP-Reply) ke perangkat tujuan.",
+				"target": "Kawal ARP-Request dan tuntun balasan ARP-Reply",
+				"char_offset": Vector2(-55, 35)
 			}
 		]
 	},
@@ -206,7 +219,16 @@ func _ready() -> void:
 	if current_stage < 1 or current_stage > 5:
 		current_stage = 1
 		
-	character_mascot.texture = tex_router
+	footstep_player = AudioStreamPlayer.new()
+	footstep_player.name = "FootstepPlayer"
+	footstep_player.volume_db = -9.0
+	add_child(footstep_player)
+	
+	_load_walk_frames()
+	if walk_frames.size() > 0:
+		character_mascot.texture = walk_frames[0]
+	else:
+		character_mascot.texture = tex_router
 	
 	_build_header_ui()
 	_build_desks()
@@ -216,15 +238,20 @@ func _ready() -> void:
 	
 	load_stage(current_stage)
 	
+	# Responsive layout centering
+	_reposition_responsive()
+	get_viewport().size_changed.connect(_reposition_responsive)
+	
 	# Screenshot helper for visual testing
-	if "--screenshot-levelpath" in OS.get_cmdline_args():
+	var all_args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	if "--screenshot-levelpath" in all_args:
 		await get_tree().process_frame
 		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
 		img.save_png("art/levelpath_render.png")
 		get_tree().quit()
 		
-	if "--screenshot-levelmodal" in OS.get_cmdline_args():
+	if "--screenshot-levelmodal" in all_args:
 		await get_tree().process_frame
 		await get_tree().create_timer(0.2).timeout
 		open_level_modal(1, 1)
@@ -233,13 +260,41 @@ func _ready() -> void:
 		img.save_png("art/levelmodal_render.png")
 		get_tree().quit()
 		
-	if "--screenshot-stage2" in OS.get_cmdline_args():
+	if "--screenshot-stage2" in all_args:
 		await get_tree().process_frame
 		load_stage(2)
 		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
 		img.save_png("art/stage2_render.png")
 		get_tree().quit()
+
+	if "--screenshot-walk" in all_args:
+		await get_tree().process_frame
+		await get_tree().create_timer(0.2).timeout
+		# Simulate clicking desk 2 (1.2) so it starts walking
+		_on_desk_clicked(1)
+		await get_tree().create_timer(0.45).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/walk_render.png")
+		get_tree().quit()
+
+	if "--screenshot-walk-arrive" in all_args:
+		await get_tree().process_frame
+		await get_tree().create_timer(0.2).timeout
+		_on_desk_clicked(1)
+		await get_tree().create_timer(1.8).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/walk_arrive_render.png")
+		get_tree().quit()
+
+func _load_walk_frames() -> void:
+	walk_frames.clear()
+	for i in range(1, 33):
+		var path = "res://art/assets/PING! Assets/Sprite animation/router walk/%d.png" % i
+		if ResourceLoader.exists(path):
+			var tex = load(path)
+			if tex:
+				walk_frames.append(tex)
 
 func _process(delta: float) -> void:
 	time_passed += delta
@@ -248,9 +303,21 @@ func _process(delta: float) -> void:
 		active_alert_node.position.y = -10.0 + sin(time_passed * 5.0) * 5.0
 		active_alert_node.scale = Vector2.ONE * (1.0 + sin(time_passed * 3.5) * 0.06)
 		
-	# Subtle breathing bob on character mascot
-	if character_mascot:
-		character_mascot.scale.y = 1.0 + sin(time_passed * 3.0) * 0.04
+	if is_walking:
+		if walk_frames.size() > 0:
+			walk_anim_timer += delta * 24.0
+			var frame_idx = int(walk_anim_timer) % walk_frames.size()
+			character_mascot.texture = walk_frames[frame_idx]
+			
+		step_timer += delta
+		if step_timer >= 0.16:
+			step_timer = 0.0
+			step_toggle = !step_toggle
+			_play_step_sfx(step_toggle)
+	else:
+		# Subtle breathing bob on character mascot when idle
+		if character_mascot:
+			character_mascot.scale.y = 1.0 + sin(time_passed * 3.0) * 0.04
 
 func load_stage(stage_num: int) -> void:
 	current_stage = clamp(stage_num, 1, 5)
@@ -267,7 +334,7 @@ func load_stage(stage_num: int) -> void:
 	stage_subtitle_label.text = s_data["subtitle"]
 	
 	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 1
-	level_fraction_label.text = "%d / 3" % unlocked_lvl
+	level_fraction_label.text = "%d.%d / %d.3" % [current_stage, unlocked_lvl, current_stage]
 	
 	# Update 3 Desks
 	active_alert_node = null
@@ -277,8 +344,8 @@ func load_stage(stage_num: int) -> void:
 		var is_unlocked = (lvl_num <= unlocked_lvl)
 		var stars_count = PlayerData.get_level_stars(current_stage, lvl_num) if PlayerData else 0
 		
-		# Number label
-		desk_dict["num_label"].text = str(lvl_num)
+		# Number label: Stage.Level e.g. 1.1, 1.2, 1.3 or 2.1, 2.2, 2.3
+		desk_dict["num_label"].text = "%d.%d" % [current_stage, lvl_num]
 		
 		# Stars
 		for s in range(3):
@@ -307,7 +374,11 @@ func load_stage(stage_num: int) -> void:
 	var target_desk_idx = clamp(unlocked_lvl - 1, 0, 2)
 	_move_character_to_desk(target_desk_idx, false)
 
-func _move_character_to_desk(desk_idx: int, animate: bool = true) -> void:
+func _move_character_to_desk(desk_idx: int, animate: bool = false) -> void:
+	if desk_idx < 0 or desk_idx >= desk_nodes.size():
+		return
+	current_char_desk_idx = desk_idx
+	selected_level_index = desk_idx
 	var desk_node = desk_nodes[desk_idx]
 	var s_data = stages_info[current_stage]
 	var char_offset = s_data["levels"][desk_idx].get("char_offset", Vector2(-50, 40))
@@ -315,6 +386,12 @@ func _move_character_to_desk(desk_idx: int, animate: bool = true) -> void:
 	
 	if char_tween and char_tween.is_valid():
 		char_tween.kill()
+		
+	is_walking = false
+	if walk_frames.size() > 0:
+		character_mascot.texture = walk_frames[0]
+	else:
+		character_mascot.texture = tex_router
 		
 	if animate:
 		play_synth_hop()
@@ -330,8 +407,83 @@ func _move_character_to_desk(desk_idx: int, animate: bool = true) -> void:
 		hop_tween.chain().tween_property(character_mascot, "scale", Vector2(1.0, 1.0), 0.12)
 	else:
 		character_mascot.position = target_pos
+		character_mascot.scale = Vector2(1.0, 1.0)
+
+func _walk_character_to_desk(target_desk_idx: int, on_arrived: Callable = Callable()) -> void:
+	if is_walking:
+		return
+	if target_desk_idx == current_char_desk_idx:
+		if on_arrived.is_valid():
+			on_arrived.call()
+		return
+		
+	var start_idx = current_char_desk_idx
+	var waypoints: Array[int] = []
+	
+	# Determine intermediate waypoints along the level path
+	if abs(target_desk_idx - start_idx) == 2:
+		# Always pass through desk 1 when traveling between 0 and 2
+		waypoints.append(1)
+		waypoints.append(target_desk_idx)
+	else:
+		waypoints.append(target_desk_idx)
+		
+	is_walking = true
+	walk_anim_timer = 0.0
+	step_timer = 0.0
+	
+	if char_tween and char_tween.is_valid():
+		char_tween.kill()
+		
+	char_tween = create_tween()
+	var s_data = stages_info[current_stage]
+	var prev_pos = desk_nodes[start_idx].position + s_data["levels"][start_idx].get("char_offset", Vector2(-50, 40))
+	
+	for wp_idx in waypoints:
+		var desk_node = desk_nodes[wp_idx]
+		var char_offset = s_data["levels"][wp_idx].get("char_offset", Vector2(-50, 40))
+		var wp_target_pos = desk_node.position + char_offset
+		
+		var moving_right = (wp_target_pos.x >= prev_pos.x)
+		var flip_dir = 1.0 if moving_right else -1.0
+		var dist = prev_pos.distance_to(wp_target_pos)
+		var seg_duration = clamp(dist / 360.0, 0.45, 1.4)
+		
+		# Set facing direction at start of this segment
+		char_tween.tween_callback((func(d: float):
+			character_mascot.scale.x = d
+		).bind(flip_dir))
+		
+		# Move along path to waypoint
+		char_tween.tween_property(character_mascot, "position", wp_target_pos, seg_duration).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+		prev_pos = wp_target_pos
+		
+	# On complete traversal and arrival
+	char_tween.tween_callback(func():
+		is_walking = false
+		current_char_desk_idx = target_desk_idx
+		selected_level_index = target_desk_idx
+		if walk_frames.size() > 0:
+			character_mascot.texture = walk_frames[0]
+		character_mascot.scale = Vector2(1.0, 1.0)
+		
+		# Celebration bounce & arrival chime
+		_play_sweep(659.25, 880.0, 0.12, 0.18)
+		var arr_tween = create_tween()
+		arr_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		arr_tween.tween_property(character_mascot, "scale", Vector2(1.15, 0.85), 0.08)
+		arr_tween.chain().tween_property(character_mascot, "scale", Vector2(0.9, 1.15), 0.12)
+		arr_tween.chain().tween_property(character_mascot, "scale", Vector2(1.0, 1.0), 0.1)
+		
+		# User requirement: "karakter harus jalan dulu baru ada notifnya"
+		if on_arrived.is_valid():
+			on_arrived.call()
+	)
 
 func _on_desk_clicked(desk_idx: int) -> void:
+	if is_walking:
+		return
+		
 	var lvl_num = desk_idx + 1
 	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 1
 	
@@ -345,19 +497,31 @@ func _on_desk_clicked(desk_idx: int) -> void:
 		shake.chain().tween_property(desk_node, "position:x", orig_x + 8.0, 0.06)
 		shake.chain().tween_property(desk_node, "position:x", orig_x - 4.0, 0.05)
 		shake.chain().tween_property(desk_node, "position:x", orig_x, 0.04)
-		show_toast("Level %d masih terkunci! Selesaikan Level %d terlebih dahulu." % [lvl_num, lvl_num - 1])
+		show_toast("Level %d.%d masih terkunci! Selesaikan Level %d.%d terlebih dahulu." % [current_stage, lvl_num, current_stage, lvl_num - 1])
 		return
 		
-	# Unlocked! Move character and open modal
-	selected_level_index = desk_idx
-	_move_character_to_desk(desk_idx, true)
-	open_level_modal(current_stage, lvl_num)
+	# Unlocked desk!
+	if current_char_desk_idx == desk_idx:
+		# Already here! Quick hop and open modal
+		selected_level_index = desk_idx
+		play_synth_hop()
+		var hop = create_tween()
+		hop.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		hop.tween_property(character_mascot, "scale", Vector2(1.15, 0.85), 0.08)
+		hop.chain().tween_property(character_mascot, "scale", Vector2(0.9, 1.15), 0.12)
+		hop.chain().tween_property(character_mascot, "scale", Vector2(1.0, 1.0), 0.1)
+		hop.chain().tween_callback(func(): open_level_modal(current_stage, lvl_num))
+	else:
+		# Walk to desk first, and ONLY open modal once arrived!
+		_walk_character_to_desk(desk_idx, func():
+			open_level_modal(current_stage, lvl_num)
+		)
 
 func open_level_modal(stage_num: int, level_num: int) -> void:
 	play_synth_chime([523.25, 659.25, 783.99], 0.08)
 	var lvl_data = stages_info[stage_num]["levels"][level_num - 1]
 	
-	modal_stage_tag.text = "STAGE %d • LEVEL %d" % [stage_num, level_num]
+	modal_stage_tag.text = "STAGE %d • LEVEL %d.%d" % [stage_num, stage_num, level_num]
 	modal_level_title.text = lvl_data["name"]
 	modal_desc_label.text = lvl_data["desc"]
 	modal_target_label.text = "🎯 " + lvl_data["target"]
@@ -394,7 +558,7 @@ func close_level_modal() -> void:
 func _start_selected_level() -> void:
 	play_synth_chime([523.25, 659.25, 1046.5], 0.1)
 	close_level_modal()
-	show_toast("Memulai Stage %d Level %d: Menyiapkan simulasi jaringan..." % [current_stage, selected_level_index + 1])
+	show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
 
 # --- UI BUILDERS ---
 
@@ -513,44 +677,44 @@ func _build_desks() -> void:
 		desk_btn.texture_normal = tex_desk
 		desk_btn.ignore_texture_size = true
 		desk_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		desk_btn.size = Vector2(160, 120)
-		desk_btn.pivot_offset = Vector2(80, 60)
+		desk_btn.size = Vector2(180, 126)
+		desk_btn.pivot_offset = Vector2(90, 63)
 		desk_node.add_child(desk_btn)
 		
 		var desk_idx = i
 		desk_btn.pressed.connect(func(): _on_desk_clicked(desk_idx))
 		_setup_hover_scale(desk_btn, 1.08)
 		
-		# Number Badge (Pill with Number "1", "2", "3")
+		# Number Badge (Pill with Number "1.1", "1.2", "1.3" / "2.1", etc.)
 		var num_badge = PanelContainer.new()
-		num_badge.size = Vector2(36, 36)
-		num_badge.position = Vector2(62, 30)
+		num_badge.size = Vector2(48, 30)
+		num_badge.position = Vector2(66, 26)
 		num_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
 		var sb_num = StyleBoxFlat.new()
 		sb_num.bg_color = Color("#ea580c")
 		sb_num.border_color = Color("#ffffff")
 		sb_num.set_border_width_all(2)
-		sb_num.set_corner_radius_all(18)
+		sb_num.set_corner_radius_all(15)
 		sb_num.shadow_color = Color(0, 0, 0, 0.25)
 		sb_num.shadow_size = 4
 		sb_num.shadow_offset = Vector2(0, 2)
 		num_badge.add_theme_stylebox_override("panel", sb_num)
 		
 		var num_lbl = Label.new()
-		num_lbl.text = str(i + 1)
+		num_lbl.text = "%d.%d" % [current_stage, i + 1]
 		num_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		num_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		num_lbl.add_theme_font_override("font", font_black)
-		num_lbl.add_theme_font_size_override("font_size", 18)
+		num_lbl.add_theme_font_size_override("font_size", 14)
 		num_lbl.add_theme_color_override("font_color", Color("#ffffff"))
 		num_badge.add_child(num_lbl)
 		desk_node.add_child(num_badge)
 		
 		# Lock Badge (shown when level is locked)
 		var lock_badge = PanelContainer.new()
-		lock_badge.size = Vector2(36, 36)
-		lock_badge.position = Vector2(62, 30)
+		lock_badge.size = Vector2(48, 30)
+		lock_badge.position = Vector2(66, 26)
 		lock_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		lock_badge.visible = false
 		
@@ -558,14 +722,14 @@ func _build_desks() -> void:
 		sb_lock.bg_color = Color("#475569")
 		sb_lock.border_color = Color("#94a3b8")
 		sb_lock.set_border_width_all(2)
-		sb_lock.set_corner_radius_all(18)
+		sb_lock.set_corner_radius_all(15)
 		lock_badge.add_theme_stylebox_override("panel", sb_lock)
 		
 		var lock_lbl = Label.new()
 		lock_lbl.text = "🔒"
 		lock_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lock_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		lock_lbl.add_theme_font_size_override("font_size", 16)
+		lock_lbl.add_theme_font_size_override("font_size", 15)
 		lock_badge.add_child(lock_lbl)
 		desk_node.add_child(lock_badge)
 		
@@ -573,7 +737,7 @@ func _build_desks() -> void:
 		var alert_rect = TextureRect.new()
 		alert_rect.texture = tex_alert
 		alert_rect.size = Vector2(44, 44)
-		alert_rect.position = Vector2(115, -10)
+		alert_rect.position = Vector2(130, -12)
 		alert_rect.pivot_offset = Vector2(22, 22)
 		alert_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		alert_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -583,7 +747,7 @@ func _build_desks() -> void:
 		
 		# Stars Box (3 stars underneath table)
 		var stars_row = HBoxContainer.new()
-		stars_row.position = Vector2(35, 116)
+		stars_row.position = Vector2(45, 126)
 		stars_row.size = Vector2(90, 22)
 		stars_row.alignment = BoxContainer.ALIGNMENT_CENTER
 		stars_row.add_theme_constant_override("separation", 4)
@@ -908,3 +1072,67 @@ func _play_sweep(start_f: float, end_f: float, duration: float, volume: float) -
 	stream.data = data
 	audio_player.stream = stream
 	audio_player.play()
+
+func _play_step_sfx(pitch_high: bool) -> void:
+	if not footstep_player:
+		return
+	var sample_rate = 22050
+	var duration = 0.035
+	var num_samples = int(sample_rate * duration)
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.stereo = false
+	
+	var freq = 680.0 if pitch_high else 540.0
+	var data = PackedByteArray()
+	data.resize(num_samples * 2)
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var envelope = exp(-t * 90.0)
+		var val = sin(t * freq * TAU) * envelope * 0.15
+		var int_val = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, int_val)
+	stream.data = data
+	footstep_player.stream = stream
+	footstep_player.play()
+
+func _reposition_responsive() -> void:
+	var screen_w = get_viewport_rect().size.x
+	var center_x = screen_w / 2.0
+	
+	# Center DoorArch horizontally
+	if door_arch:
+		door_arch.position = Vector2(center_x - 164.0, 46.0)
+		door_arch.size = Vector2(328.0, 200.0)
+		
+	# Position Potted Plant next to DoorArch
+	if potted_plant:
+		potted_plant.position = Vector2(center_x + 180.0, 70.0)
+		potted_plant.size = Vector2(120.0, 180.0)
+		potted_plant.pivot_offset = Vector2(60, 150)
+		
+	# Reposition Desks spread across the center
+	if desk_nodes.size() > 0 and desk_nodes[0]:
+		desk_nodes[0].position = Vector2(center_x - 560.0, 460.0)
+		desk_nodes[0].size = Vector2(180.0, 126.0)
+	if desk_nodes.size() > 1 and desk_nodes[1]:
+		desk_nodes[1].position = Vector2(center_x - 90.0, 460.0)
+		desk_nodes[1].size = Vector2(180.0, 126.0)
+	if desk_nodes.size() > 2 and desk_nodes[2]:
+		desk_nodes[2].position = Vector2(center_x + 390.0, 210.0)
+		desk_nodes[2].size = Vector2(180.0, 126.0)
+		
+	# Dynamic connecting path line
+	if path_line and desk_nodes.size() >= 3:
+		path_line.visible = true
+		var p1 = desk_nodes[0].position + Vector2(90.0, 63.0)
+		var p2 = desk_nodes[1].position + Vector2(90.0, 63.0)
+		var p3 = desk_nodes[2].position + Vector2(90.0, 63.0)
+		var p_door = door_arch.position + Vector2(164.0, 140.0)
+		path_line.points = PackedVector2Array([p1, p2, p3, p_door])
+		
+	# Move mascot to active selected desk
+	if not is_walking:
+		_move_character_to_desk(selected_level_index, false)
+
