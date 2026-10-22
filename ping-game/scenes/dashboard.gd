@@ -231,4 +231,3 @@ func _reposition_responsive() -> void:
 		back_btn.position.x = screen_w - back_btn.size.x - 36.0
 	if toast_panel:
 		toast_panel.position.x = (screen_w - toast_panel.size.x) / 2.0
-

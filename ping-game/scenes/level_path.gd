@@ -77,7 +77,7 @@ var stages_info: Dictionary = {
 				"name": "Kabel Straight vs Cross",
 				"desc": "Fokus pada infrastruktur fisik. Pemain belajar membedakan kabel Straight dan Cross untuk menghubungkan perangkat jaringan yang tepat.",
 				"target": "Identifikasi perbedaan kabel Straight dan Cross",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
@@ -85,7 +85,7 @@ var stages_info: Dictionary = {
 				"name": "Perakitan Pin TIA/EIA 568A/B",
 				"desc": "Merakit urutan pin warna standar TIA/EIA 568A/B dengan batasan waktu untuk memastikan kualitas transmisi data.",
 				"target": "Rakit 8 pin warna kabel standar TIA/EIA tepat waktu",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
@@ -93,7 +93,7 @@ var stages_info: Dictionary = {
 				"name": "Switch vs Hub (Anti-Collision)",
 				"desc": "Memilih penggunaan Switch ketimbang Hub untuk merutekan paket data Unicast agar terhindar dari Collision pada jaringan.",
 				"target": "Rutekan paket Unicast via Switch tanpa collision",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			}
 		]
 	},
@@ -108,7 +108,7 @@ var stages_info: Dictionary = {
 				"name": "Klasifikasi Kelas IPv4",
 				"desc": "Fokus pada pemahaman IP Address. Pemain menyortir masuknya alamat IPv4 ke kelas A, B, atau C secara akurat.",
 				"target": "Sortir paket alamat IPv4 ke kelas A, B, atau C",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
@@ -116,7 +116,7 @@ var stages_info: Dictionary = {
 				"name": "Firewall Manual: IP Publik vs Privat",
 				"desc": "Bertindak sebagai Firewall manual untuk memblokir IP Publik berbahaya dan mengizinkan aliran IP Privat aman.",
 				"target": "Blokir IP Publik berbahaya & izinkan IP Privat",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
@@ -124,7 +124,7 @@ var stages_info: Dictionary = {
 				"name": "Protokol ARP: Request & Reply",
 				"desc": "Mengawal langsung perjalanan amplop bersayap (ARP-Request) dan menuntun balasan MAC-Address (ARP-Reply) ke perangkat tujuan.",
 				"target": "Kawal ARP-Request dan tuntun balasan ARP-Reply",
-				"char_offset": Vector2(-55, 35)
+				"char_offset": Vector2(-85, 20)
 			}
 		]
 	},
@@ -138,21 +138,21 @@ var stages_info: Dictionary = {
 				"name": "Prefix CIDR & Subnet Mask",
 				"desc": "Hitung jumlah host valid dan network range menggunakan notasi CIDR /24 hingga /30 secara efisien.",
 				"target": "Hitung alokasi IP efisien untuk 3 divisi lab",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
 				"name": "Tabel Routing Statis",
 				"desc": "Konfigurasi rute statis (next-hop IP) agar router dapat meneruskan paket ke subnet tujuan tanpa loop.",
 				"target": "Bangun rute jalur koneksi antar switch & router",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
 				"name": "Simulasi Pengiriman Paket (PING)",
 				"desc": "Kirim paket ICMP echo request dan analisis latency (RTT) serta hop count antar router.",
 				"target": "Pastikan status: PING SUCCESS! (0% packet loss)",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			}
 		]
 	},
@@ -166,21 +166,21 @@ var stages_info: Dictionary = {
 				"name": "Topologi Jaringan (Star vs Mesh)",
 				"desc": "Bandingkan kelebihan topologi Star dengan switch pusat versus redundant Mesh topology tahan kendala.",
 				"target": "Rancang topologi tahan toleransi kegagalan link",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
 				"name": "VLAN & Switch Port Security",
 				"desc": "Pisahkan traffic jaringan per departemen secara logis menggunakan 802.1Q Virtual LAN.",
 				"target": "Atur Access Port dan Trunk Port pada switch",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
 				"name": "Backbone Fiber Optik & SFP",
 				"desc": "Gunakan kabel serat optik untuk transmisi data kecepatan gigabit antar gedung kampus.",
 				"target": "Pasang modul transceiver SFP dan verifikasi link",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			}
 		]
 	},
@@ -194,21 +194,21 @@ var stages_info: Dictionary = {
 				"name": "Model 7 Lapisan OSI Layer",
 				"desc": "Petakan protokol dari Physical, Data Link, Network, Transport, Session, Presentation, hingga Application.",
 				"target": "Cocokkan protokol dengan lapisan yang tepat",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
 				"name": "Protokol TCP vs UDP",
 				"desc": "Pahami perbedaan handshaking 3 arah (SYN-ACK) TCP dengan transmisi cepat UDP tanpa koneksi.",
 				"target": "Pilih protokol yang sesuai untuk Web, Video, dan DNS",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
 				"name": "Troubleshooting & Analisis Paket",
 				"desc": "Inspeksi paket header, temukan paket korup, dan selesaikan tantangan akhir master teknisi PING!",
 				"target": "Dapatkan sertifikasi Teknisi Jaringan Handal!",
-				"char_offset": Vector2(-50, 40)
+				"char_offset": Vector2(-85, 20)
 			}
 		]
 	}
@@ -558,7 +558,10 @@ func close_level_modal() -> void:
 func _start_selected_level() -> void:
 	play_synth_chime([523.25, 659.25, 1046.5], 0.1)
 	close_level_modal()
-	show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
+	if current_stage == 1 and selected_level_index == 0:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_1_1.tscn")
+	else:
+		show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
 
 # --- UI BUILDERS ---
 
@@ -1123,14 +1126,9 @@ func _reposition_responsive() -> void:
 		desk_nodes[2].position = Vector2(center_x + 390.0, 210.0)
 		desk_nodes[2].size = Vector2(180.0, 126.0)
 		
-	# Dynamic connecting path line
-	if path_line and desk_nodes.size() >= 3:
-		path_line.visible = true
-		var p1 = desk_nodes[0].position + Vector2(90.0, 63.0)
-		var p2 = desk_nodes[1].position + Vector2(90.0, 63.0)
-		var p3 = desk_nodes[2].position + Vector2(90.0, 63.0)
-		var p_door = door_arch.position + Vector2(164.0, 140.0)
-		path_line.points = PackedVector2Array([p1, p2, p3, p_door])
+	# Path line hidden as per user request: "gak usah dikasih garis garis gitu"
+	if path_line:
+		path_line.visible = false
 		
 	# Move mascot to active selected desk
 	if not is_walking:

@@ -105,10 +105,10 @@ pivot_offset = Vector2(80, 60)
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 70.0
-offset_top = 490.0
-offset_right = 180.0
-offset_bottom = 552.0
-pivot_offset = Vector2(55, 31)
+offset_top = 470.0
+offset_right = 246.0
+offset_bottom = 568.0
+pivot_offset = Vector2(88, 49)
 expand_mode = 1
 stretch_mode = 5
 
