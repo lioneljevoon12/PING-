@@ -15,12 +15,17 @@ extends Control
 @onready var guidebook_modal: Control = %GuidebookModal
 
 # Stage buttons
+@onready var stages_scroll: ScrollContainer = %StagesScroll
 @onready var stage1_card: PanelContainer = %Stage1Card
 @onready var stage1_play_btn: TextureButton = %Stage1PlayButton
 @onready var stage2_card: PanelContainer = %Stage2Card
 @onready var stage2_play_btn: TextureButton = %Stage2PlayButton
 @onready var stage3_card: PanelContainer = %Stage3Card
 @onready var stage3_play_btn: TextureButton = %Stage3PlayButton
+@onready var stage4_card: PanelContainer = %Stage4Card
+@onready var stage4_play_btn: TextureButton = %Stage4PlayButton
+@onready var stage5_card: PanelContainer = %Stage5Card
+@onready var stage5_play_btn: TextureButton = %Stage5PlayButton
 @onready var chevron_btn: TextureButton = %ChevronButton
 
 # Toast / Notification
@@ -50,11 +55,24 @@ func _ready() -> void:
 	_reposition_responsive()
 	get_viewport().size_changed.connect(_reposition_responsive)
 	
-	if "--screenshot" in OS.get_cmdline_args():
+	var all_args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	if "--screenshot-scroll" in all_args:
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if stages_scroll:
+			stages_scroll.scroll_vertical = 320
+		await get_tree().create_timer(0.2).timeout
+		var img = get_viewport().get_texture().get_image()
+		if img:
+			img.save_png("art/dashboard_scroll_render.png")
+		get_tree().quit()
+
+	if "--screenshot" in all_args:
 		await get_tree().process_frame
 		await get_tree().process_frame
 		var img = get_viewport().get_texture().get_image()
-		img.save_png("art/dashboard_render.png")
+		if img:
+			img.save_png("art/dashboard_render.png")
 		get_tree().quit()
 		
 	# Setup button animations and events
@@ -75,14 +93,35 @@ func _ready() -> void:
 	_setup_stage_card(stage1_card, stage1_play_btn, 1, "Stage 1: Gudang Hardware")
 	_setup_stage_card(stage2_card, stage2_play_btn, 2, "Stage 2: Koridor Server Utama")
 	_setup_stage_card(stage3_card, stage3_play_btn, 3, "Stage 3: Ruang Kontrol Subnet")
+	_setup_stage_card(stage4_card, stage4_play_btn, 4, "Stage 4: Topologi & Infrastruktur")
+	_setup_stage_card(stage5_card, stage5_play_btn, 5, "Stage 5: Standardisasi OSI & Transport")
 	
-	_setup_button(chevron_btn, func(): show_toast("Menampilkan stage berikutnya..."))
+	_setup_button(chevron_btn, _on_chevron_pressed)
 
 func _process(delta: float) -> void:
 	time_passed += delta
-	# Subtle floating bob on the chevron down button
+	# Subtle floating bob and direction flip on chevron button
 	if chevron_btn and chevron_base_y > 0.0:
 		chevron_btn.position.y = chevron_base_y + sin(time_passed * 4.0) * 4.0
+		if stages_scroll:
+			var v_bar = stages_scroll.get_v_scroll_bar()
+			var max_v = v_bar.max_value - stages_scroll.size.y
+			if max_v > 10.0 and stages_scroll.scroll_vertical > max_v * 0.4:
+				chevron_btn.rotation = lerp_angle(chevron_btn.rotation, PI, 10.0 * delta)
+			else:
+				chevron_btn.rotation = lerp_angle(chevron_btn.rotation, 0.0, 10.0 * delta)
+
+func _on_chevron_pressed() -> void:
+	if not stages_scroll:
+		return
+	var v_bar = stages_scroll.get_v_scroll_bar()
+	var max_v = v_bar.max_value - stages_scroll.size.y
+	if max_v <= 0.0:
+		return
+	var target_v = max_v if stages_scroll.scroll_vertical < max_v * 0.4 else 0.0
+	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(stages_scroll, "scroll_vertical", int(target_v), 0.35)
+	play_sfx(659.25)
 
 func _update_profile(user: String) -> void:
 	if username_label:

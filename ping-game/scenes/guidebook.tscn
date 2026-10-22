@@ -5,7 +5,7 @@
 [ext_resource type="FontFile" uid="uid://dwd0sb6ffhlic" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="3_font_extrabold"]
 [ext_resource type="FontFile" uid="uid://dsqq4nxtdx5u7" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="4_font_bold"]
 [ext_resource type="FontFile" uid="uid://ttjv12iqtqdn" path="res://art/assets/PING! Assets/Fonts/Nunito-SemiBold.ttf" id="5_font_semibold"]
-[ext_resource type="Texture2D" uid="uid://bv7g1ioijs6ev" path="res://art/ui-ux/guidebook/book_empty_clean.png" id="6_book_bg"]
+[ext_resource type="Texture2D" uid="uid://c0r2grioiypwd" path="res://art/assets/PING! Assets/correction v1/guidebook_book.png" id="6_book_bg"]
 [ext_resource type="Texture2D" uid="uid://5147ddy5eo12" path="res://art/ui-ux/guidebook/page_sheet.png" id="7_page_sheet"]
 [ext_resource type="Texture2D" uid="uid://biw5x582lb2dy" path="res://art/ui-ux/guidebook/btn_close.png" id="8_btn_close"]
 [ext_resource type="Texture2D" uid="uid://ckwfutx405ch3" path="res://art/ui-ux/guidebook/btn_prev_square.png" id="9_btn_prev"]
@@ -29,7 +29,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.180392, 0.109804, 0.129412, 0.55)
+color = Color(0.12, 0.08, 0.1, 0.65)
 
 [node name="BookWrapper" type="Control" parent="."]
 unique_name_in_owner = true
@@ -40,12 +40,12 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -440.0
-offset_top = -285.0
+offset_top = -289.0
 offset_right = 440.0
-offset_bottom = 285.0
+offset_bottom = 289.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(440, 285)
+pivot_offset = Vector2(440, 289)
 
 [node name="BookTexture" type="TextureRect" parent="BookWrapper"]
 layout_mode = 1
@@ -54,26 +54,18 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("6_book_bg")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SpineShadow" type="ColorRect" parent="BookWrapper"]
-layout_mode = 0
-offset_left = 438.0
-offset_top = 35.0
-offset_right = 442.0
-offset_bottom = 535.0
-mouse_filter = 2
-color = Color(0.290196, 0.180392, 0.168627, 0.22)
-
 [node name="LeftPage" type="Control" parent="BookWrapper"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 68.0
-offset_top = 30.0
-offset_right = 425.0
-offset_bottom = 535.0
+offset_left = 34.0
+offset_top = 28.0
+offset_right = 422.0
+offset_bottom = 546.0
 mouse_filter = 2
 
 [node name="LeftTitle" type="Label" parent="BookWrapper/LeftPage"]
@@ -81,15 +73,15 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 30.0
-offset_top = 18.0
-offset_right = -10.0
-offset_bottom = 54.0
+offset_left = 12.0
+offset_top = 16.0
+offset_right = -12.0
+offset_bottom = 52.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_colors/font_color = Color(0.24, 0.16, 0.15, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
-theme_override_font_sizes/font_size = 20
-text = "TATA LETAK KABEL UTP"
+theme_override_font_sizes/font_size = 17
+text = "KABEL STRAIGHT (T568B)"
 horizontal_alignment = 1
 
 [node name="LeftContentVBox" type="VBoxContainer" parent="BookWrapper/LeftPage"]
@@ -98,18 +90,18 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 36.0
-offset_top = 56.0
-offset_right = -12.0
-offset_bottom = -64.0
+offset_left = 14.0
+offset_top = 54.0
+offset_right = -14.0
+offset_bottom = -54.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="LeftImage" type="TextureRect" parent="BookWrapper/LeftPage/LeftContentVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 195)
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
@@ -122,35 +114,36 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-theme_override_colors/default_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_colors/default_color = Color(0.24, 0.16, 0.15, 1)
 theme_override_constants/line_separation = 3
 theme_override_fonts/normal_font = ExtResource("5_font_semibold")
 theme_override_fonts/bold_font = ExtResource("3_font_extrabold")
-theme_override_font_sizes/normal_font_size = 13
-theme_override_font_sizes/bold_font_size = 14
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 13
 bbcode_enabled = true
-text = "[center][b]Standar T568B:[/b][/center]
-1. Putih-Oranye   5. Putih-Biru
-2. Oranye         6. Hijau
-3. Putih-Hijau    7. Putih-Cokelat
-4. Biru           8. Cokelat"
+text = "Urutan pin kabel Straight."
 fit_content = true
 scroll_active = false
 
-[node name="PrevButton" type="TextureButton" parent="BookWrapper/LeftPage"]
+[node name="PrevButton" type="Button" parent="BookWrapper/LeftPage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 32.0
+offset_top = 425.0
+offset_right = 78.0
+offset_bottom = 471.0
+flat = true
+
+[node name="PrevDimmer" type="ColorRect" parent="BookWrapper/LeftPage/PrevButton"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = -64.0
-offset_right = 70.0
-offset_bottom = -22.0
-grow_vertical = 0
-texture_normal = ExtResource("9_btn_prev")
-ignore_texture_size = true
-stretch_mode = 5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.6)
 
 [node name="PageNumLeft" type="Label" parent="BookWrapper/LeftPage"]
 unique_name_in_owner = true
@@ -160,13 +153,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -26.0
-offset_right = 20.0
-offset_bottom = -6.0
+offset_left = -30.0
+offset_top = -32.0
+offset_right = 30.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.6, 0.5, 0.48, 1)
+theme_override_colors/font_color = Color(0.65, 0.55, 0.52, 1)
 theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 12
 text = "1"
@@ -175,10 +168,10 @@ horizontal_alignment = 1
 [node name="RightPage" type="Control" parent="BookWrapper"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 458.0
-offset_top = 30.0
-offset_right = 815.0
-offset_bottom = 535.0
+offset_left = 444.0
+offset_top = 28.0
+offset_right = 846.0
+offset_bottom = 546.0
 mouse_filter = 2
 
 [node name="RightTitle" type="Label" parent="BookWrapper/RightPage"]
@@ -186,15 +179,15 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 10.0
-offset_top = 18.0
-offset_right = -30.0
-offset_bottom = 54.0
+offset_left = 12.0
+offset_top = 16.0
+offset_right = -12.0
+offset_bottom = 52.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_colors/font_color = Color(0.24, 0.16, 0.15, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
-theme_override_font_sizes/font_size = 20
-text = "Straight vs Cross"
+theme_override_font_sizes/font_size = 17
+text = "KABEL CROSSOVER (T568A/B)"
 horizontal_alignment = 1
 
 [node name="RightContentVBox" type="VBoxContainer" parent="BookWrapper/RightPage"]
@@ -203,61 +196,59 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 56.0
-offset_right = -36.0
-offset_bottom = -64.0
+offset_left = 14.0
+offset_top = 54.0
+offset_right = -14.0
+offset_bottom = -54.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 8
-
-[node name="RightText" type="RichTextLabel" parent="BookWrapper/RightPage/RightContentVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-theme_override_colors/default_color = Color(0.290196, 0.180392, 0.168627, 1)
-theme_override_constants/line_separation = 3
-theme_override_fonts/normal_font = ExtResource("5_font_semibold")
-theme_override_fonts/bold_font = ExtResource("3_font_extrabold")
-theme_override_font_sizes/normal_font_size = 13
-theme_override_font_sizes/bold_font_size = 14
-bbcode_enabled = true
-text = "[b]Kabel Straight-Through:[/b]
-Menghubungkan dua perangkat [b]berbeda tipe[/b] (misal: Komputer ke Switch, Switch ke Router). Kedua ujung menggunakan urutan warna pin yang sama (568B).
-
-[b]Kabel Crossover:[/b]
-Menghubungkan dua perangkat [b]sejenis[/b] (misal: PC ke PC, Switch ke Switch). Pin TX di satu ujung terhubung ke pin RX di ujung lainnya."
-fit_content = true
-scroll_active = false
+theme_override_constants/separation = 6
 
 [node name="RightImage" type="TextureRect" parent="BookWrapper/RightPage/RightContentVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 85)
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NextButton" type="TextureButton" parent="BookWrapper/RightPage"]
+[node name="RightText" type="RichTextLabel" parent="BookWrapper/RightPage/RightContentVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.24, 0.16, 0.15, 1)
+theme_override_constants/line_separation = 3
+theme_override_fonts/normal_font = ExtResource("5_font_semibold")
+theme_override_fonts/bold_font = ExtResource("3_font_extrabold")
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 13
+bbcode_enabled = true
+text = "Urutan pin kabel Cross."
+fit_content = true
+scroll_active = false
+
+[node name="NextButton" type="Button" parent="BookWrapper/RightPage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 311.0
+offset_top = 425.0
+offset_right = 357.0
+offset_bottom = 471.0
+flat = true
+
+[node name="NextDimmer" type="ColorRect" parent="BookWrapper/RightPage/NextButton"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -70.0
-offset_top = -64.0
-offset_right = -28.0
-offset_bottom = -22.0
-grow_horizontal = 0
-grow_vertical = 0
-texture_normal = ExtResource("10_btn_next")
-ignore_texture_size = true
-stretch_mode = 5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.6)
 
 [node name="PageNumRight" type="Label" parent="BookWrapper/RightPage"]
 unique_name_in_owner = true
@@ -267,13 +258,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -26.0
-offset_right = 20.0
-offset_bottom = -6.0
+offset_left = -30.0
+offset_top = -32.0
+offset_right = 30.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.6, 0.5, 0.48, 1)
+theme_override_colors/font_color = Color(0.65, 0.55, 0.52, 1)
 theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 12
 text = "2"
@@ -283,12 +274,12 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
-offset_left = 458.0
-offset_top = 30.0
-offset_right = 815.0
-offset_bottom = 535.0
+offset_left = 444.0
+offset_top = 28.0
+offset_right = 846.0
+offset_bottom = 546.0
 mouse_filter = 2
-pivot_offset = Vector2(0, 252)
+pivot_offset = Vector2(0, 259)
 
 [node name="SheetTexture" type="TextureRect" parent="BookWrapper/FlipSheet"]
 layout_mode = 1
@@ -318,10 +309,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -22.0
-offset_top = -10.0
-offset_right = 26.0
-offset_bottom = 38.0
+offset_left = -20.0
+offset_top = -12.0
+offset_right = 28.0
+offset_bottom = 36.0
 grow_horizontal = 0
 texture_normal = ExtResource("8_btn_close")
 ignore_texture_size = true
@@ -334,18 +325,18 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -200.0
-offset_top = 6.0
-offset_right = 200.0
+offset_left = -250.0
+offset_top = 8.0
+offset_right = 250.0
 offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(1, 0.98, 0.95, 1)
-theme_override_colors/font_outline_color = Color(0.290196, 0.180392, 0.168627, 1)
-theme_override_constants/outline_size = 7
+theme_override_colors/font_outline_color = Color(0.25, 0.15, 0.14, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("2_font_black")
-theme_override_font_sizes/font_size = 22
-text = "Guidebook / Buku Panduan"
+theme_override_font_sizes/font_size = 18
+text = "📖 BUKU PANDUAN JARINGAN (GUIDEBOOK)"
 horizontal_alignment = 1
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

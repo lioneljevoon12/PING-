@@ -5,8 +5,10 @@ signal closed
 @onready var dim_backdrop: ColorRect = %DimBackdrop
 @onready var book_wrapper: Control = %BookWrapper
 @onready var close_btn: TextureButton = %CloseButton
-@onready var prev_btn: TextureButton = %PrevButton
-@onready var next_btn: TextureButton = %NextButton
+@onready var prev_btn: Button = %PrevButton
+@onready var next_btn: Button = %NextButton
+@onready var prev_dimmer: ColorRect = %PrevDimmer
+@onready var next_dimmer: ColorRect = %NextDimmer
 
 # Left page nodes
 @onready var left_title: Label = %LeftTitle
@@ -30,38 +32,38 @@ var is_animating: bool = false
 var book_tween: Tween
 
 # Textures
-var tex_rj45: Texture2D = preload("res://art/ui-ux/guidebook/rj45_graphic.png")
-var tex_diagram: Texture2D = preload("res://art/ui-ux/guidebook/diagram_graphic.png")
+var tex_straight: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/straight_opt.png")
+var tex_cross: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/cross_opt.png")
 var tex_crimping: Texture2D = preload("res://art/assets/PING! Assets/Objects/Crimping.png")
 var tex_cable: Texture2D = preload("res://art/assets/PING! Assets/Objects/kabel utp.png")
 
 var spreads: Array = [
 	{
 		"left": {
-			"title": "URUTAN KABEL T568B",
-			"image": tex_rj45,
-			"image_height": 170,
-			"desc": "[center][b]Standar Pengkabelan T568B:[/b][/center]\n[table=2]\n[cell]1. Putih-Oranye   [/cell][cell]5. Putih-Biru[/cell]\n[cell]2. Oranye         [/cell][cell]6. Hijau[/cell]\n[cell]3. Putih-Hijau    [/cell][cell]7. Putih-Cokelat[/cell]\n[cell]4. Biru           [/cell][cell]8. Cokelat[/cell]\n[/table]"
+			"title": "KABEL STRAIGHT (T568B)",
+			"image": tex_straight,
+			"image_height": 135,
+			"desc": "[b][color=#166534]🔌 Penggunaan (Perangkat BERBEDA):[/color][/b]\n• PC ↔ Switch / Hub       • Router ↔ Switch\n\n[b][color=#166534]📋 Urutan Warna Pin T568B (Kedua Ujung SAMA):[/color][/b]\n[table=2]\n[cell][b]1.[/b] Putih-Oranye   [/cell][cell][b]5.[/b] Putih-Biru[/cell]\n[cell][b]2.[/b] Oranye         [/cell][cell][b]6.[/b] Hijau[/cell]\n[cell][b]3.[/b] Putih-Hijau    [/cell][cell][b]7.[/b] Putih-Cokelat[/cell]\n[cell][b]4.[/b] Biru           [/cell][cell][b]8.[/b] Cokelat[/cell]\n[/table]\n[i][color=#4b5563]💡 Kabel paling umum digunakan di jaringan lokal.[/color][/i]"
 		},
 		"right": {
-			"title": "STRAIGHT VS CROSS",
-			"image": tex_diagram,
-			"image_height": 95,
-			"body": "[b]Kabel Straight-Through:[/b]\nMenghubungkan dua perangkat [b]berbeda tipe[/b] (misal: Komputer ke Switch, Switch ke Router). Kedua ujung menggunakan susunan warna standar yang sama (568B).\n\n[b]Kabel Crossover:[/b]\nMenghubungkan dua perangkat [b]sejenis[/b] (misal: PC ke PC, Switch ke Switch). Menyilangkan pin kirim (TX) dan terima (RX)."
+			"title": "KABEL CROSSOVER (T568A/B)",
+			"image": tex_cross,
+			"image_height": 135,
+			"body": "[b][color=#991b1b]⚡ Penggunaan (Perangkat SEJENIS):[/color][/b]\n• PC ↔ PC   • Switch ↔ Switch   • Router ↔ Router\n\n[b][color=#92400e]⭐ RUMUS SILANG (Pin 1&2 tukar Pin 3&6):[/color][/b]\n[table=2]\n[cell][b]1.[/b] Putih-Hijau (dari 3) [/cell][cell][b]5.[/b] Putih-Biru (tetap)[/cell]\n[cell][b]2.[/b] Hijau (dari 6)        [/cell][cell][b]6.[/b] Oranye (dari 2)[/cell]\n[cell][b]3.[/b] Putih-Oranye (dari 1) [/cell][cell][b]7.[/b] Putih-Cokelat (tetap)[/cell]\n[cell][b]4.[/b] Biru (tetap)          [/cell][cell][b]8.[/b] Cokelat (tetap)[/cell]\n[/table]\n[i][color=#4b5563]💡 Ujung 1 berstandar T568A, ujung 2 berstandar T568B.[/color][/i]"
 		}
 	},
 	{
 		"left": {
 			"title": "FUNGSI PIN RJ-45",
 			"image": tex_cable,
-			"image_height": 120,
-			"desc": "[b]Fungsi Pin RJ-45 (10/100 Mbps):[/b]\n• [b]Pin 1 & 2:[/b] Transmit Data (Tx+ / Tx-)\n• [b]Pin 3 & 6:[/b] Receive Data (Rx+ / Rx-)\n• [b]Pin 4, 5, 7, 8:[/b] Cadangan / PoE (Power)\n\n[b]Perbedaan T568A vs T568B:[/b]\nHanya menukar pasangan [b]Oranye[/b] dan [b]Hijau[/b] (Pin 1, 2 dengan Pin 3, 6)."
+			"image_height": 115,
+			"desc": "[b][color=#1e3a8a]Fungsi Jalur Pin RJ-45 (Ethernet 10/100):[/color][/b]\n• [b]Pin 1 & 2:[/b] Transmit Data (Tx+ / Tx-)\n• [b]Pin 3 & 6:[/b] Receive Data (Rx+ / Rx-)\n• [b]Pin 4, 5, 7, 8:[/b] Cadangan / Power over Ethernet (PoE)\n\n[b][color=#b45309]Perbedaan T568A vs T568B:[/color][/b]\nHanya menukar pasangan warna [color=#ea580c][b]Oranye[/b][/color] dan [color=#16a34a][b]Hijau[/b][/color] (Pin 1, 2 ditukar dengan Pin 3, 6)."
 		},
 		"right": {
 			"title": "LANGKAH CRIMPING",
 			"image": tex_crimping,
-			"image_height": 110,
-			"body": "[b]Urutan Pemasangan Kabel LAN:[/b]\n[b]1. Kupas Jaket:[/b] Kupas jaket luar kabel ~2 cm.\n[b]2. Urai & Luruskan:[/b] Buka 4 pilinan kawat.\n[b]3. Susun Warna:[/b] Urutkan pin standar T568B.\n[b]4. Potong Rata:[/b] Potong rata kawat ~1.2 cm.\n[b]5. Tekan Crimping:[/b] Masukkan ke RJ-45 lalu jepit kuat dengan tang crimping!"
+			"image_height": 115,
+			"body": "[b][color=#166534]Urutan Pemasangan Kabel LAN UTP:[/color][/b]\n[b]1. Kupas Jaket:[/b] Kupas jaket pelindung luar ~2 cm.\n[b]2. Urai & Luruskan:[/b] Buka 4 pilinan pasang kawat.\n[b]3. Susun Warna:[/b] Urutkan pin sesuai standar T568B.\n[b]4. Potong Rata:[/b] Potong rata ujung kawat ~1.2 cm.\n[b]5. Tekan Crimping:[/b] Masukkan ke konektor RJ-45 lalu jepit erat dengan tang crimping hingga mengunci!"
 		}
 	},
 	{
@@ -69,13 +71,13 @@ var spreads: Array = [
 			"title": "KLASIFIKASI IPv4",
 			"image": null,
 			"image_height": 0,
-			"desc": "[b]Kelas A (1.0.0.0 – 126.255.255.255)[/b]\n• Subnet Mask default: 255.0.0.0 (/8)\n• Skala: Jaringan global raksasa (16 Juta Host)\n\n[b]Kelas B (128.0.0.0 – 191.255.255.255)[/b]\n• Subnet Mask default: 255.255.0.0 (/16)\n• Skala: Kampus / Perusahaan besar (65.534 Host)\n\n[b]Kelas C (192.0.0.0 – 223.255.255.255)[/b]\n• Subnet Mask default: 255.255.255.0 (/24)\n• Skala: Jaringan LAN lokal & rumah (254 Host)"
+			"desc": "[b][color=#1e3a8a]Pembagian Kelas Alamat IPv4:[/color][/b]\n\n• [b]Kelas A (1.0.0.0 – 126.255.255.255):[/b]\n  Subnet Mask /8 (255.0.0.0)\n  Skala: Jaringan global sangat besar (16 Juta Host)\n\n• [b]Kelas B (128.0.0.0 – 191.255.255.255):[/b]\n  Subnet Mask /16 (255.255.0.0)\n  Skala: Kampus / Perusahaan skala besar (65.534 Host)\n\n• [b]Kelas C (192.0.0.0 – 223.255.255.255):[/b]\n  Subnet Mask /24 (255.255.255.0)\n  Skala: Jaringan LAN lokal & rumah (254 Host)"
 		},
 		"right": {
 			"title": "IP PRIVAT & NAT",
 			"image": null,
 			"image_height": 0,
-			"body": "[b]Rentang IP Privat (Gratis untuk LAN):[/b]\n• [b]Kelas A:[/b] 10.0.0.0 – 10.255.255.255\n• [b]Kelas B:[/b] 172.16.0.0 – 172.31.255.255\n• [b]Kelas C:[/b] 192.168.0.0 – 192.168.255.255\n\n[b]Fungsi NAT (Network Address Translation):[/b]\nIP privat tidak bisa langsung mengakses internet. Router menggunakan [b]NAT[/b] untuk memetakan ribuan perangkat lokal ke satu IP publik resmi saat terhubung ke internet."
+			"body": "[b][color=#047857]Rentang IP Privat (Gratis untuk LAN):[/color][/b]\n• [b]Kelas A:[/b] 10.0.0.0 – 10.255.255.255\n• [b]Kelas B:[/b] 172.16.0.0 – 172.31.255.255\n• [b]Kelas C:[/b] 192.168.0.0 – 192.168.255.255\n\n[b][color=#b45309]Mekanisme NAT (Network Address Translation):[/color][/b]\nIP privat tidak dapat dirutekan langsung di Internet publik. Router menggunakan fitur [b]NAT[/b] untuk menerjemahkan banyak IP privat lokal ke satu IP publik resmi saat berkomunikasi ke luar jaringan."
 		}
 	}
 ]
@@ -92,9 +94,9 @@ func _ready() -> void:
 	prev_btn.pressed.connect(_on_prev_pressed)
 	next_btn.pressed.connect(_on_next_pressed)
 	
-	_setup_button_hover(close_btn)
-	_setup_button_hover(prev_btn)
-	_setup_button_hover(next_btn)
+	_setup_scale_feedback(close_btn)
+	_setup_scale_feedback(prev_btn)
+	_setup_scale_feedback(next_btn)
 	
 	dim_backdrop.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -104,7 +106,7 @@ func _ready() -> void:
 	_render_spread(current_spread)
 	
 	if "--screenshot-guidebook" in OS.get_cmdline_args():
-		open()
+		open(0)
 		await get_tree().create_timer(0.45).timeout
 		var img0 = get_viewport().get_texture().get_image()
 		img0.save_png("art/guidebook_spread0.png")
@@ -123,15 +125,15 @@ func _ready() -> void:
 		
 		get_tree().quit()
 
-func open() -> void:
+func open(target_spread: int = 0) -> void:
 	visible = true
 	is_animating = false
-	current_spread = 0
+	current_spread = clamp(target_spread, 0, spreads.size() - 1)
 	_render_spread(current_spread)
 	
 	dim_backdrop.modulate.a = 0.0
 	book_wrapper.modulate.a = 0.0
-	book_wrapper.scale = Vector2(0.3, 0.3)
+	book_wrapper.scale = Vector2(0.4, 0.4)
 	
 	if book_tween and book_tween.is_valid():
 		book_tween.kill()
@@ -140,7 +142,7 @@ func open() -> void:
 	book_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	book_tween.tween_property(dim_backdrop, "modulate:a", 1.0, 0.25)
 	book_tween.tween_property(book_wrapper, "modulate:a", 1.0, 0.2)
-	book_tween.tween_property(book_wrapper, "scale", Vector2(1.0, 1.0), 0.35)
+	book_tween.tween_property(book_wrapper, "scale", Vector2.ONE, 0.32)
 	
 	play_book_open_sfx()
 
@@ -186,31 +188,27 @@ func _flip_page(forward: bool) -> void:
 	
 	if forward:
 		# Flip from right to left across spine
-		# Start on right page
-		flip_sheet.position = Vector2(458, 30)
-		flip_sheet.size = Vector2(357, 505)
-		flip_sheet.pivot_offset = Vector2(0, 252) # Left edge (spine)
+		flip_sheet.position = Vector2(444, 28)
+		flip_sheet.size = Vector2(396, 518)
+		flip_sheet.pivot_offset = Vector2(0, 259) # Left edge (spine)
 		flip_sheet.scale = Vector2(1.0, 1.0)
 		sheet_shadow.color.a = 0.0
 		
 		var tween = create_tween()
-		# Phase 1: fold right page into spine
 		tween.set_parallel(true)
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tween.tween_property(flip_sheet, "scale:x", 0.0, flip_duration)
-		tween.tween_property(sheet_shadow, "color:a", 0.4, flip_duration)
+		tween.tween_property(sheet_shadow, "color:a", 0.35, flip_duration)
 		
-		# Halfway: update underlying contents and switch pivot to right edge (spine) on left side
 		tween.chain().tween_callback(func():
 			current_spread = next_index
 			_render_spread(current_spread)
 			
-			flip_sheet.position = Vector2(68, 30)
-			flip_sheet.pivot_offset = Vector2(357, 252) # Right edge (spine)
+			flip_sheet.position = Vector2(34, 28)
+			flip_sheet.pivot_offset = Vector2(396, 259) # Right edge (spine)
 			flip_sheet.scale = Vector2(0.0, 1.0)
 		)
 		
-		# Phase 2: unfold onto left page
 		tween.chain().set_parallel(true)
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(flip_sheet, "scale:x", 1.0, flip_duration)
@@ -222,30 +220,27 @@ func _flip_page(forward: bool) -> void:
 		)
 	else:
 		# Flip from left to right across spine
-		flip_sheet.position = Vector2(68, 30)
-		flip_sheet.size = Vector2(357, 505)
-		flip_sheet.pivot_offset = Vector2(357, 252) # Right edge (spine)
+		flip_sheet.position = Vector2(34, 28)
+		flip_sheet.size = Vector2(396, 518)
+		flip_sheet.pivot_offset = Vector2(396, 259) # Right edge (spine)
 		flip_sheet.scale = Vector2(1.0, 1.0)
 		sheet_shadow.color.a = 0.0
 		
 		var tween = create_tween()
-		# Phase 1: fold left page into spine
 		tween.set_parallel(true)
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tween.tween_property(flip_sheet, "scale:x", 0.0, flip_duration)
-		tween.tween_property(sheet_shadow, "color:a", 0.4, flip_duration)
+		tween.tween_property(sheet_shadow, "color:a", 0.35, flip_duration)
 		
-		# Halfway: update underlying contents and switch pivot to left edge (spine) on right side
 		tween.chain().tween_callback(func():
 			current_spread = next_index
 			_render_spread(current_spread)
 			
-			flip_sheet.position = Vector2(458, 30)
-			flip_sheet.pivot_offset = Vector2(0, 252) # Left edge (spine)
+			flip_sheet.position = Vector2(444, 28)
+			flip_sheet.pivot_offset = Vector2(0, 259) # Left edge (spine)
 			flip_sheet.scale = Vector2(0.0, 1.0)
 		)
 		
-		# Phase 2: unfold onto right page
 		tween.chain().set_parallel(true)
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(flip_sheet, "scale:x", 1.0, flip_duration)
@@ -266,7 +261,7 @@ func _render_spread(index: int) -> void:
 	left_title.text = data["left"]["title"]
 	if data["left"]["image"]:
 		left_image.texture = data["left"]["image"]
-		var h = data["left"].get("image_height", 140)
+		var h = data["left"].get("image_height", 135)
 		left_image.custom_minimum_size = Vector2(0, h)
 		left_image.visible = true
 	else:
@@ -279,48 +274,57 @@ func _render_spread(index: int) -> void:
 	right_text.text = data["right"]["body"]
 	if data["right"]["image"]:
 		right_image.texture = data["right"]["image"]
-		var h = data["right"].get("image_height", 100)
+		var h = data["right"].get("image_height", 135)
 		right_image.custom_minimum_size = Vector2(0, h)
 		right_image.visible = true
 	else:
 		right_image.visible = false
 	page_num_right.text = str(index * 2 + 2)
 	
-	# Button states
+	# Button states & visual dimmers
 	prev_btn.disabled = (index == 0)
-	prev_btn.modulate.a = 0.35 if prev_btn.disabled else 1.0
+	if prev_dimmer:
+		prev_dimmer.visible = prev_btn.disabled
 	
 	next_btn.disabled = (index == spreads.size() - 1)
-	next_btn.modulate.a = 0.35 if next_btn.disabled else 1.0
+	if next_dimmer:
+		next_dimmer.visible = next_btn.disabled
 
-func _setup_button_hover(btn: TextureButton) -> void:
+func _setup_scale_feedback(btn: Control) -> void:
 	btn.mouse_entered.connect(func():
-		if not btn.disabled:
-			var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			t.tween_property(btn, "scale", Vector2(1.12, 1.12), 0.1)
+		var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_property(btn, "scale", Vector2(1.12, 1.12), 0.1)
 	)
 	btn.mouse_exited.connect(func():
 		var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(btn, "scale", Vector2(1.0, 1.0), 0.1)
+		t.tween_property(btn, "scale", Vector2.ONE, 0.1)
 	)
-	btn.button_down.connect(func():
-		if not btn.disabled:
+	if btn is Button:
+		btn.button_down.connect(func():
 			var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			t.tween_property(btn, "scale", Vector2(0.92, 0.92), 0.08)
-	)
-	btn.button_up.connect(func():
-		var target = Vector2(1.12, 1.12) if btn.is_hovered() and not btn.disabled else Vector2(1.0, 1.0)
-		var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(btn, "scale", target, 0.1)
-	)
+			t.tween_property(btn, "scale", Vector2(0.9, 0.9), 0.08)
+		)
+		btn.button_up.connect(func():
+			var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			t.tween_property(btn, "scale", Vector2.ONE, 0.1)
+		)
+	elif btn is TextureButton:
+		btn.button_down.connect(func():
+			var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			t.tween_property(btn, "scale", Vector2(0.9, 0.9), 0.08)
+		)
+		btn.button_up.connect(func():
+			var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			t.tween_property(btn, "scale", Vector2.ONE, 0.1)
+		)
 
 # Sound Synthesis: Book Open Chime
 func play_book_open_sfx() -> void:
-	_play_synth_tone([523.25, 659.25, 783.99], 0.18, 0.3)
+	_play_synth_tone([523.25, 659.25, 783.99], 0.16, 0.28)
 
 # Sound Synthesis: Book Close Tone
 func play_book_close_sfx() -> void:
-	_play_synth_tone([783.99, 523.25], 0.14, 0.3)
+	_play_synth_tone([783.99, 523.25], 0.12, 0.28)
 
 # Sound Synthesis: Crisp Paper Turn Rustle
 func play_page_flip_sfx() -> void:
@@ -337,14 +341,12 @@ func play_page_flip_sfx() -> void:
 	var data = PackedByteArray()
 	data.resize(num_samples * 2)
 	
-	# Generate filtered noise with paper whoosh envelope
 	for i in range(num_samples):
 		var t = float(i) / sample_rate
 		var envelope = sin(t / duration * PI) * exp(-t * 12.0)
-		# Combine noise with soft frequency sweep
 		var noise = randf_range(-1.0, 1.0)
 		var flutter = sin(t * 1200.0 * TAU) * 0.25
-		var sample_val = (noise * 0.7 + flutter) * envelope * 0.4
+		var sample_val = (noise * 0.7 + flutter) * envelope * 0.35
 		var int_val = int(clamp(sample_val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, int_val)
 		

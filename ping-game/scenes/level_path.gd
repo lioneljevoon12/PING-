@@ -1133,4 +1133,3 @@ func _reposition_responsive() -> void:
 	# Move mascot to active selected desk
 	if not is_walking:
 		_move_character_to_desk(selected_level_index, false)
-
