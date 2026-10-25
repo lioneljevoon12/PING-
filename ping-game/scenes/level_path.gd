@@ -560,6 +560,8 @@ func _start_selected_level() -> void:
 	close_level_modal()
 	if current_stage == 1 and selected_level_index == 0:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_1_1.tscn")
+	elif current_stage == 1 and selected_level_index == 1:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_1_2.tscn")
 	else:
 		show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
 

@@ -23,7 +23,6 @@ var tex_cable_red: Texture2D = preload("res://art/assets/PING! Assets/asset-game
 
 var tex_diagram_straight: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/straight_opt.png")
 var tex_diagram_cross: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/cross_opt.png")
-var tex_guidebook_book: Texture2D = preload("res://art/assets/PING! Assets/correction v1/guidebook_book.png")
 
 var tex_joystick_pad: Texture2D = preload("res://art/assets/PING! Assets/mobile-controls-1/Sprites/Style C/Default/joystick_circle_pad_a.png")
 var tex_joystick_nub: Texture2D = preload("res://art/assets/PING! Assets/mobile-controls-1/Sprites/Style C/Default/joystick_circle_nub_a.png")
@@ -74,16 +73,17 @@ var toast_panel: PanelContainer
 var toast_label: Label
 var toast_tween: Tween
 
+
+
 var intro_modal: Control
 var intro_card: Control
 var guidebook_modal: Control
-var inspect_modal: Control
-var inspect_card: Control
-var inspect_title_lbl: Label
-var inspect_spec_lbl: Label
-var inspect_diagram_rect: TextureRect
-var inspect_desc_lbl: Label
+var pinout_modal: Control
+var pinout_card: PanelContainer
+var pinout_diagram_rect: TextureRect
+var pinout_info_lbl: Label
 var pause_modal: Control
+var pause_card: Control
 var win_modal: Control
 var win_card: Control
 var win_stars_row: HBoxContainer
@@ -91,11 +91,12 @@ var gameover_modal: Control
 var gameover_card: Control
 var gameover_reason_lbl: Label
 
-# Interaction Prompt Pills
-var prompt_container: Control
-var prompt_btn_inspect: Button
-var prompt_btn_action: Button
-var prompt_label: Label
+# Interaction Prompt Pills (Figma Style)
+var table_prompts_container: Control
+var btn_lihat: Button
+var btn_ambil: Button
+var rack_prompt_left: Button
+var rack_prompt_right: Button
 
 # Joystick Variables
 var joystick_zone: Control
@@ -104,11 +105,13 @@ var joystick_nub: TextureRect
 var joystick_touch_id: int = -1
 var joystick_center: Vector2 = Vector2.ZERO
 var joystick_max_radius: float = 58.0
-# Drag & Drop Cable Variables
-var dragging_cable_idx: int = -1
-var drag_preview: TextureRect
-var drag_touch_id: int = -1
-var drag_start_global: Vector2 = Vector2.ZERO
+
+var pinout_lbl_u1: Label
+var pinout_lbl_u2: Label
+var pinout_grid_u1: GridContainer
+var pinout_grid_u2: GridContainer
+var pinout_hint_panel: PanelContainer
+var pinout_hint_lbl: Label
 
 func _ready() -> void:
 	_load_walk_frames()
@@ -119,50 +122,40 @@ func _ready() -> void:
 	_build_header_ui()
 	_build_interaction_prompts()
 	_build_joystick_ui()
-	_build_inspection_modal()
+	_build_pinout_modal()
+	_build_guidebook_modal()
 	_build_intro_modal()
 	_build_endgame_modals()
 	_build_toast_ui()
 	
-	# Drag preview overlay node
-	drag_preview = TextureRect.new()
-	drag_preview.size = Vector2(80, 80)
-	drag_preview.pivot_offset = Vector2(40, 40)
-	drag_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	drag_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	drag_preview.visible = false
-	drag_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(drag_preview)
-	
 	_reposition_responsive()
 	get_viewport().size_changed.connect(_reposition_responsive)
 	
-	# Automated screenshot testing flags
 	var all_args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
-	if "--screenshot-gameplay-intro" in all_args:
-		await get_tree().process_frame
-		await get_tree().create_timer(0.3).timeout
+	if "--screenshot-pause" in all_args:
+		await get_tree().create_timer(0.4).timeout
+		intro_modal.visible = false
+		_open_pause_modal()
+		await get_tree().create_timer(0.4).timeout
 		var img = get_viewport().get_texture().get_image()
-		img.save_png("art/gameplay_intro_render.png")
+		img.save_png("art/gameplay_pause_render.png")
 		get_tree().quit()
 		
+	if "--screenshot-gameplay-inspect" in all_args:
+		await get_tree().create_timer(0.4).timeout
+		intro_modal.visible = false
+		_open_pinout_modal(cables_data[1]) # Show Cross cable pinout matching Figma Screen 3
+		await get_tree().create_timer(0.5).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/gameplay_inspect_render.png")
+		get_tree().quit()
+	
 	if "--screenshot-gameplay" in all_args:
-		await get_tree().process_frame
-		await get_tree().create_timer(0.1).timeout
+		intro_modal.visible = false
 		_start_gameplay()
 		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
 		img.save_png("art/gameplay_main_render.png")
-		get_tree().quit()
-		
-	if "--screenshot-gameplay-inspect" in all_args:
-		await get_tree().process_frame
-		await get_tree().create_timer(0.1).timeout
-		_start_gameplay()
-		_open_inspect_modal(cables_data[0])
-		await get_tree().create_timer(0.35).timeout
-		var img = get_viewport().get_texture().get_image()
-		img.save_png("art/gameplay_inspect_render.png")
 		get_tree().quit()
 
 func _load_walk_frames() -> void:
@@ -174,7 +167,22 @@ func _load_walk_frames() -> void:
 			if tex:
 				walk_frames.append(tex)
 
+
 func _init_cables_data() -> void:
+	var straight_pins = [
+		"1. Putih-Oranye", "5. Putih-Biru",
+		"2. Oranye",       "6. Hijau",
+		"3. Putih-Hijau",  "7. Putih-Cokelat",
+		"4. Biru",         "8. Cokelat"
+	]
+	
+	var cross_u1_pins = [
+		"1. Putih-Hijau",  "5. Putih-Biru",
+		"2. Hijau",        "6. Oranye",
+		"3. Putih-Oranye", "7. Putih-Cokelat",
+		"4. Biru",         "8. Cokelat"
+	]
+	
 	cables_data = [
 		{
 			"id": 0,
@@ -182,9 +190,11 @@ func _init_cables_data() -> void:
 			"type": "Straight",
 			"tex": tex_cable_green,
 			"diagram": tex_diagram_straight,
-			"pins_desc": "Ujung 1: T568B  |  Ujung 2: T568B",
-			"spec": "Standar: TIA/EIA 568B di kedua ujung",
-			"explanation": "Kedua ujung kabel memiliki susunan pin warna standar T568B yang PERSIS SAMA (Straight-Through).\n\nKabel Straight digunakan untuk menghubungkan dua perangkat yang BERBEDA (contoh: Komputer ke Switch, atau Router ke Switch).",
+			"u1_standard": "Standar T568B",
+			"u2_standard": "Standar T568B",
+			"u1_pins": straight_pins,
+			"u2_pins": straight_pins,
+			"rule_hint": "💡 Urutan warna di kedua ujung PERSIS SAMA (Straight) • Letakkan di RAK STRAIGHT!",
 			"state": "on_table"
 		},
 		{
@@ -193,9 +203,11 @@ func _init_cables_data() -> void:
 			"type": "Cross",
 			"tex": tex_cable_yellow,
 			"diagram": tex_diagram_cross,
-			"pins_desc": "Ujung 1: T568A  |  Ujung 2: T568B",
-			"spec": "Standar: TIA/EIA 568A (kiri) vs 568B (kanan)",
-			"explanation": "Ujung 1 menggunakan T568A dan Ujung 2 menggunakan T568B.\nPin 1 & 2 (TX) bersilangan langsung dengan Pin 3 & 6 (RX).\n\nKabel Crossover digunakan untuk menghubungkan dua perangkat SEJENIS (contoh: PC ke PC, Switch ke Switch, atau Router ke Router).",
+			"u1_standard": "Standar T568A",
+			"u2_standard": "Standar T568B",
+			"u1_pins": cross_u1_pins,
+			"u2_pins": straight_pins,
+			"rule_hint": "⚡ Pin 1 & 2 bertukar dengan Pin 3 & 6 (Crossover) • Letakkan di RAK CROSS!",
 			"state": "on_table"
 		},
 		{
@@ -204,9 +216,11 @@ func _init_cables_data() -> void:
 			"type": "Straight",
 			"tex": tex_cable_blue,
 			"diagram": tex_diagram_straight,
-			"pins_desc": "Ujung 1: T568B  |  Ujung 2: T568B",
-			"spec": "Standar: TIA/EIA 568B di kedua ujung",
-			"explanation": "Kedua ujung kabel menggunakan standar T568B yang identik (Straight-Through).\n\nCocok untuk koneksi transmisi data antara workstation/laptop ke jaringan switch LAN.",
+			"u1_standard": "Standar T568B",
+			"u2_standard": "Standar T568B",
+			"u1_pins": straight_pins,
+			"u2_pins": straight_pins,
+			"rule_hint": "💡 Urutan warna di kedua ujung PERSIS SAMA (Straight) • Letakkan di RAK STRAIGHT!",
 			"state": "on_table"
 		},
 		{
@@ -215,9 +229,11 @@ func _init_cables_data() -> void:
 			"type": "Cross",
 			"tex": tex_cable_red,
 			"diagram": tex_diagram_cross,
-			"pins_desc": "Ujung 1: T568A  |  Ujung 2: T568B",
-			"spec": "Standar: Pin 1-2 TX disilangkan ke Pin 3-6 RX",
-			"explanation": "Urutan warna kabel menyilang (Cross). Digunakan untuk menghubungkan port Ethernet perangkat sejenis secara peer-to-peer tanpa melalui Switch.",
+			"u1_standard": "Standar T568A",
+			"u2_standard": "Standar T568B",
+			"u1_pins": cross_u1_pins,
+			"u2_pins": straight_pins,
+			"rule_hint": "⚡ Pin 1 & 2 bertukar dengan Pin 3 & 6 (Crossover) • Letakkan di RAK CROSS!",
 			"state": "on_table"
 		}
 	]
@@ -244,21 +260,45 @@ func _process(delta: float) -> void:
 	if carried_icon and carried_icon.visible:
 		carried_icon.position.y = -46.0 + sin(time_passed * 6.0) * 4.0
 
-func _is_table_collision(pos: Vector2, center_x: float) -> bool:
+
+func _is_room_collision(pos: Vector2, center_x: float) -> bool:
+	# Character mascot collision box (feet base)
 	var feet_left = pos.x + 36.0
 	var feet_right = pos.x + 140.0
-	var feet_top = pos.y + 60.0
-	var feet_bottom = pos.y + 96.0
+	var feet_top = pos.y + 55.0
+	var feet_bottom = pos.y + 98.0
 	
-	# Table obstacle boundaries (adding margin for clean visual buffer)
-	var tbl_left = center_x - 232.0
-	var tbl_right = center_x + 232.0
-	var tbl_top = 510.0
-	var tbl_bottom = 650.0
-	
-	if feet_right > tbl_left and feet_left < tbl_right:
-		if feet_bottom > tbl_top and feet_top < tbl_bottom:
+	# 1. Cable Workbench Table (Bottom Center: center_x - 230 to center_x + 230, Y: 520 to 650)
+	var tbl_l = center_x - 230.0
+	var tbl_r = center_x + 230.0
+	var tbl_t = 515.0
+	var tbl_b = 650.0
+	if feet_right > tbl_l and feet_left < tbl_r:
+		if feet_bottom > tbl_t and feet_top < tbl_b:
 			return true
+			
+	# 2. Left Rack (center_x - 560 to center_x - 290, Y: 220 to 560)
+	var lr_l = center_x - 560.0
+	var lr_r = center_x - 290.0
+	var lr_t = 300.0
+	var lr_b = 560.0
+	if feet_right > lr_l and feet_left < lr_r:
+		if feet_bottom > lr_t and feet_top < lr_b:
+			return true
+			
+	# 3. Right Rack (center_x + 290 to center_x + 560, Y: 220 to 560)
+	var rr_l = center_x + 290.0
+	var rr_r = center_x + 560.0
+	var rr_t = 300.0
+	var rr_b = 560.0
+	if feet_right > rr_l and feet_left < rr_r:
+		if feet_bottom > rr_t and feet_top < rr_b:
+			return true
+			
+	# 4. Top Wall Obstacle (navy wall at top Y < 240)
+	if feet_top < 240.0:
+		return true
+		
 	return false
 
 func _handle_character_movement(delta: float) -> void:
@@ -281,14 +321,16 @@ func _handle_character_movement(delta: float) -> void:
 			
 		var screen_w = get_viewport_rect().size.x
 		var center_x = screen_w / 2.0
+		var delta_mov = input_vec * walk_speed * delta
 		
-		# Movement translation with Table Collision (Obstacle)
-		var test_x = clamp(char_pos.x + input_vec.x * walk_speed * delta, center_x - 560.0, center_x + 560.0)
-		if not _is_table_collision(Vector2(test_x, char_pos.y), center_x):
+		# Independent X movement test (enables smooth sliding along table and rack rims)
+		var test_x = clamp(char_pos.x + delta_mov.x, center_x - 560.0, center_x + 560.0)
+		if not _is_room_collision(Vector2(test_x, char_pos.y), center_x):
 			char_pos.x = test_x
 			
-		var test_y = clamp(char_pos.y + input_vec.y * walk_speed * delta, 240.0, 580.0)
-		if not _is_table_collision(Vector2(char_pos.x, test_y), center_x):
+		# Independent Y movement test (stops tightly at edge of table without passing through)
+		var test_y = clamp(char_pos.y + delta_mov.y, 240.0, 580.0)
+		if not _is_room_collision(Vector2(char_pos.x, test_y), center_x):
 			char_pos.y = test_y
 			
 		character_mascot.position = char_pos
@@ -312,9 +354,49 @@ func _handle_character_movement(delta: float) -> void:
 		mascot_sprite.scale.y = 1.0 + sin(time_passed * 3.0) * 0.03
 
 func _update_interaction_prompts() -> void:
-	# Directive: Suppress all floating notification pills for clean immersive gameplay
-	if prompt_container:
-		prompt_container.visible = false
+	var screen_w = get_viewport_rect().size.x
+	var center_x = screen_w / 2.0
+	
+	var char_center = character_mascot.position + Vector2(88, 49)
+	var table_pos = cable_table_node.position + Vector2(230, 60)
+	var left_rack_pos = left_rack_node.position + Vector2(135, 170)
+	var right_rack_pos = right_rack_node.position + Vector2(135, 170)
+	
+	var dist_table = char_center.distance_to(table_pos)
+	var dist_left_rack = char_center.distance_to(left_rack_pos)
+	var dist_right_rack = char_center.distance_to(right_rack_pos)
+	
+	# Table Prompts (Lihat & Ambil pills on left of table / cable)
+	if table_prompts_container:
+		if dist_table < 220.0:
+			table_prompts_container.visible = true
+			if carried_cable_data == null:
+				var first_idx = _get_first_available_cable_idx()
+				if active_focused_cable_idx < 0 or active_focused_cable_idx >= cables_data.size() or cables_data[active_focused_cable_idx]["state"] != "on_table":
+					active_focused_cable_idx = first_idx
+				
+				if active_focused_cable_idx != -1:
+					btn_ambil.text = "Ambil"
+					btn_ambil.visible = true
+					btn_lihat.visible = true
+				else:
+					btn_ambil.visible = false
+					btn_lihat.visible = false
+					table_prompts_container.visible = false
+			else:
+				btn_ambil.text = "Kembalikan"
+				btn_ambil.visible = true
+				btn_lihat.visible = true
+		else:
+			table_prompts_container.visible = false
+			
+	# Left Rack Prompt (Letakkan Kabel pill on right rim of left rack)
+	if rack_prompt_left:
+		rack_prompt_left.visible = (carried_cable_data != null and dist_left_rack < 250.0)
+		
+	# Right Rack Prompt (Letakkan Kabel pill on left rim of right rack)
+	if rack_prompt_right:
+		rack_prompt_right.visible = (carried_cable_data != null and dist_right_rack < 250.0)
 
 func _get_first_available_cable_idx() -> int:
 	for i in range(cables_data.size()):
@@ -470,6 +552,8 @@ func _trigger_victory() -> void:
 		
 	win_modal.visible = true
 	if win_card:
+		var vp_sz_w = get_viewport_rect().size
+		win_card.position = Vector2((vp_sz_w.x - win_card.size.x) / 2.0, (vp_sz_w.y - win_card.size.y) / 2.0)
 		win_card.scale = Vector2(0.7, 0.7)
 		win_card.modulate.a = 0.0
 		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -489,25 +573,86 @@ func _trigger_game_over(msg: String) -> void:
 	if gameover_reason_lbl:
 		gameover_reason_lbl.text = msg
 	if gameover_card:
+		var vp_sz_go = get_viewport_rect().size
+		gameover_card.position = Vector2((vp_sz_go.x - gameover_card.size.x) / 2.0, (vp_sz_go.y - gameover_card.size.y) / 2.0)
 		gameover_card.scale = Vector2(0.7, 0.7)
 		gameover_card.modulate.a = 0.0
 		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tw.tween_property(gameover_card, "scale", Vector2.ONE, 0.28)
 		tw.tween_property(gameover_card, "modulate:a", 1.0, 0.2)
 
-# --- INSPECTION / GUIDEBOOK MODAL ---
-func _open_inspect_modal(_c_data: Dictionary = {}) -> void:
+# --- INSPECTION MODAL ---
+
+
+func _open_pinout_modal(c_data: Dictionary = {}) -> void:
 	if toast_tween and toast_tween.is_valid():
 		toast_tween.kill()
 	if toast_panel:
 		toast_panel.visible = false
-	if guidebook_modal:
-		guidebook_modal.open(0)
+		
+	_play_sweep(523.25, 783.99, 0.1, 0.15)
+	
+	if c_data.is_empty():
+		c_data = cables_data[1] if cables_data.size() > 1 else cables_data[0]
+		
+	if pinout_diagram_rect and c_data.has("diagram"):
+		pinout_diagram_rect.texture = c_data["diagram"]
+		
+	if pinout_lbl_u1:
+		if c_data.get("type") == "Cross":
+			pinout_lbl_u1.text = "568A"
+		else:
+			pinout_lbl_u1.text = "568B"
+	if pinout_lbl_u2:
+		pinout_lbl_u2.text = "568B"
+		
+	pinout_modal.visible = true
+	if pinout_card:
+		var vp_size = get_viewport_rect().size
+		pinout_card.position = Vector2((vp_size.x - pinout_card.size.x) / 2.0, (vp_size.y - pinout_card.size.y) / 2.0)
+		pinout_card.scale = Vector2(0.85, 0.85)
+		pinout_card.modulate.a = 0.0
+		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(pinout_card, "scale", Vector2.ONE, 0.22)
+		tw.tween_property(pinout_card, "modulate:a", 1.0, 0.18)
+
+func _close_pinout_modal() -> void:
+	_play_sweep(659.25, 440.0, 0.1, 0.15)
+	if pinout_card:
+		var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(pinout_card, "scale", Vector2(0.85, 0.85), 0.12)
+		tw.tween_property(pinout_card, "modulate:a", 0.0, 0.12)
+		tw.tween_callback(func(): pinout_modal.visible = false)
+	else:
+		pinout_modal.visible = false
+
+func _open_pause_modal() -> void:
+	_play_sweep(659.25, 523.25, 0.1, 0.15)
+	if pause_card:
+		var vp_sz = get_viewport_rect().size
+		pause_card.position = Vector2((vp_sz.x - pause_card.size.x) / 2.0, (vp_sz.y - pause_card.size.y) / 2.0)
+		pause_card.scale = Vector2(0.85, 0.85)
+		pause_card.modulate.a = 0.0
+		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(pause_card, "scale", Vector2.ONE, 0.22)
+		tw.tween_property(pause_card, "modulate:a", 1.0, 0.18)
+	pause_modal.visible = true
+
+func _close_pause_modal() -> void:
+	_play_sweep(523.25, 659.25, 0.1, 0.15)
+	if pause_card:
+		var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(pause_card, "scale", Vector2(0.85, 0.85), 0.12)
+		tw.tween_property(pause_card, "modulate:a", 0.0, 0.12)
+		tw.tween_callback(func(): pause_modal.visible = false)
+	else:
+		pause_modal.visible = false
+
+func _open_inspect_modal(c_data: Dictionary = {}) -> void:
+	_open_pinout_modal(c_data)
 
 func _close_inspect_modal() -> void:
-	if guidebook_modal:
-		guidebook_modal.close()
-
+	_close_pinout_modal()
 
 func _build_room_visuals() -> void:
 	# Left Rack (Rak Kabel Cross)
@@ -517,28 +662,13 @@ func _build_room_visuals() -> void:
 	# Cable Workbench
 	_setup_cable_workbench()
 
-func _on_rack_tapped(rack_type: String) -> void:
-	if carried_cable_data != null:
-		var char_center = character_mascot.position + Vector2(88, 49)
-		var rack_node = left_rack_node if rack_type == "Cross" else right_rack_node
-		var rack_pos = rack_node.position + Vector2(135, 170)
-		if char_center.distance_to(rack_pos) <= 360.0:
-			_attempt_place_in_rack(rack_type)
-		else:
-			show_toast("Mendekatlah ke Rak %s untuk meletakkan kabel!" % rack_type)
-	else:
-		show_toast("Pilih dan bawa kabel dari meja terlebih dahulu!")
-
 func _setup_rack_node(rack_root: Control, title_text: String, badge_color_hex: String, slots_array: Array[TextureRect]) -> void:
-	rack_root.mouse_filter = Control.MOUSE_FILTER_STOP
-	
 	# Rack Graphic
 	var rack_tex = TextureRect.new()
 	rack_tex.texture = tex_rack
 	rack_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rack_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	rack_tex.size = Vector2(270, 340)
-	rack_tex.mouse_filter = Control.MOUSE_FILTER_PASS
 	rack_root.add_child(rack_tex)
 	
 	# Rack Title Badge
@@ -580,93 +710,32 @@ func _setup_rack_node(rack_root: Control, title_text: String, badge_color_hex: S
 		slot_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		slot_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		slot_rect.pivot_offset = Vector2(37, 37)
-		slot_rect.mouse_filter = Control.MOUSE_FILTER_PASS
 		slot_rect.visible = false
 		rack_root.add_child(slot_rect)
 		slots_array.append(slot_rect)
-		
-	# Direct Tap on Rack (Directive: no popups needed)
-	var r_type = "Cross" if "Cross" in title_text else "Straight"
-	rack_root.gui_input.connect(func(event: InputEvent):
-		var is_click = false
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			is_click = true
-		elif event is InputEventScreenTouch and event.pressed:
-			is_click = true
-		if is_click:
-			_on_rack_tapped(r_type)
-	)
 
-func _handle_cable_drag_input(cable_idx: int, event: InputEvent) -> void:
+
+func _select_cable_on_table(cable_idx: int) -> void:
 	if cable_idx < 0 or cable_idx >= cables_data.size():
 		return
-	var c_data = cables_data[cable_idx]
-	if c_data["state"] != "on_table":
+	if cables_data[cable_idx]["state"] != "on_table":
 		return
 		
-	if event is InputEventScreenTouch:
-		if event.pressed:
-			drag_touch_id = event.index
-			_start_cable_drag(cable_idx, event.position)
-		elif event.index == drag_touch_id:
-			_end_cable_drag(cable_idx, event.position)
-	elif event is InputEventScreenDrag:
-		if event.index == drag_touch_id:
-			_update_cable_drag(event.position)
-	elif event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				drag_touch_id = 999
-				_start_cable_drag(cable_idx, event.global_position)
-			elif drag_touch_id == 999:
-				_end_cable_drag(cable_idx, event.global_position)
-	elif event is InputEventMouseMotion:
-		if drag_touch_id == 999 and dragging_cable_idx == cable_idx:
-			_update_cable_drag(event.global_position)
-
-func _start_cable_drag(cable_idx: int, g_pos: Vector2) -> void:
-	dragging_cable_idx = cable_idx
-	drag_start_global = g_pos
-	if drag_preview:
-		drag_preview.texture = cables_data[cable_idx]["tex"]
-		drag_preview.global_position = g_pos - Vector2(40, 40)
-		drag_preview.visible = true
-		drag_preview.scale = Vector2(1.2, 1.2)
-	_play_tone(587.33, 0.05, 0.15)
-
-func _update_cable_drag(g_pos: Vector2) -> void:
-	if drag_preview and dragging_cable_idx >= 0:
-		drag_preview.global_position = g_pos - Vector2(40, 40)
-
-func _end_cable_drag(cable_idx: int, g_pos: Vector2) -> void:
-	drag_touch_id = -1
-	if dragging_cable_idx < 0 or dragging_cable_idx != cable_idx:
-		if drag_preview:
-			drag_preview.visible = false
-		return
-		
-	var char_center = character_mascot.global_position + Vector2(88, 49)
-	var dist_to_char = g_pos.distance_to(char_center)
-	var c_box = cable_item_nodes[cable_idx]
-	var dist_drag = g_pos.distance_to(drag_start_global)
+	active_focused_cable_idx = cable_idx
+	_play_tone(659.25, 0.06, 0.15)
 	
-	# Dragged onto mascot (dist < 170) OR quick tap when mascot is near table
-	var table_center = cable_table_node.global_position + Vector2(230, 60)
-	var char_near_table = char_center.distance_to(table_center) < 220.0
+	# Subtle scale bounce highlight on focused cable
+	var c_node = cable_item_nodes[cable_idx]
+	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(c_node, "scale", Vector2(1.15, 1.15), 0.1)
+	tw.chain().tween_property(c_node, "scale", Vector2.ONE, 0.1)
 	
-	if dist_to_char < 170.0 or (char_near_table and dist_drag < 35.0):
-		if carried_cable_data != null:
-			_return_cable_to_table()
-		_pickup_cable(cable_idx)
-		if drag_preview:
-			drag_preview.visible = false
-	else:
-		if drag_preview:
-			var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tw.tween_property(drag_preview, "global_position", c_box.global_position, 0.2)
-			tw.tween_callback(func(): drag_preview.visible = false)
-			
-	dragging_cable_idx = -1
+	# Update prompts
+	if table_prompts_container:
+		table_prompts_container.visible = true
+		btn_ambil.text = "Ambil" if carried_cable_data == null else "Kembalikan"
+		btn_ambil.visible = true
+		btn_lihat.visible = true
 
 func _setup_cable_workbench() -> void:
 	cable_item_nodes.clear()
@@ -687,10 +756,10 @@ func _setup_cable_workbench() -> void:
 	
 	# Table Label
 	var table_tag = Label.new()
-	table_tag.text = "MEJA KERJA KABEL UTP (Drag kabel ke Router)"
-	table_tag.position = Vector2(12, 6)
+	table_tag.text = "MEJA KERJA KABEL UTP"
+	table_tag.position = Vector2(16, 8)
 	table_tag.add_theme_font_override("font", font_black)
-	table_tag.add_theme_font_size_override("font_size", 11)
+	table_tag.add_theme_font_size_override("font_size", 12)
 	table_tag.add_theme_color_override("font_color", Color("#78350f"))
 	cable_table_node.add_child(table_tag)
 	
@@ -716,8 +785,8 @@ func _setup_cable_workbench() -> void:
 		btn_cable.pivot_offset = Vector2(36, 36)
 		
 		var cable_idx = i
-		btn_cable.gui_input.connect(func(event: InputEvent):
-			_handle_cable_drag_input(cable_idx, event)
+		btn_cable.pressed.connect(func():
+			_select_cable_on_table(cable_idx)
 		)
 		_setup_hover_scale(btn_cable, 1.1)
 		c_box.add_child(btn_cable)
@@ -782,8 +851,7 @@ func _build_header_ui() -> void:
 	back_btn.add_child(lbl_back)
 	
 	back_btn.pressed.connect(func():
-		_play_tone(440.0, 0.1)
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+		_open_pause_modal()
 	)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
@@ -827,44 +895,6 @@ func _build_header_ui() -> void:
 	lvl_lbl.add_theme_color_override("font_color", Color("#1d4ed8"))
 	lvl_badge.add_child(lvl_lbl)
 	header_ui.add_child(lvl_badge)
-	
-	# Top Header Guidebook Button ("📖 PANDUAN PIN")
-	var guide_top_btn = TextureButton.new()
-	guide_top_btn.name = "GuidebookTopBtn"
-	guide_top_btn.custom_minimum_size = Vector2(165, 48)
-	guide_top_btn.pivot_offset = Vector2(82, 24)
-	
-	var sb_gtop = StyleBoxFlat.new()
-	sb_gtop.bg_color = Color("#fef3c7")
-	sb_gtop.border_color = Color("#854d0e")
-	sb_gtop.set_border_width_all(3)
-	sb_gtop.set_corner_radius_all(20)
-	sb_gtop.shadow_color = Color(0, 0, 0, 0.2)
-	sb_gtop.shadow_size = 4
-	sb_gtop.shadow_offset = Vector2(0, 2)
-	
-	var p_gtop = Panel.new()
-	p_gtop.size = Vector2(165, 48)
-	p_gtop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p_gtop.add_theme_stylebox_override("panel", sb_gtop)
-	guide_top_btn.add_child(p_gtop)
-	
-	var lbl_gtop = Label.new()
-	lbl_gtop.text = "📖 PANDUAN PIN"
-	lbl_gtop.size = Vector2(165, 48)
-	lbl_gtop.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl_gtop.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl_gtop.add_theme_font_override("font", font_black)
-	lbl_gtop.add_theme_font_size_override("font_size", 13)
-	lbl_gtop.add_theme_color_override("font_color", Color("#78350f"))
-	guide_top_btn.add_child(lbl_gtop)
-	
-	guide_top_btn.pressed.connect(func():
-		_play_tone(587.33, 0.1)
-		_open_inspect_modal()
-	)
-	_setup_hover_scale(guide_top_btn, 1.08)
-	header_ui.add_child(guide_top_btn)
 	
 	# Timer Badge (⏱️ 02:45)
 	var timer_panel = PanelContainer.new()
@@ -926,73 +956,85 @@ func _build_header_ui() -> void:
 	_setup_hover_scale(pause_btn, 1.1)
 	header_ui.add_child(pause_btn)
 
+
 func _build_interaction_prompts() -> void:
-	prompt_container = Control.new()
-	prompt_container.name = "PromptContainer"
-	prompt_container.visible = false
-	prompt_container.custom_minimum_size = Vector2(340, 70)
-	add_child(prompt_container)
+	# 1. Table Prompts Container (Lihat & Ambil pills on left of table)
+	table_prompts_container = Control.new()
+	table_prompts_container.name = "TablePrompts"
+	table_prompts_container.visible = false
+	table_prompts_container.size = Vector2(85, 70)
+	add_child(table_prompts_container)
 	
-	var card = PanelContainer.new()
-	card.size = Vector2(340, 70)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#fef3c7")
-	sb.border_color = Color("#b45309")
-	sb.set_border_width_all(3)
-	sb.set_corner_radius_all(14)
-	sb.set_content_margin_all(8)
-	sb.shadow_color = Color(0, 0, 0, 0.25)
-	sb.shadow_size = 5
-	card.add_theme_stylebox_override("panel", sb)
-	prompt_container.add_child(card)
+	var vb_table = VBoxContainer.new()
+	vb_table.size = Vector2(85, 70)
+	vb_table.add_theme_constant_override("separation", 6)
+	table_prompts_container.add_child(vb_table)
 	
-	var vb = VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 4)
-	card.add_child(vb)
+	# Helper lambda for creating Figma pill buttons
+	var create_figma_pill = func(btn_text: String, btn_size: Vector2) -> Button:
+		var b = Button.new()
+		b.text = btn_text
+		b.custom_minimum_size = btn_size
+		b.size = btn_size
+		b.add_theme_font_override("font", font_black)
+		b.add_theme_font_size_override("font_size", 12)
+		b.add_theme_color_override("font_color", Color("#4a2e2b"))
+		b.add_theme_color_override("font_hover_color", Color("#1f1412"))
+		b.add_theme_color_override("font_pressed_color", Color("#000000"))
+		
+		var sb_norm = StyleBoxFlat.new()
+		sb_norm.bg_color = Color("#fbcfe8") # Soft pastel pink matching Figma
+		sb_norm.border_color = Color("#4a2e2b")
+		sb_norm.set_border_width_all(2)
+		sb_norm.set_corner_radius_all(11)
+		sb_norm.set_content_margin_all(3)
+		b.add_theme_stylebox_override("normal", sb_norm)
+		
+		var sb_hover = sb_norm.duplicate()
+		sb_hover.bg_color = Color("#f472b6")
+		b.add_theme_stylebox_override("hover", sb_hover)
+		
+		var sb_press = sb_norm.duplicate()
+		sb_press.bg_color = Color("#db2777")
+		b.add_theme_stylebox_override("pressed", sb_press)
+		
+		_setup_hover_scale(b, 1.08)
+		return b
 	
-	prompt_label = Label.new()
-	prompt_label.text = "Aksi Tersedia"
-	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	prompt_label.add_theme_font_override("font", font_black)
-	prompt_label.add_theme_font_size_override("font_size", 12)
-	prompt_label.add_theme_color_override("font_color", Color("#78350f"))
-	vb.add_child(prompt_label)
-	
-	var hb = HBoxContainer.new()
-	hb.alignment = BoxContainer.ALIGNMENT_CENTER
-	hb.add_theme_constant_override("separation", 10)
-	vb.add_child(hb)
-	
-	# Inspect Button
-	prompt_btn_inspect = Button.new()
-	prompt_btn_inspect.text = "🔍 LIHAT PIN"
-	prompt_btn_inspect.add_theme_font_override("font", font_black)
-	prompt_btn_inspect.add_theme_font_size_override("font_size", 12)
-	var sb_btn_ins = StyleBoxFlat.new()
-	sb_btn_ins.bg_color = Color("#0284c7")
-	sb_btn_ins.set_corner_radius_all(10)
-	sb_btn_ins.set_content_margin_all(6)
-	prompt_btn_inspect.add_theme_stylebox_override("normal", sb_btn_ins)
-	prompt_btn_inspect.pressed.connect(func():
-		if carried_cable_data != null:
-			_open_inspect_modal(carried_cable_data)
-		elif active_focused_cable_idx >= 0 and active_focused_cable_idx < cables_data.size():
-			_open_inspect_modal(cables_data[active_focused_cable_idx])
+	btn_lihat = create_figma_pill.call("Lihat", Vector2(80, 26))
+	btn_lihat.pressed.connect(func():
+		var c = carried_cable_data if carried_cable_data != null else (cables_data[active_focused_cable_idx] if active_focused_cable_idx >= 0 and active_focused_cable_idx < cables_data.size() else cables_data[0])
+		_open_pinout_modal(c)
 	)
-	hb.add_child(prompt_btn_inspect)
+	vb_table.add_child(btn_lihat)
 	
-	# Action Button
-	prompt_btn_action = Button.new()
-	prompt_btn_action.text = "🖐️ AMBIL KABEL"
-	prompt_btn_action.add_theme_font_override("font", font_black)
-	prompt_btn_action.add_theme_font_size_override("font_size", 12)
-	var sb_btn_act = StyleBoxFlat.new()
-	sb_btn_act.bg_color = Color("#ea580c")
-	sb_btn_act.set_corner_radius_all(10)
-	sb_btn_act.set_content_margin_all(6)
-	prompt_btn_action.add_theme_stylebox_override("normal", sb_btn_act)
-	prompt_btn_action.pressed.connect(_on_action_button_pressed)
-	hb.add_child(prompt_btn_action)
+	btn_ambil = create_figma_pill.call("Ambil", Vector2(80, 26))
+	btn_ambil.pressed.connect(func():
+		if carried_cable_data == null:
+			if active_focused_cable_idx >= 0 and active_focused_cable_idx < cables_data.size():
+				_pickup_cable(active_focused_cable_idx)
+		else:
+			_return_cable_to_table()
+	)
+	vb_table.add_child(btn_ambil)
+	
+	# 2. Left Rack "Letakkan Kabel" Pill Button
+	rack_prompt_left = create_figma_pill.call("Letakkan Kabel", Vector2(125, 28))
+	rack_prompt_left.name = "RackPromptLeft"
+	rack_prompt_left.visible = false
+	rack_prompt_left.pressed.connect(func():
+		_attempt_place_in_rack("Cross")
+	)
+	add_child(rack_prompt_left)
+	
+	# 3. Right Rack "Letakkan Kabel" Pill Button
+	rack_prompt_right = create_figma_pill.call("Letakkan Kabel", Vector2(125, 28))
+	rack_prompt_right.name = "RackPromptRight"
+	rack_prompt_right.visible = false
+	rack_prompt_right.pressed.connect(func():
+		_attempt_place_in_rack("Straight")
+	)
+	add_child(rack_prompt_right)
 
 func _build_joystick_ui() -> void:
 	# Virtual Joystick container (bottom-left)
@@ -1085,14 +1127,161 @@ func _reset_joystick() -> void:
 	var t = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	t.tween_property(joystick_nub, "position", joystick_center - Vector2(37, 37), 0.1)
 
-# --- INSPECTION / GUIDEBOOK MODAL ---
-func _build_inspection_modal() -> void:
+# --- INSPECTION MODAL (Screen 3 in Mockup) ---
+
+
+func _build_pinout_modal() -> void:
+	pinout_modal = Control.new()
+	pinout_modal.name = "PinoutModal"
+	pinout_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pinout_modal.visible = false
+	add_child(pinout_modal)
+	
+	var backdrop = ColorRect.new()
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0, 0, 0, 0.65)
+	backdrop.gui_input.connect(func(ev: InputEvent):
+		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventScreenTouch and ev.pressed):
+			_close_pinout_modal()
+	)
+	pinout_modal.add_child(backdrop)
+	
+	# Modal Card (Figma Style)
+	pinout_card = PanelContainer.new()
+	pinout_card.name = "PinoutCard"
+	pinout_card.size = Vector2(760, 360)
+	pinout_card.pivot_offset = Vector2(380, 180)
+	var sb_card = StyleBoxFlat.new()
+	sb_card.bg_color = Color("#fffdf7") # Warm cream matching Figma
+	sb_card.border_color = Color("#4a2e2b") # Dark brown matching Figma
+	sb_card.set_border_width_all(3)
+	sb_card.set_corner_radius_all(18)
+	sb_card.shadow_color = Color(0, 0, 0, 0.3)
+	sb_card.shadow_size = 12
+	sb_card.shadow_offset = Vector2(0, 4)
+	pinout_card.add_theme_stylebox_override("panel", sb_card)
+	pinout_modal.add_child(pinout_card)
+	
+	var vb_main = VBoxContainer.new()
+	vb_main.add_theme_constant_override("separation", 0)
+	pinout_card.add_child(vb_main)
+	
+	# Header Panel (Figma lavender bar)
+	var header_panel = PanelContainer.new()
+	header_panel.custom_minimum_size = Vector2(754, 48)
+	var sb_hdr = StyleBoxFlat.new()
+	sb_hdr.bg_color = Color("#e8daf8") # Soft lavender matching Figma
+	sb_hdr.border_color = Color("#4a2e2b")
+	sb_hdr.border_width_bottom = 3
+	sb_hdr.corner_radius_top_left = 15
+	sb_hdr.corner_radius_top_right = 15
+	header_panel.add_theme_stylebox_override("panel", sb_hdr)
+	vb_main.add_child(header_panel)
+	
+	var h_box_hdr = Control.new()
+	h_box_hdr.custom_minimum_size = Vector2(754, 48)
+	header_panel.add_child(h_box_hdr)
+	
+	var title_lbl = Label.new()
+	title_lbl.text = "URUTKAN PIN WARNA TIA/EIA 568A/B"
+	title_lbl.size = Vector2(754, 48)
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_font_override("font", font_black)
+	title_lbl.add_theme_font_size_override("font_size", 16)
+	title_lbl.add_theme_color_override("font_color", Color("#4a2e2b"))
+	h_box_hdr.add_child(title_lbl)
+	
+	# Circular Close Button at top-right
+	var close_btn = Button.new()
+	close_btn.text = "\u2715"
+	close_btn.position = Vector2(754 - 44, 7)
+	close_btn.size = Vector2(34, 34)
+	close_btn.custom_minimum_size = Vector2(34, 34)
+	close_btn.pivot_offset = Vector2(17, 17)
+	var sb_close = StyleBoxFlat.new()
+	sb_close.bg_color = Color("#fddede") # Soft peach/pink matching Figma
+	sb_close.border_color = Color("#4a2e2b")
+	sb_close.set_border_width_all(2.5)
+	sb_close.set_corner_radius_all(17)
+	close_btn.add_theme_stylebox_override("normal", sb_close)
+	var sb_close_h = sb_close.duplicate()
+	sb_close_h.bg_color = Color("#fca5a5")
+	close_btn.add_theme_stylebox_override("hover", sb_close_h)
+	close_btn.add_theme_font_override("font", font_black)
+	close_btn.add_theme_font_size_override("font_size", 14)
+	close_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
+	close_btn.pressed.connect(_close_pinout_modal)
+	_setup_hover_scale(close_btn, 1.15)
+	h_box_hdr.add_child(close_btn)
+	
+	# Content Area
+	var content_margin = MarginContainer.new()
+	content_margin.add_theme_constant_override("margin_left", 24)
+	content_margin.add_theme_constant_override("margin_top", 16)
+	content_margin.add_theme_constant_override("margin_right", 24)
+	content_margin.add_theme_constant_override("margin_bottom", 20)
+	vb_main.add_child(content_margin)
+	
+	# Dashed inner box
+	var dashed_box = Control.new()
+	dashed_box.custom_minimum_size = Vector2(706, 260)
+	dashed_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dashed_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dashed_box.draw.connect(func():
+		var w = dashed_box.size.x
+		var h = dashed_box.size.y
+		var col = Color("#baa89d")
+		var lw = 3.0
+		var dash = 10.0
+		var pad = 4.0
+		dashed_box.draw_dashed_line(Vector2(pad + 12, pad), Vector2(w - pad - 12, pad), col, lw, dash)
+		dashed_box.draw_dashed_line(Vector2(w - pad, pad + 12), Vector2(w - pad, h - pad - 12), col, lw, dash)
+		dashed_box.draw_dashed_line(Vector2(w - pad - 12, h - pad), Vector2(pad + 12, h - pad), col, lw, dash)
+		dashed_box.draw_dashed_line(Vector2(pad, h - pad - 12), Vector2(pad, pad + 12), col, lw, dash)
+	)
+	content_margin.add_child(dashed_box)
+	
+	var hb_content = HBoxContainer.new()
+	hb_content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hb_content.alignment = BoxContainer.ALIGNMENT_CENTER
+	hb_content.add_theme_constant_override("separation", 24)
+	dashed_box.add_child(hb_content)
+	
+	pinout_lbl_u1 = Label.new()
+	pinout_lbl_u1.text = "568A"
+	pinout_lbl_u1.custom_minimum_size = Vector2(80, 0)
+	pinout_lbl_u1.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pinout_lbl_u1.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pinout_lbl_u1.add_theme_font_override("font", font_black)
+	pinout_lbl_u1.add_theme_font_size_override("font_size", 20)
+	pinout_lbl_u1.add_theme_color_override("font_color", Color("#4a2e2b"))
+	hb_content.add_child(pinout_lbl_u1)
+	
+	pinout_diagram_rect = TextureRect.new()
+	pinout_diagram_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pinout_diagram_rect.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pinout_diagram_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pinout_diagram_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	pinout_diagram_rect.custom_minimum_size = Vector2(460, 230)
+	pinout_diagram_rect.texture = tex_diagram_cross
+	hb_content.add_child(pinout_diagram_rect)
+	
+	pinout_lbl_u2 = Label.new()
+	pinout_lbl_u2.text = "568B"
+	pinout_lbl_u2.custom_minimum_size = Vector2(80, 0)
+	pinout_lbl_u2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pinout_lbl_u2.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pinout_lbl_u2.add_theme_font_override("font", font_black)
+	pinout_lbl_u2.add_theme_font_size_override("font_size", 20)
+	pinout_lbl_u2.add_theme_color_override("font_color", Color("#4a2e2b"))
+	hb_content.add_child(pinout_lbl_u2)
+
+func _build_guidebook_modal() -> void:
 	guidebook_modal = preload("res://scenes/guidebook.tscn").instantiate()
 	guidebook_modal.name = "GuidebookModal"
 	guidebook_modal.visible = false
 	add_child(guidebook_modal)
-	inspect_modal = guidebook_modal
-
 
 func _build_intro_modal() -> void:
 	intro_modal = Control.new()
@@ -1108,11 +1297,11 @@ func _build_intro_modal() -> void:
 	
 	var card = PanelContainer.new()
 	card.name = "IntroCard"
-	card.set_anchors_preset(Control.PRESET_CENTER)
 	card.size = Vector2(620, 360)
 	card.pivot_offset = Vector2(310, 180)
-	card.position = Vector2(470, 180)
 	intro_card = card
+	var vp_sz_i = get_viewport_rect().size
+	card.position = Vector2((vp_sz_i.x - card.size.x) / 2.0, (vp_sz_i.y - card.size.y) / 2.0)
 	
 	var sb = StyleBoxFlat.new()
 	sb.bg_color = Color("#fffbeb") # Warm cream matching mockup
@@ -1182,9 +1371,8 @@ func _build_endgame_modals() -> void:
 	
 	var w_card = PanelContainer.new()
 	w_card.name = "WinCard"
-	w_card.set_anchors_preset(Control.PRESET_CENTER)
 	w_card.size = Vector2(560, 360)
-	w_card.position = Vector2(500, 180)
+	w_card.pivot_offset = Vector2(280, 180)
 	win_card = w_card
 	var sb_win = StyleBoxFlat.new()
 	sb_win.bg_color = Color("#f0fdf4")
@@ -1201,7 +1389,7 @@ func _build_endgame_modals() -> void:
 	w_card.add_child(vb_w)
 	
 	var w_title = Label.new()
-	w_title.text = "🎉 MISI SELESAI!"
+	w_title.text = "MISI SELESAI!"
 	w_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	w_title.add_theme_font_override("font", font_black)
 	w_title.add_theme_font_size_override("font_size", 24)
@@ -1258,7 +1446,7 @@ func _build_endgame_modals() -> void:
 	sb_bn.set_content_margin_all(8)
 	btn_next.add_theme_stylebox_override("normal", sb_bn)
 	btn_next.add_theme_color_override("font_color", Color("#ffffff"))
-	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
+	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_1_2.tscn"))
 	hb_w_btns.add_child(btn_next)
 	vb_w.add_child(hb_w_btns)
 	
@@ -1276,9 +1464,8 @@ func _build_endgame_modals() -> void:
 	
 	var g_card = PanelContainer.new()
 	g_card.name = "GameOverCard"
-	g_card.set_anchors_preset(Control.PRESET_CENTER)
 	g_card.size = Vector2(520, 320)
-	g_card.position = Vector2(520, 200)
+	g_card.pivot_offset = Vector2(260, 160)
 	gameover_card = g_card
 	var sb_go = StyleBoxFlat.new()
 	sb_go.bg_color = Color("#fef2f2")
@@ -1295,7 +1482,7 @@ func _build_endgame_modals() -> void:
 	g_card.add_child(vb_go)
 	
 	var go_title = Label.new()
-	go_title.text = "❌ MISI GAGAL"
+	go_title.text = "MISI GAGAL"
 	go_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	go_title.add_theme_font_override("font", font_black)
 	go_title.add_theme_font_size_override("font_size", 24)
@@ -1318,7 +1505,7 @@ func _build_endgame_modals() -> void:
 	hb_go_btns.add_theme_constant_override("separation", 16)
 	
 	var btn_retry = Button.new()
-	btn_retry.text = "🔄 COBA LAGI"
+	btn_retry.text = "COBA LAGI"
 	btn_retry.add_theme_font_override("font", font_black)
 	btn_retry.add_theme_font_size_override("font_size", 13)
 	var sb_br = StyleBoxFlat.new()
@@ -1349,19 +1536,27 @@ func _build_endgame_modals() -> void:
 	
 	var bd_p = ColorRect.new()
 	bd_p.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_p.color = Color(0, 0, 0, 0.7)
+	bd_p.color = Color(0, 0, 0, 0.65)
+	bd_p.gui_input.connect(func(ev: InputEvent):
+		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventScreenTouch and ev.pressed):
+			_close_pause_modal()
+	)
 	pause_modal.add_child(bd_p)
 	
 	var p_card = PanelContainer.new()
-	p_card.set_anchors_preset(Control.PRESET_CENTER)
-	p_card.size = Vector2(400, 280)
-	p_card.position = Vector2(580, 220)
+	p_card.name = "PauseCard"
+	p_card.size = Vector2(460, 320)
+	p_card.pivot_offset = Vector2(230, 160)
+	pause_card = p_card
 	var sb_p = StyleBoxFlat.new()
-	sb_p.bg_color = Color("#f8fafc")
+	sb_p.bg_color = Color("#fffdf7") # Warm cream
 	sb_p.border_color = Color("#4a2e2b")
-	sb_p.set_border_width_all(3)
-	sb_p.set_corner_radius_all(18)
-	sb_p.set_content_margin_all(20)
+	sb_p.set_border_width_all(3.5)
+	sb_p.set_corner_radius_all(20)
+	sb_p.set_content_margin_all(24)
+	sb_p.shadow_color = Color(0, 0, 0, 0.3)
+	sb_p.shadow_size = 14
+	sb_p.shadow_offset = Vector2(0, 4)
 	p_card.add_theme_stylebox_override("panel", sb_p)
 	pause_modal.add_child(p_card)
 	
@@ -1386,7 +1581,7 @@ func _build_endgame_modals() -> void:
 	sb_res.set_corner_radius_all(10)
 	sb_res.set_content_margin_all(8)
 	btn_resume.add_theme_stylebox_override("normal", sb_res)
-	btn_resume.pressed.connect(func(): pause_modal.visible = false)
+	btn_resume.pressed.connect(_close_pause_modal)
 	vb_p.add_child(btn_resume)
 	
 	var btn_p_restart = Button.new()
@@ -1451,6 +1646,7 @@ func show_toast(msg: String) -> void:
 	fade_tween.tween_property(toast_panel, "modulate:a", 0.0, 0.25)
 	fade_tween.chain().tween_callback(func(): toast_panel.visible = false)
 
+
 func _reposition_responsive() -> void:
 	var screen_w = get_viewport_rect().size.x
 	var center_x = screen_w / 2.0
@@ -1480,6 +1676,18 @@ func _reposition_responsive() -> void:
 		cable_table_node.position = Vector2(center_x - 230.0, 520.0)
 		cable_table_node.size = Vector2(460.0, 130.0)
 		
+	# Table Prompts (Lihat & Ambil pills on left of table)
+	if table_prompts_container and cable_table_node:
+		table_prompts_container.position = Vector2(cable_table_node.position.x - 90.0, cable_table_node.position.y + 40.0)
+		
+	# Left Rack Prompt ("Letakkan Kabel" on right rim of left rack)
+	if rack_prompt_left and left_rack_node:
+		rack_prompt_left.position = Vector2(left_rack_node.position.x + 276.0, left_rack_node.position.y + 115.0)
+		
+	# Right Rack Prompt ("Letakkan Kabel" on left rim of right rack)
+	if rack_prompt_right and right_rack_node:
+		rack_prompt_right.position = Vector2(right_rack_node.position.x - 132.0, right_rack_node.position.y + 115.0)
+		
 	# Character Mascot initial placement
 	if char_pos == Vector2.ZERO:
 		char_pos = Vector2(center_x - 88.0, 370.0)
@@ -1497,26 +1705,27 @@ func _reposition_responsive() -> void:
 		if pause_b:
 			pause_b.position.x = screen_w - 90.0
 			
-	# Modals Centering
-	if intro_card:
-		intro_card.position = Vector2((screen_w - intro_card.size.x) / 2.0, (720.0 - intro_card.size.y) / 2.0)
-		
-	if inspect_card:
-		var vp_sz = get_viewport_rect().size
-		inspect_card.position = Vector2((vp_sz.x - inspect_card.size.x) / 2.0, (vp_sz.y - inspect_card.size.y) / 2.0)
-		
-	if win_card:
-		win_card.position = Vector2((screen_w - win_card.size.x) / 2.0, (720.0 - win_card.size.y) / 2.0)
-		
-	if gameover_card:
-		gameover_card.position = Vector2((screen_w - gameover_card.size.x) / 2.0, (720.0 - gameover_card.size.y) / 2.0)
-		
 	# Action Touch Button
 	var act_btn = get_node_or_null("ActionTouchBtn") as Control
 	if act_btn:
 		act_btn.position = Vector2(screen_w - 150.0, 550.0)
-
-# --- AUDIO SYNTHESIS HELPERS ---
+		
+	# Modals Centering
+	var vp_sz = get_viewport_rect().size
+	if intro_card:
+		intro_card.position = Vector2((vp_sz.x - intro_card.size.x) / 2.0, (vp_sz.y - intro_card.size.y) / 2.0)
+		
+	if pinout_card:
+		pinout_card.position = Vector2((vp_sz.x - pinout_card.size.x) / 2.0, (vp_sz.y - pinout_card.size.y) / 2.0)
+		
+	if pause_card:
+		pause_card.position = Vector2((vp_sz.x - pause_card.size.x) / 2.0, (vp_sz.y - pause_card.size.y) / 2.0)
+		
+	if win_card:
+		win_card.position = Vector2((vp_sz.x - win_card.size.x) / 2.0, (vp_sz.y - win_card.size.y) / 2.0)
+		
+	if gameover_card:
+		gameover_card.position = Vector2((vp_sz.x - gameover_card.size.x) / 2.0, (vp_sz.y - gameover_card.size.y) / 2.0)
 
 func _setup_hover_scale(btn: Control, max_scale: float = 1.08) -> void:
 	btn.mouse_entered.connect(func():
