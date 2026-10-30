@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/dashboard.gd" id="1_dash_script"]
 [ext_resource type="PackedScene" path="res://scenes/guidebook.tscn" id="23_guidebook"]
+[ext_resource type="PackedScene" path="res://scenes/settings_modal.tscn" id="26_settings_modal"]
 [ext_resource type="Texture2D" uid="uid://bvqylweq5fgyd" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="2_bg"]
 [ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="3_font_black"]
 [ext_resource type="FontFile" uid="uid://dwd0sb6ffhlic" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="4_font_extrabold"]
@@ -856,6 +857,10 @@ vertical_alignment = 1
 unique_name_in_owner = true
 
 [node name="GuidebookModal" parent="." instance=ExtResource("23_guidebook")]
+unique_name_in_owner = true
+visible = false
+
+[node name="SettingsModal" parent="." instance=ExtResource("26_settings_modal")]
 unique_name_in_owner = true
 visible = false
 

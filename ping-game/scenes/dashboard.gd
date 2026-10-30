@@ -13,6 +13,7 @@ extends Control
 @onready var leaderboard_btn: TextureButton = %LeaderboardButton
 @onready var practice_btn: TextureButton = %PracticeButton
 @onready var guidebook_modal: Control = %GuidebookModal
+@onready var settings_modal: Control = %SettingsModal
 
 # Stage buttons
 @onready var stages_scroll: ScrollContainer = %StagesScroll
@@ -67,6 +68,17 @@ func _ready() -> void:
 			img.save_png("art/dashboard_scroll_render.png")
 		get_tree().quit()
 
+	if "--screenshot-settings" in all_args:
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if settings_modal:
+			settings_modal.open()
+		await get_tree().create_timer(0.4).timeout
+		var img = get_viewport().get_texture().get_image()
+		if img:
+			img.save_png("art/settings_modal_render.png")
+		get_tree().quit()
+
 	if "--screenshot" in all_args:
 		await get_tree().process_frame
 		await get_tree().process_frame
@@ -78,7 +90,10 @@ func _ready() -> void:
 	# Setup button animations and events
 	_setup_button(profile_btn, func(): show_toast("Profil: %s (Status: Aktif)" % PlayerData.current_username))
 	_setup_button(stars_btn, func(): show_toast("Total Bintang: 12 / 57 Bintang terkumpul"))
-	_setup_button(settings_btn, func(): show_toast("Membuka Pengaturan Sistem..."))
+	_setup_button(settings_btn, func():
+		if settings_modal:
+			settings_modal.open()
+	)
 	if back_btn:
 		_setup_button(back_btn, _on_back_pressed)
 		

@@ -1,0 +1,346 @@
+=== PAGE 1 ===
+
+
+=== PAGE 2 ===
+MATA KULIAH
+Pemrograman Game
+DISUSUN OLEH
+Abidah Azka Zaen Prasetyo
+25091397018
+Lionel Jevon Chrismana Putra 
+25091397019
+Muhammad Ashim Dzulhilmi 
+25091397027
+Farradhisa Putri Listyaji
+25091367094
+PROGRAM STUDI
+D4 Manajemen Informatika
+2025A
+D4 Desain Grafis
+SUMBER REFERENSI
+Modul Pembelajaran Mata Kuliah Jaringan Komputer D4 Manajemen
+Informatika
+
+
+=== PAGE 3 ===
+Nama Aplikasi Permainan
+Aplikasi permainan edukasi yang kami kembangkan bernama PING!.
+Nama ini diambil dari utilitas command-line standar untuk menguji
+jangkauan jaringan, merepresentasikan tujuan utama game ini:
+menghubungkan konsep jaringan yang rumit ke pemahaman pemain.
+Latar Belakang dan Motivasi
+Mempelajari infrastruktur dan dasar jaringan komputer sering kali
+dianggap sebagai materi teknis yang kaku, penuh dengan abstraksi, dan
+mengintimidasi bagi pelajar pemula. Sistem pembelajaran dan
+simulator jaringan yang ada saat ini (seperti Cisco Packet Tracer atau
+GNS3) dirancang khusus untuk profesional. Antarmuka yang disajikan
+sangat teknis, bernuansa gelap, dan penuh dengan istilah rumit,
+sehingga menimbulkan beban kognitif (cognitive overload) bagi pelajar
+sekolah menengah atau mahasiswa IT tingkat awal yang baru memulai
+studinya.
+Pengembangan aplikasi permainan PING! dilandasi oleh motivasi untuk
+memecahkan barrier of entry (hambatan masuk) tersebut. Kami
+mengusung semangat pencapaian Sustainable Development Goals
+(SDGs) Target ke-4: Pendidikan Berkualitas, secara spesifik pada pilar
+pendidikan berkelanjutan. Kami percaya bahwa setiap materi yang sulit
+dapat dipahami jika disampaikan dengan bahasa dan visual yang tepat.
+PING! merombak total ketegangan dari simulasi jaringan yang kaku
+menjadi pengalaman bermain cozy puzzle yang santai, imut, dan
+menyenangkan. Dengan pendekatan ini, materi teknis seperti
+subnetting, perakitan kabel UTP, hingga konfigurasi OSI Layer tidak lagi
+menjadi momok menakutkan, melainkan sebuah teka-teki logika yang
+ramah dan mudah didekati oleh semua kalangan, mulai dari pelajar,
+remaja, orang dewasa, hingga masyarakat umum yang memiliki
+ketertarikan pada dasar-dasar ilmu komputer.
+
+
+=== PAGE 4 ===
+Deskripsi Aplikasi Permainan
+A. High Concept Statement
+PING! adalah game simulasi edukasi single-player yang memadukan
+visual interaktif ramah bergaya 2D kawaii doodle dengan kompleksitas
+teknis pengujian jaringan ala simulator profesional, dikemas dalam
+bentuk tantangan teka-teki logika yang estetik, menyenangkan, dan
+memacu adrenalin di bawah tekanan waktu.
+B. Story atau Cerita
+Pemain akan bermain sebagai seorang teknisi yang baru saja diterima
+bekerja di sebuah perusahaan. Alih-alih bekerja di ruang server sci-fi
+bawah tanah yang gelap dan dingin, pemain ditempatkan di sebuah
+ruang kerja estetik, hangat, dengan ornamen tanaman hias dan
+perabotan pastel.
+Namun, kedamaian di ruangan tersebut tidak bertahan lama. Setiap
+harinya, infrastruktur logis maupun fisik perusahaan mengalami
+berbagai krisis yang menggemaskan namun kritis: kabel putus, router
+yang tertidur dan crash, hingga paket data yang kebingungan mencari
+alamat. Pemain bertugas menyelamatkan koneksi sistem utama
+perusahaan dengan menyelesaikan krisis-krisis tersebut sebelum
+sistem mengalami downtime total.
+C. Mechanics and Players' Role
+Di dalam permainan, pemain bertindak sebagai pengambil keputusan
+tunggal (sole troubleshooter). Berikut adalah rincian mekanika
+permainannya:
+Sudut Pandang (POV): Pemain melihat lingkungan kerja dari sudut
+pandang pihak ketiga (top-down camera).
+Interaksi Inti (Core Loop): Menggunakan sistem Raycasting, pemain
+dapat menyentuh objek seperti PC yang rusak, Switch yang mati,
+atau kabel yang putus. Interaksi ini akan memicu munculnya canvas
+2D berupa mini-game puzzle spesifik. Setelah puzzle diselesaikan,
+perangkat di lingkungan 2D akan kembali menyala dan berfungsi.
+
+
+=== PAGE 5 ===
+Sistem Nyawa (HP) dan Hukuman Estetik:
+Pemain diberikan 3 Nyawa per level, direpresentasikan melalui
+UI ikon hati/baterai kecil yang tersenyum.
+Jika pemain melakukan kesalahan logika fatal (misal:
+menyambungkan kabel silang pada perangkat yang salah, atau
+memicu collision data), HP akan berkurang satu (ikon memudar
+dan menjadi sedih).
+Penalti: Menghindari efek game over yang membuat stres
+(seperti animasi tersetrum keras), PING! menggunakan penalti
+komikal. Layar akan bergetar lembut (bouncing effect), karakter
+pemain mengeluarkan emotikon pusing (mata spiral), dan
+perangkat akan cemberut, menangis kecil, atau sedikit gosong
+ala kartun.
+Sistem Skor (Time-Attack) : Tantangan permainan diatur oleh float
+timer hitung mundur dengan visualisasi jam beker yang melompat-
+lompat panik di sudut layar saat waktu menipis. Skor akhir (Star
+Rating) bergantung pada kecepatan dan efisiensi penyelesaian
+teka-teki.
+Color Coding Fungsional Indikator visual sangat penting dalam
+game ini. Kami menggunakan skema:
+Pastel Mint Green (Hijau Lembut): Status "UP" / Sukses
+tersambung.
+Baby Blue (Biru Langit): Jalur Standby / Menunggu instruksi.
+Soft Coral (Merah Muda Pucat): Troubleshoot / Error / Terputus
+(warna peringatan yang tidak menyakiti mata).
+Genre : Simulation, Logic Puzzle, Educational.
+Competition Modes : Single Player (Pemain tunggal) dengan
+integrasi Local Leaderboard berdasarkan perolehan skor waktu
+penyelesaian (Time-Attack Score).
+
+
+=== PAGE 6 ===
+General Summary of Progression : Jalan cerita dan progres
+kesulitan permainan dibagi secara terstruktur menjadi 5 Stage
+(Tahapan) Utama yang mengadaptasi kurikulum dasar jaringan
+komputer:
+Stage 1: Physical & Data Link (Gudang Hardware) Fokus pada
+infrastruktur fisik. Pemain belajar membedakan kabel Straight
+dan Cross (Level 1.1), merakit urutan pin warna TIA/EIA 568A/B
+dengan batasan waktu (Level 1.2), dan memilih penggunaan
+Switch ketimbang Hub untuk merutekan paket data Unicast
+agar terhindar dari Collision (Level 1.3).
+Stage 2: Network & Addressing (Koridor Server Utama) Fokus
+pada pemahaman IP Address. Pemain menyortir masuknya IPv4
+ke kelas A, B, atau C (Level 2.1), bertindak sebagai Firewall
+manual untuk memblokir IP Publik dan mengizinkan IP Privat
+(Level 2.2), serta mengawal langsung perjalanan amplop
+bersayap (ARP-Request) dan menuntun balasan MAC-Address
+(ARP-Reply) (Level 2.3 & 2.4).
+Stage 3: Subnetting & Routing (Ruang Kontrol Subnet) Fokus
+pada efisiensi alamat (matematika jaringan). Memecah sebuah
+IP menjadi bagian NetID dan HostID (Level 3.1), mini-game
+mencocokkan Subnet Mask desimal dengan nilai CIDR (Level
+3.2), mengidentifikasi IP Usable untuk menyalakan PC Klien
+tanpa menyentuh alamat Broadcast/Network (Level 3.3), dan
+merapikan teka-teki balok tabel routing yang berantakan (Level
+3.4).
+Stage 4: Topology & Infrastructure (Fasilitas Eksternal) Fokus
+pada desain wilayah dan arsitektur spasial. Menyesuaikan
+jangkauan pemancar dari PAN, LAN, MAN, hingga WAN (Level
+4.1). Pemain juga harus memperbaiki pusat Topologi Star yang
+mati (Level 4.2), serta mengembalikan siklus perputaran data
+pada Topologi Ring dan mengatur persilangan Topologi Mesh
+(Level 4.3).
+
+
+=== PAGE 7 ===
+Stage 5: Standardisasi OSI & Transport (Core Mainframe) Fokus
+pada arsitektur sistem tingkat tinggi (Tahap Final). Menyusun
+balok 7 OSI Layer (Level 5.1), memandu konveyor pengemasan
+data dari Bits menjadi Segments (Level 5.2). Menyortir paket
+aplikasi (email/file) ke jalur TCP yang aman, dan (video/voice) ke
+jalur UDP yang cepat (Level 5.3). Pemain lalu menyambungkan
+kabel Port (misal: HTTP ke 80) (Level 5.4), dan ditutup dengan
+rhythm mini-game untuk melakukan TCP Three-Way Handshake
+secara berurutan (SYN -> SYN/ACK -> ACK) (Level 5.5).
+C. Target Audience
+Target demografis utama adalah remaja hingga dewasa muda (usia 15 -
+25 tahun), khususnya pelajar SMK jurusan TKJ (Teknik Komputer
+Jaringan), mahasiswa IT tingkat pertama, atau siapapun yang ingin
+mempelajari dasar jaringan. Secara psikografis, visual kawaii doodle
+dan mekanik yang anti-frustrasi membuat game ini sangat cocok dan
+aman dimainkan oleh casual gamers atau anak-anak di bawah umur
+sebagai media pengenalan teknologi informasi sejak dini.
+D. Informasi Tambahan (Unique Selling Proposition)
+Nilai tambah dari PING! adalah metode "Personifikasi Data". Proses
+gaib di dalam jaringan (seperti pengiriman ARP atau perubahan bit
+data) yang biasanya hanya berwujud teks di layar Terminal, dihidupkan
+secara visual. Paket data digambarkan sebagai "amplop kecil bersayap"
+yang berlarian di dalam kabel, memberikan pemahaman spasial yang
+konkret bagi pemain mengenai bagaimana internet sebenarnya
+bekerja.
+
+
+=== PAGE 8 ===
+Ilustrasi Visual /Aesthetics
+A. Preview Karakter dan Benda Mati atau Personifikasi
+B. Preview Elemen Permainan dan In-Game HUD
+C. Preview Map
+
+=== PAGE 9 ===
+D. Wireframe Antarmuka
+Halaman awal : tampilan antarmuka pertama yang akan dilihat oleh
+pemain saat membuka aplikasi permainan PING!. Halaman ini
+memuat judul utama permainan beserta tombol navigasi dasar
+untuk masuk ke dashbor.
+Dashboard : sebagai pusat kendali utama bagi pemain. Melalui
+halaman ini, pemain dapat mengakses berbagai menu turunan,
+seperti pemilihan tahapan permainan (stage), pengaturan sistem,
+papan peringkat, dan buku panduan edukasi.
+
+
+=== PAGE 10 ===
+Halaman gameplay : menampilkan lingkungan visual utama
+permainan dengan sudut pandang dari atas (top-down view).
+Antarmuka ini juga secara langsung memuat elemen interaktif
+Head-Up Display (HUD), seperti indikator nyawa (HP) berbentuk
+baterai tersenyum, pengatur waktu (timer), karakter pemain, serta
+perangkat keras jaringan yang beroperasi.
+Popup mekanik gameplay : ini akan muncul secara otomatis ketika
+pemain berinteraksi dengan objek perangkat yang mengalami
+kerusakan (seperti kabel terputus atau router yang mati). Layar ini
+akan menampilkan kanvas 2D berupa permainan teka-teki logika
+spesifik yang harus diselesaikan oleh pemain.
+
+
+=== PAGE 11 ===
+Popup task gameplay : antarmuka ini merupakan jendela informasi
+yang menyajikan rincian instruksi, krisis jaringan yang sedang
+terjadi, dan daftar misi yang harus diselesaikan oleh pemain pada
+tingkat permainan (level) yang sedang berlangsung.
+Leaderboard penyelesaian level terbaik : Halaman ini menampilkan
+daftar peringkat secara lokal (local leaderboard) yang disusun
+berdasarkan perolehan skor tertinggi dan rekor waktu penyelesaian
+tercepat (time-attack score). Halaman ini dirancang untuk memacu
+motivasi dan semangat kompetitif pemain dalam menyelesaikan
+teka-teki secara efisien.
+
+
+=== PAGE 12 ===
+Pemilihan karakter : Halaman ini memfasilitasi pemain untuk
+memilih karakter yang akan digunakan selama permainan. Pemain
+dapat menentukan tampilan karakter sebelum memasuki ruangan
+atau fasilitas perusahaan.
+Halaman Latihan : Halaman ini didedikasikan sebagai area tutorial
+interaktif. Pemain pemula dapat bereksperimen dan mempelajari
+mekanika dasar permainan, seperti merakit kabel dan menguji
+koneksi tanpa adanya tekanan batas waktu maupun risiko
+pengurangan nyawa (HP).
+
+
+=== PAGE 13 ===
+������������������������������������������������������������������������������������������������������������������������������
+����������������������������������������������������������������������������������������������������������������������������
+��������������������������������������������������������������������������������������������������������������������������������
+����������������������������������������������������������������������������������������������������������������������������������
+������������������������������������������������������������������������������������������������������������������������
+
+
+=== PAGE 14 ===
+Teknologi dan Sumber Daya yang Digunakan
+Untuk mencapai standar kualitas industri dalam masa pengembangan,
+tim kami menggunakan kombinasi perangkat keras dan lunak sebagai
+berikut:
+A. Teknologi Pengembangan (Development Tools)
+Game Engine: Android SDK & JDK. Android SDK menyediakan
+kumpulan platform tools dan API resmi dari Google yang
+dibutuhkan Godot Engine untuk mengenali struktur sistem Android
+saat proses export, sementara JDK berfungsi menjalankan Gradle
+build system yang mengemas seluruh aset dan skrip permainan
+menjadi satu paket instalasi (.APK). Kedua komponen ini bersifat
+free and open-source, sehingga tidak menambah beban biaya
+pengembangan. Untuk kebutuhan uji coba internal dan distribusi
+terbatas tanpa publikasi ke Google Play Store, tim cukup
+melakukan export dalam mode Debug, di mana Godot secara
+otomatis menandatangani signing file .APK menggunakan debug
+keystore bawaan, sehingga permainan sudah dapat langsung
+dipasang dan dimainkan pada perangkat Android fisik maupun
+emulator tanpa proses administratif tambahan seperti pendaftaran
+akun developer berbayar.
+2D Art & UI Design: Adobe Illustrator dan Figma. Digunakan untuk
+menggambar sprite kawaii doodle vektor agar tidak pecah saat di-
+scale pada layar mobile, serta merancang komponen UI (seperti
+tombol rounded dan sticky notes).
+Audio Engineering: Audacity / FL Studio. Digunakan untuk meracik
+SFX cozy (suara klik kayu, notifikasi lonceng ringan, suara bouncing
+kartun).
+Version Control: Git & GitHub untuk kolaborasi repositori kode
+antar anggota tim.
+B. Target Platform & Penggunaan (Deployment):
+Perangkat: Mobile Smartphone & Tablet.
+Sistem Operasi: Android. Dipilih karena penetrasi pasar mobile
+sangat tinggi di kalangan pelajar, memungkinkan game edukasi ini
+diakses kapan saja dan di mana saja.
+
+
+=== PAGE 15 ===
+Fase Tahapan Implementasi
+1 Pra-Produksi &
+Konseptualisasi
+Pembuatan Game Design
+Document (GDD). Riset akurasi
+kurikulum modul jaringan
+(Subnetting, warna kabel, dll).
+Desain sketsa/mockup karakter
+kawaii dan UI sticky notes.
+2 Pembuatan Prototipe (Core-
+Loop)
+Pemrograman pondasi utama:
+Sistem pergerakan kamera,
+Raycasting 2D. Pembuatan
+sistem HP (nyawa), Timer
+Countdown, dan kondisi
+menang/kalah. Prototipe Stage
+1.
+C. Struktur Tim (Sumber Daya Manusia):
+Project Manager / Game Designer: Mengatur metrik level, tingkat
+kesulitan timer, dan kurikulum IT yang dimasukkan ke dalam game.
+Lead Programmer: Bertanggung jawab atas logika koding
+raycasting, interaksi mekanik UI, dan sistem validasi puzzle.
+UI/UX & 2D Artist: Bertanggung jawab sepenuhnya pada estetika
+Cozy Pastel, memastikan skema warna fungsional berjalan baik,
+dan menganimasikan idle breathing setiap karakter.
+Tahapan Rancangan dan Implementasi
+Pengembangan aplikasi PING! menggunakan metodologi Agile (Scrum)
+yang diadaptasi dalam 5 fase operasional selama kurang lebih 3-4
+bulan pengerjaan.
+
+
+=== PAGE 16 ===
+3 Produksi Lanjutan (ModulLengkap)
+Implementasi penuh Stage 2
+hingga 5. Pemrograman
+kalkulator logika IP/Subnet di
+balik layar. Memasukkan sprite
+visual, animasi idle breathing,
+dan ekspresi wajah responsif
+perangkat.
+4 QA Testing, Debugging &Polish
+Playtesting internal untuk
+menyeimbangkan durasi Time-
+Attack dengan tingkat kesulitan.
+Memperbaiki bug collision UI.
+Penambahan efek Screen
+Shake/Bouncing dan SFX.
+5 Finalisasi & Pengajuan HKI
+Kompilasi (Build) permainan ke
+format .APK/.AAB final untuk
+sistem Android. Pembuatan
+dokumentasi akhir teknis,
+manual pengguna, dan
+pemberkasan administratif
+untuk pendaftaran pencatatan
+Hak Cipta (Hak Kekayaan
+Intelektual).

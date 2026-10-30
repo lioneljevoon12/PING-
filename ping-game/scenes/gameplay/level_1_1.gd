@@ -30,6 +30,8 @@ var tex_joystick_nub: Texture2D = preload("res://art/assets/PING! Assets/mobile-
 var tex_star_gold: Texture2D = preload("res://art/ui-ux/levelpath/star_gold.png")
 var tex_star_gray: Texture2D = preload("res://art/ui-ux/levelpath/star_gray.png")
 var tex_router_idle: Texture2D = preload("res://art/assets/PING! Assets/Character/main-char-router.png")
+var tex_frame_jam: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/generals/frame-jam.png")
+var tex_vector_heart: Texture2D = preload("res://art/assets/PING! Assets/asset-gameplay/generals/vector-hearts.png")
 
 var font_black: Font = preload("res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf")
 var font_extrabold: Font = preload("res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf")
@@ -53,6 +55,7 @@ var time_passed: float = 0.0
 
 # Gameplay State
 var hearts: int = 3
+var hearts_rects: Array[TextureRect] = []
 var time_remaining: float = 165.0 # 02:45
 var is_game_active: bool = false
 var carried_cable_data = null
@@ -83,6 +86,7 @@ var pinout_card: PanelContainer
 var pinout_diagram_rect: TextureRect
 var pinout_info_lbl: Label
 var pause_modal: Control
+var settings_modal: Control
 var pause_card: Control
 var win_modal: Control
 var win_card: Control
@@ -114,6 +118,8 @@ var pinout_hint_panel: PanelContainer
 var pinout_hint_lbl: Label
 
 func _ready() -> void:
+	settings_modal = preload("res://scenes/settings_modal.tscn").instantiate()
+	add_child(settings_modal)
 	_load_walk_frames()
 	_init_cables_data()
 	
@@ -266,7 +272,7 @@ func _is_room_collision(pos: Vector2, center_x: float) -> bool:
 	var feet_left = pos.x + 36.0
 	var feet_right = pos.x + 140.0
 	var feet_top = pos.y + 55.0
-	var feet_bottom = pos.y + 98.0
+	var feet_bottom = pos.y + 144.0
 	
 	# 1. Cable Workbench Table (Bottom Center: center_x - 230 to center_x + 230, Y: 520 to 650)
 	var tbl_l = center_x - 230.0
@@ -357,7 +363,7 @@ func _update_interaction_prompts() -> void:
 	var screen_w = get_viewport_rect().size.x
 	var center_x = screen_w / 2.0
 	
-	var char_center = character_mascot.position + Vector2(88, 49)
+	var char_center = character_mascot.position + Vector2(128, 72)
 	var table_pos = cable_table_node.position + Vector2(230, 60)
 	var left_rack_pos = left_rack_node.position + Vector2(135, 170)
 	var right_rack_pos = right_rack_node.position + Vector2(135, 170)
@@ -407,7 +413,7 @@ func _get_first_available_cable_idx() -> int:
 func _on_action_button_pressed() -> void:
 	var screen_w = get_viewport_rect().size.x
 	var center_x = screen_w / 2.0
-	var char_center = character_mascot.position + Vector2(88, 49)
+	var char_center = character_mascot.position + Vector2(128, 72)
 	
 	var dist_table = char_center.distance_to(cable_table_node.position + Vector2(230, 60))
 	var dist_left_rack = char_center.distance_to(left_rack_node.position + Vector2(135, 170))
@@ -649,6 +655,7 @@ func _close_pause_modal() -> void:
 		pause_modal.visible = false
 
 func _open_inspect_modal(c_data: Dictionary = {}) -> void:
+	if SettingsManager: SettingsManager.vibrate(35)
 	_open_pinout_modal(c_data)
 
 func _close_inspect_modal() -> void:
@@ -663,7 +670,9 @@ func _build_room_visuals() -> void:
 	_setup_cable_workbench()
 
 func _setup_rack_node(rack_root: Control, title_text: String, badge_color_hex: String, slots_array: Array[TextureRect]) -> void:
-	# Rack Graphic
+	rack_root.clip_contents = false
+	rack_root.size = Vector2(270, 340)
+	
 	var rack_tex = TextureRect.new()
 	rack_tex.texture = tex_rack
 	rack_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -671,29 +680,43 @@ func _setup_rack_node(rack_root: Control, title_text: String, badge_color_hex: S
 	rack_tex.size = Vector2(270, 340)
 	rack_root.add_child(rack_tex)
 	
-	# Rack Title Badge
+	# Figma Rack Badge: White background, 3.5px border #4a2e2b, centered on top, no clipping
 	var badge = PanelContainer.new()
-	badge.size = Vector2(190, 36)
-	badge.position = Vector2(40, -18)
+	badge.custom_minimum_size = Vector2(210, 56)
+	badge.size = Vector2(210, 56)
+	badge.position = Vector2((270.0 - 210.0) / 2.0, -30.0)
 	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color(badge_color_hex)
-	sb.border_color = Color("#ffffff")
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(12)
-	sb.shadow_color = Color(0, 0, 0, 0.2)
-	sb.shadow_size = 4
-	sb.shadow_offset = Vector2(0, 2)
+	sb.bg_color = Color("#ffffff")
+	sb.border_color = Color("#4a2e2b")
+	sb.set_border_width_all(3.5)
+	sb.set_corner_radius_all(14)
+	sb.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb.shadow_size = 5
+	sb.shadow_offset = Vector2(0, 3)
 	badge.add_theme_stylebox_override("panel", sb)
-	
-	var lbl = Label.new()
-	lbl.text = title_text
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.add_theme_font_override("font", font_black)
-	lbl.add_theme_font_size_override("font_size", 13)
-	lbl.add_theme_color_override("font_color", Color("#ffffff"))
-	badge.add_child(lbl)
 	rack_root.add_child(badge)
+	
+	var vb_badge = VBoxContainer.new()
+	vb_badge.alignment = BoxContainer.ALIGNMENT_CENTER
+	vb_badge.add_theme_constant_override("separation", -2)
+	badge.add_child(vb_badge)
+	
+	var lbl_top = Label.new()
+	lbl_top.text = "Rak Kabel"
+	lbl_top.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_top.add_theme_font_override("font", font_bold)
+	lbl_top.add_theme_font_size_override("font_size", 13)
+	lbl_top.add_theme_color_override("font_color", Color("#4a2e2b"))
+	vb_badge.add_child(lbl_top)
+	
+	var lbl_bot = Label.new()
+	var type_name = "Cross" if "Cross" in title_text else "Straight"
+	lbl_bot.text = type_name
+	lbl_bot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_bot.add_theme_font_override("font", font_black)
+	lbl_bot.add_theme_font_size_override("font_size", 16)
+	lbl_bot.add_theme_color_override("font_color", Color("#4a2e2b"))
+	vb_badge.add_child(lbl_bot)
 	
 	# 4 shelf slots inside the rack
 	slots_array.clear()
@@ -713,7 +736,6 @@ func _setup_rack_node(rack_root: Control, title_text: String, badge_color_hex: S
 		slot_rect.visible = false
 		rack_root.add_child(slot_rect)
 		slots_array.append(slot_rect)
-
 
 func _select_cable_on_table(cable_idx: int) -> void:
 	if cable_idx < 0 or cable_idx >= cables_data.size():
@@ -795,21 +817,21 @@ func _setup_cable_workbench() -> void:
 		cable_item_nodes.append(c_box)
 
 func _build_character_mascot() -> void:
-	character_mascot.size = Vector2(176, 98)
-	character_mascot.pivot_offset = Vector2(88, 49)
+	character_mascot.size = Vector2(256, 144)
+	character_mascot.pivot_offset = Vector2(128, 72)
 	
 	mascot_sprite = TextureRect.new()
-	mascot_sprite.size = Vector2(176, 98)
+	mascot_sprite.size = Vector2(256, 144)
 	mascot_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mascot_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	mascot_sprite.pivot_offset = Vector2(88, 49)
+	mascot_sprite.pivot_offset = Vector2(128, 72)
 	mascot_sprite.texture = walk_frames[0] if walk_frames.size() > 0 else tex_router_idle
 	character_mascot.add_child(mascot_sprite)
 	
 	# Floating Carried Cable Icon
 	carried_icon = TextureRect.new()
-	carried_icon.size = Vector2(58, 58)
-	carried_icon.position = Vector2(59, -46)
+	carried_icon.size = Vector2(64, 64)
+	carried_icon.position = Vector2(96, -52)
 	carried_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	carried_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	carried_icon.visible = false
@@ -818,144 +840,195 @@ func _build_character_mascot() -> void:
 func _build_header_ui() -> void:
 	header_ui = Control.new()
 	header_ui.name = "HeaderUI"
-	header_ui.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	header_ui.offset_bottom = 90.0
+	header_ui.set_anchors_preset(Control.PRESET_FULL_RECT)
+	header_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(header_ui)
 	
-	# Back Button (Circle with <)
+	# 1. Back Button (<) - Big pink circular button (64x64)
 	var back_btn = TextureButton.new()
-	back_btn.position = Vector2(30, 20)
-	back_btn.custom_minimum_size = Vector2(50, 50)
-	back_btn.pivot_offset = Vector2(25, 25)
-	
-	var sb_back = StyleBoxFlat.new()
-	sb_back.bg_color = Color("#fef3c7")
-	sb_back.border_color = Color("#4a2e2b")
-	sb_back.set_border_width_all(3)
-	sb_back.set_corner_radius_all(25)
-	
-	var p_back = Panel.new()
-	p_back.size = Vector2(50, 50)
+	back_btn.name = "BackBtn"
+	back_btn.position = Vector2(30, 18)
+	back_btn.custom_minimum_size = Vector2(64, 64)
+	back_btn.size = Vector2(64, 64)
+	back_btn.pivot_offset = Vector2(32, 32)
+	var p_back = PanelContainer.new()
+	p_back.size = Vector2(64, 64)
 	p_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb_back = StyleBoxFlat.new()
+	sb_back.bg_color = Color("#fed0cf") # Soft pastel pink
+	sb_back.border_color = Color("#4a2e2b")
+	sb_back.set_border_width_all(3.5)
+	sb_back.set_corner_radius_all(32)
+	sb_back.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb_back.shadow_size = 5
+	sb_back.shadow_offset = Vector2(0, 3)
 	p_back.add_theme_stylebox_override("panel", sb_back)
 	back_btn.add_child(p_back)
 	
 	var lbl_back = Label.new()
-	lbl_back.text = "❮"
-	lbl_back.size = Vector2(50, 50)
+	lbl_back.text = "<"
+	lbl_back.size = Vector2(64, 64)
 	lbl_back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl_back.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl_back.add_theme_font_override("font", font_black)
-	lbl_back.add_theme_font_size_override("font_size", 18)
+	lbl_back.add_theme_font_size_override("font_size", 28)
 	lbl_back.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.add_child(lbl_back)
-	
-	back_btn.pressed.connect(func():
-		_open_pause_modal()
-	)
-	_setup_hover_scale(back_btn, 1.1)
+	back_btn.pressed.connect(_open_pause_modal)
+	_setup_hover_scale(back_btn, 1.08)
 	header_ui.add_child(back_btn)
 	
-	# Hearts Container (❤️❤️❤️)
+	# 2. Hearts Panel (Health Bar) - Big cyan pill with 3 vector hearts (196x64)
 	var hearts_panel = PanelContainer.new()
-	hearts_panel.position = Vector2(95, 23)
-	var sb_hearts = StyleBoxFlat.new()
-	sb_hearts.bg_color = Color("#fef2f2")
-	sb_hearts.border_color = Color("#ef4444")
-	sb_hearts.set_border_width_all(3)
-	sb_hearts.set_corner_radius_all(16)
-	sb_hearts.set_content_margin_all(8)
-	hearts_panel.add_theme_stylebox_override("panel", sb_hearts)
-	
-	hearts_container = HBoxContainer.new()
-	hearts_container.add_theme_constant_override("separation", 6)
-	for i in range(3):
-		var h_lbl = Label.new()
-		h_lbl.text = "❤️"
-		h_lbl.add_theme_font_size_override("font_size", 16)
-		hearts_container.add_child(h_lbl)
-	hearts_panel.add_child(hearts_container)
+	hearts_panel.name = "HeartsPanel"
+	hearts_panel.position = Vector2(106, 18)
+	hearts_panel.custom_minimum_size = Vector2(196, 64)
+	hearts_panel.size = Vector2(196, 64)
+	var sb_h = StyleBoxFlat.new()
+	sb_h.bg_color = Color("#d3f4ee") # Soft mint/cyan
+	sb_h.border_color = Color("#4a2e2b")
+	sb_h.set_border_width_all(3.5)
+	sb_h.set_corner_radius_all(32)
+	sb_h.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb_h.shadow_size = 5
+	sb_h.shadow_offset = Vector2(0, 3)
+	sb_h.content_margin_left = 14
+	sb_h.content_margin_right = 14
+	hearts_panel.add_theme_stylebox_override("panel", sb_h)
 	header_ui.add_child(hearts_panel)
 	
-	# Level Tag Badge ("Level 1.1")
-	var lvl_badge = PanelContainer.new()
-	lvl_badge.position = Vector2(235, 23)
+	var hb_hearts = HBoxContainer.new()
+	hb_hearts.alignment = BoxContainer.ALIGNMENT_CENTER
+	hb_hearts.add_theme_constant_override("separation", 8)
+	hearts_panel.add_child(hb_hearts)
+	
+	hearts_rects.clear()
+	for i in range(3):
+		var h_rect = TextureRect.new()
+		h_rect.texture = tex_vector_heart
+		h_rect.custom_minimum_size = Vector2(46, 42)
+		h_rect.size = Vector2(46, 42)
+		h_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		h_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		hb_hearts.add_child(h_rect)
+		hearts_rects.append(h_rect)
+	
+	# 3. Level Badge (Level 1) - 2-row card matching Figma (80x64)
+	var lvl_panel = PanelContainer.new()
+	lvl_panel.name = "LevelBadge"
+	lvl_panel.position = Vector2(314, 18)
+	lvl_panel.custom_minimum_size = Vector2(80, 64)
+	lvl_panel.size = Vector2(80, 64)
 	var sb_lvl = StyleBoxFlat.new()
-	sb_lvl.bg_color = Color("#eff6ff")
-	sb_lvl.border_color = Color("#3b82f6")
-	sb_lvl.set_border_width_all(3)
+	sb_lvl.bg_color = Color("#ffffff")
+	sb_lvl.border_color = Color("#4a2e2b")
+	sb_lvl.set_border_width_all(3.5)
 	sb_lvl.set_corner_radius_all(16)
-	sb_lvl.set_content_margin_all(8)
-	lvl_badge.add_theme_stylebox_override("panel", sb_lvl)
+	sb_lvl.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb_lvl.shadow_size = 5
+	sb_lvl.shadow_offset = Vector2(0, 3)
+	sb_lvl.content_margin_top = 4
+	sb_lvl.content_margin_bottom = 4
+	lvl_panel.add_theme_stylebox_override("panel", sb_lvl)
+	header_ui.add_child(lvl_panel)
 	
-	var lvl_lbl = Label.new()
-	lvl_lbl.text = "LEVEL 1.1"
-	lvl_lbl.add_theme_font_override("font", font_black)
-	lvl_lbl.add_theme_font_size_override("font_size", 13)
-	lvl_lbl.add_theme_color_override("font_color", Color("#1d4ed8"))
-	lvl_badge.add_child(lvl_lbl)
-	header_ui.add_child(lvl_badge)
+	var vb_lvl = VBoxContainer.new()
+	vb_lvl.alignment = BoxContainer.ALIGNMENT_CENTER
+	vb_lvl.add_theme_constant_override("separation", -2)
+	lvl_panel.add_child(vb_lvl)
 	
-	# Timer Badge (⏱️ 02:45)
+	var lbl_lvl_title = Label.new()
+	lbl_lvl_title.text = "Level"
+	lbl_lvl_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_lvl_title.add_theme_font_override("font", font_bold)
+	lbl_lvl_title.add_theme_font_size_override("font_size", 12)
+	lbl_lvl_title.add_theme_color_override("font_color", Color("#4a2e2b"))
+	vb_lvl.add_child(lbl_lvl_title)
+	
+	var sep_lvl = ColorRect.new()
+	sep_lvl.custom_minimum_size = Vector2(48, 1.5)
+	sep_lvl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	sep_lvl.color = Color("#4a2e2b")
+	vb_lvl.add_child(sep_lvl)
+	
+	var lbl_lvl_num = Label.new()
+	lbl_lvl_num.text = "1"
+	lbl_lvl_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_lvl_num.add_theme_font_override("font", font_black)
+	lbl_lvl_num.add_theme_font_size_override("font_size", 22)
+	lbl_lvl_num.add_theme_color_override("font_color", Color("#4a2e2b"))
+	vb_lvl.add_child(lbl_lvl_num)
+	
+	# 4. Timer Panel (frame-jam + 02:45) - Big white pill (215x64)
 	var timer_panel = PanelContainer.new()
 	timer_panel.name = "TimerPanel"
-	timer_panel.position = Vector2(1330, 23)
-	var sb_time = StyleBoxFlat.new()
-	sb_time.bg_color = Color("#fdf4eb")
-	sb_time.border_color = Color("#4a2e2b")
-	sb_time.set_border_width_all(3)
-	sb_time.set_corner_radius_all(16)
-	sb_time.set_content_margin_all(8)
-	timer_panel.add_theme_stylebox_override("panel", sb_time)
+	timer_panel.custom_minimum_size = Vector2(215, 64)
+	timer_panel.size = Vector2(215, 64)
+	var sb_timer = StyleBoxFlat.new()
+	sb_timer.bg_color = Color("#ffffff")
+	sb_timer.border_color = Color("#4a2e2b")
+	sb_timer.set_border_width_all(3.5)
+	sb_timer.set_corner_radius_all(32)
+	sb_timer.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb_timer.shadow_size = 5
+	sb_timer.shadow_offset = Vector2(0, 3)
+	sb_timer.content_margin_left = 14
+	sb_timer.content_margin_right = 16
+	timer_panel.add_theme_stylebox_override("panel", sb_timer)
+	header_ui.add_child(timer_panel)
 	
-	var h_time = HBoxContainer.new()
-	h_time.add_theme_constant_override("separation", 6)
+	var hb_t = HBoxContainer.new()
+	hb_t.alignment = BoxContainer.ALIGNMENT_CENTER
+	hb_t.add_theme_constant_override("separation", 10)
+	timer_panel.add_child(hb_t)
 	
-	var icon_time = Label.new()
-	icon_time.text = "⏱️"
-	icon_time.add_theme_font_size_override("font_size", 15)
-	h_time.add_child(icon_time)
+	var icon_jam = TextureRect.new()
+	icon_jam.texture = tex_frame_jam
+	icon_jam.custom_minimum_size = Vector2(44, 44)
+	icon_jam.size = Vector2(44, 44)
+	icon_jam.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_jam.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	hb_t.add_child(icon_jam)
 	
 	timer_label = Label.new()
 	timer_label.text = "02:45"
 	timer_label.add_theme_font_override("font", font_black)
-	timer_label.add_theme_font_size_override("font_size", 16)
+	timer_label.add_theme_font_size_override("font_size", 24)
 	timer_label.add_theme_color_override("font_color", Color("#4a2e2b"))
-	h_time.add_child(timer_label)
+	hb_t.add_child(timer_label)
 	
-	timer_panel.add_child(h_time)
-	header_ui.add_child(timer_panel)
-	
-	# Pause / Menu Button (☰)
+	# 5. Pause / Menu Button (☰) - Big white rounded square (64x64)
 	var pause_btn = TextureButton.new()
 	pause_btn.name = "PauseBtn"
-	pause_btn.position = Vector2(1460, 20)
-	pause_btn.custom_minimum_size = Vector2(50, 50)
-	pause_btn.pivot_offset = Vector2(25, 25)
-	
-	var p_menu = Panel.new()
-	p_menu.size = Vector2(50, 50)
+	pause_btn.custom_minimum_size = Vector2(64, 64)
+	pause_btn.size = Vector2(64, 64)
+	pause_btn.pivot_offset = Vector2(32, 32)
+	var p_menu = PanelContainer.new()
+	p_menu.size = Vector2(64, 64)
 	p_menu.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p_menu.add_theme_stylebox_override("panel", sb_back)
+	var sb_menu = StyleBoxFlat.new()
+	sb_menu.bg_color = Color("#ffffff")
+	sb_menu.border_color = Color("#4a2e2b")
+	sb_menu.set_border_width_all(3.5)
+	sb_menu.set_corner_radius_all(18)
+	sb_menu.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+	sb_menu.shadow_size = 5
+	sb_menu.shadow_offset = Vector2(0, 3)
+	p_menu.add_theme_stylebox_override("panel", sb_menu)
 	pause_btn.add_child(p_menu)
 	
 	var lbl_menu = Label.new()
 	lbl_menu.text = "☰"
-	lbl_menu.size = Vector2(50, 50)
+	lbl_menu.size = Vector2(64, 64)
 	lbl_menu.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl_menu.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl_menu.add_theme_font_override("font", font_black)
-	lbl_menu.add_theme_font_size_override("font_size", 20)
+	lbl_menu.add_theme_font_size_override("font_size", 28)
 	lbl_menu.add_theme_color_override("font_color", Color("#4a2e2b"))
 	pause_btn.add_child(lbl_menu)
-	
-	pause_btn.pressed.connect(func():
-		_play_tone(493.88, 0.1)
-		pause_modal.visible = true
-	)
-	_setup_hover_scale(pause_btn, 1.1)
+	pause_btn.pressed.connect(func(): _open_pause_modal())
+	_setup_hover_scale(pause_btn, 1.08)
 	header_ui.add_child(pause_btn)
-
 
 func _build_interaction_prompts() -> void:
 	# 1. Table Prompts Container (Lihat & Ambil pills on left of table)
@@ -1068,6 +1141,13 @@ func _build_joystick_ui() -> void:
 	
 	# Joystick touch handling
 	joystick_zone.gui_input.connect(_on_joystick_input)
+	if SettingsManager:
+		var j_scale = SettingsManager.get_joystick_scale()
+		joystick_zone.scale = Vector2(j_scale, j_scale)
+		SettingsManager.joystick_size_changed.connect(func(ns: float):
+			if is_instance_valid(joystick_zone):
+				joystick_zone.scale = Vector2(ns, ns)
+		)
 	
 	# Bottom-right quick action touch button (Style C circle button)
 	var action_touch_btn = TextureButton.new()
@@ -1545,8 +1625,8 @@ func _build_endgame_modals() -> void:
 	
 	var p_card = PanelContainer.new()
 	p_card.name = "PauseCard"
-	p_card.size = Vector2(460, 320)
-	p_card.pivot_offset = Vector2(230, 160)
+	p_card.size = Vector2(460, 365)
+	p_card.pivot_offset = Vector2(230, 182)
 	pause_card = p_card
 	var sb_p = StyleBoxFlat.new()
 	sb_p.bg_color = Color("#fffdf7") # Warm cream
@@ -1592,6 +1672,18 @@ func _build_endgame_modals() -> void:
 	btn_p_restart.add_theme_color_override("font_color", Color("#334155"))
 	btn_p_restart.pressed.connect(func(): get_tree().reload_current_scene())
 	vb_p.add_child(btn_p_restart)
+	
+	var btn_p_settings = Button.new()
+	btn_p_settings.text = "PENGATURAN"
+	btn_p_settings.add_theme_font_override("font", font_black)
+	btn_p_settings.add_theme_font_size_override("font_size", 13)
+	btn_p_settings.add_theme_stylebox_override("normal", sb_bm)
+	btn_p_settings.add_theme_color_override("font_color", Color("#4a2e2b"))
+	btn_p_settings.pressed.connect(func():
+		if settings_modal:
+			settings_modal.open()
+	)
+	vb_p.add_child(btn_p_settings)
 	
 	var btn_p_exit = Button.new()
 	btn_p_exit.text = "KELUAR KE PETA LEVEL"
@@ -1648,7 +1740,8 @@ func show_toast(msg: String) -> void:
 
 
 func _reposition_responsive() -> void:
-	var screen_w = get_viewport_rect().size.x
+	var vp_sz = get_viewport_rect().size
+	var screen_w = vp_sz.x
 	var center_x = screen_w / 2.0
 	
 	# Center DoorArch
@@ -1690,31 +1783,24 @@ func _reposition_responsive() -> void:
 		
 	# Character Mascot initial placement
 	if char_pos == Vector2.ZERO:
-		char_pos = Vector2(center_x - 88.0, 370.0)
+		char_pos = Vector2(center_x - 128.0, 270.0)
 		character_mascot.position = char_pos
 		
 	# Header Elements
 	if header_ui:
-		var guide_b = header_ui.get_node_or_null("GuidebookTopBtn")
-		if guide_b:
-			guide_b.position = Vector2(screen_w - 410.0, 23.0)
+		var back_b = header_ui.get_node_or_null("BackBtn")
+		var hearts_p = header_ui.get_node_or_null("HeartsPanel")
+		var lvl_p = header_ui.get_node_or_null("LevelBadge")
 		var timer_p = header_ui.get_node_or_null("TimerPanel")
-		if timer_p:
-			timer_p.position.x = screen_w - 230.0
 		var pause_b = header_ui.get_node_or_null("PauseBtn")
-		if pause_b:
-			pause_b.position.x = screen_w - 90.0
-			
-	# Action Touch Button
-	var act_btn = get_node_or_null("ActionTouchBtn") as Control
-	if act_btn:
-		act_btn.position = Vector2(screen_w - 150.0, 550.0)
 		
-	# Modals Centering
-	var vp_sz = get_viewport_rect().size
-	if intro_card:
-		intro_card.position = Vector2((vp_sz.x - intro_card.size.x) / 2.0, (vp_sz.y - intro_card.size.y) / 2.0)
+		if back_b: back_b.position = Vector2(30.0, 18.0)
+		if hearts_p: hearts_p.position = Vector2(106.0, 18.0)
+		if lvl_p: lvl_p.position = Vector2(314.0, 18.0)
 		
+		if pause_b: pause_b.position = Vector2(screen_w - 94.0, 18.0)
+		if timer_p: timer_p.position = Vector2(screen_w - 325.0, 18.0)
+	
 	if pinout_card:
 		pinout_card.position = Vector2((vp_sz.x - pinout_card.size.x) / 2.0, (vp_sz.y - pinout_card.size.y) / 2.0)
 		

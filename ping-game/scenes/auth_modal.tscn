@@ -159,7 +159,8 @@ alignment = 1
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font_bold")
 theme_override_font_sizes/font_size = 18
-text = "🔐 "
+text = ""
+visible = false
 
 [node name="TitleLabel" type="Label" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox"]
 unique_name_in_owner = true

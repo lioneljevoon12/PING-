@@ -2,33 +2,121 @@
 
 [ext_resource type="Script" path="res://scenes/title_screen.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://2b0j6ww185b1" path="res://fonts/MADE Tommy Soft Bold PERSONAL USE.otf" id="2_font_bold"]
-[ext_resource type="Texture2D" uid="uid://cyltc2fvleumc" path="res://art/assets/scattered/logo-ping-cropped.png" id="3_logo"]
-[ext_resource type="Texture2D" uid="uid://eumer1p45qxo" path="res://art/assets/scattered/router1-removebg-preview.png" id="4_router"]
+[ext_resource type="Texture2D" uid="uid://cxvh871u3s2e2" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://bv8v70g5yff86" path="res://art/assets/PING! Assets/Titles/PING-JUDUL.png" id="4_logo"]
 [ext_resource type="Texture2D" uid="uid://75ukddvk2pe8" path="res://art/assets/scattered/Paket_data-removebg-preview.png" id="5_packet"]
-[ext_resource type="Texture2D" uid="uid://d18d6g8140850" path="res://art/assets/scattered/switch-removebg-preview.png" id="6_switch"]
-[ext_resource type="Texture2D" uid="uid://b2us8cr25fg76" path="res://art/assets/scattered/kabel_utp-removebg-preview.png" id="7_kabel"]
-[ext_resource type="Texture2D" uid="uid://dmvp7p6obkus2" path="res://art/ui-ux/play-button.png" id="8_play_btn"]
-[ext_resource type="Texture2D" uid="uid://bg5sums74oj4h" path="res://art/ui-ux/masuk-button.png" id="9_login_btn"]
-[ext_resource type="PackedScene" uid="uid://b3y7kx8v4pq2n" path="res://scenes/auth_modal.tscn" id="10_auth_modal"]
+[ext_resource type="PackedScene" uid="uid://b3y7kx8v4pq2n" path="res://scenes/auth_modal.tscn" id="6_auth_modal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_greeting"]
-content_margin_left = 14.0
-content_margin_top = 6.0
-content_margin_right = 14.0
-content_margin_bottom = 6.0
-bg_color = Color(1, 0.992157, 0.976471, 0.95)
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(0.972549, 0.945098, 0.94902, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.352941, 0.164706, 0.152941, 0.22)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_circle"]
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+bg_color = Color(0.956863, 0.921569, 0.952941, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
-border_width_bottom = 3
-border_color = Color(0.611765, 0.831373, 0.980392, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0.243137, 0.219608, 0.207843, 0.08)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
+border_width_bottom = 2
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 21
+corner_radius_top_right = 21
+corner_radius_bottom_right = 21
+corner_radius_bottom_left = 21
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_play"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 0.952941, 0.690196, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.352941, 0.164706, 0.152941, 0.3)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_play_pressed"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.98, 0.92, 0.62, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.352941, 0.164706, 0.152941, 0.15)
+shadow_size = 2
+shadow_offset = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_login"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.968627, 0.87451, 0.360784, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.352941, 0.164706, 0.152941, 0.3)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_login_pressed"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.92, 0.82, 0.3, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.352941, 0.164706, 0.152941, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.352941, 0.164706, 0.152941, 0.15)
+shadow_size = 2
+shadow_offset = Vector2(0, 1)
 
 [node name="TitleScreen" type="Control"]
 layout_mode = 3
@@ -39,158 +127,54 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.980392, 0.960784, 0.92549, 1)
-
-[node name="PlantTopLeft" type="Label" parent="."]
-layout_mode = 1
-offset_left = 48.0
-offset_top = 28.0
-offset_right = 88.0
-offset_bottom = 68.0
-theme_override_font_sizes/font_size = 28
-text = "🪴"
-horizontal_alignment = 1
-vertical_alignment = 1
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="GreetingBadge" type="PanelContainer" parent="."]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -120.0
-offset_top = 26.0
-offset_right = 120.0
-offset_bottom = 66.0
-grow_horizontal = 2
+layout_mode = 0
+offset_left = 50.0
+offset_top = 38.0
+offset_right = 280.0
+offset_bottom = 92.0
 mouse_default_cursor_shape = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_greeting")
 
 [node name="GreetingHBox" type="HBoxContainer" parent="GreetingBadge"]
 layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
+theme_override_constants/separation = 10
+alignment = 0
 
-[node name="AvatarIcon" type="Label" parent="GreetingBadge/GreetingHBox"]
+[node name="AvatarCircle" type="PanelContainer" parent="GreetingBadge/GreetingHBox"]
+custom_minimum_size = Vector2(42, 42)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "👤"
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_circle")
 
-[node name="UserGreetingLabel" type="Label" parent="GreetingBadge/GreetingHBox"]
-unique_name_in_owner = true
+[node name="AvatarIcon" type="TextureRect" parent="GreetingBadge/GreetingHBox/AvatarCircle"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.231373, 0.498039, 0.658824, 1)
-theme_override_fonts/font = ExtResource("2_font_bold")
-theme_override_font_sizes/font_size = 14
-text = "Hello, Tamu!"
-vertical_alignment = 1
-
-[node name="StarTopRight" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -300.0
-offset_top = 40.0
-offset_right = -260.0
-offset_bottom = 80.0
-grow_horizontal = 0
-pivot_offset = Vector2(20, 20)
-theme_override_font_sizes/font_size = 28
-text = "✨"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="StarBottomLeft" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 240.0
-offset_top = -120.0
-offset_right = 280.0
-offset_bottom = -80.0
-grow_vertical = 0
-pivot_offset = Vector2(20, 20)
-theme_override_font_sizes/font_size = 24
-text = "⭐"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RouterMascot" type="TextureRect" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 110.0
-offset_top = -110.0
-offset_right = 320.0
-offset_bottom = 80.0
-grow_vertical = 2
-pivot_offset = Vector2(105, 95)
-texture = ExtResource("4_router")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="PacketMascot" type="TextureRect" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -330.0
-offset_top = -120.0
-offset_right = -110.0
-offset_bottom = -30.0
-grow_horizontal = 0
-grow_vertical = 2
-pivot_offset = Vector2(110, 45)
+mouse_filter = 2
 texture = ExtResource("5_packet")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SwitchMascot" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 60.0
-offset_top = -120.0
-offset_right = 220.0
-offset_bottom = -30.0
-grow_vertical = 0
-texture = ExtResource("6_switch")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CableDecor" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -260.0
-offset_top = -120.0
-offset_right = -30.0
-offset_bottom = -20.0
-grow_horizontal = 0
-grow_vertical = 0
-texture = ExtResource("7_kabel")
-expand_mode = 1
-stretch_mode = 5
+[node name="UserGreetingLabel" type="Label" parent="GreetingBadge/GreetingHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 15
+text = "Halo, Player"
+vertical_alignment = 1
 
 [node name="CenterUI" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -199,28 +183,21 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -170.0
-offset_top = -175.0
-offset_right = 170.0
-offset_bottom = 205.0
+offset_left = -270.0
+offset_top = -185.0
+offset_right = 270.0
+offset_bottom = 225.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 45
+theme_override_constants/separation = 22
 alignment = 1
 
-[node name="LogoContainer" type="Control" parent="CenterUI"]
-custom_minimum_size = Vector2(340, 110)
+[node name="LogoPing" type="TextureRect" parent="CenterUI"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 224)
 layout_mode = 2
-
-[node name="LogoPing" type="TextureRect" parent="CenterUI/LogoContainer"]
-modulate = Color(0.290196, 0.592157, 0.796078, 1)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_logo")
+size_flags_horizontal = 4
+texture = ExtResource("4_logo")
 expand_mode = 1
 stretch_mode = 5
 
@@ -229,27 +206,41 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="PlayButton" type="TextureButton" parent="CenterUI/ButtonsVBox"]
+[node name="PlayButton" type="Button" parent="CenterUI/ButtonsVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 76)
+custom_minimum_size = Vector2(260, 62)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("8_play_btn")
-ignore_texture_size = true
-stretch_mode = 5
+theme_override_colors/font_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_colors/font_pressed_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_colors/font_hover_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_play")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_play")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_play_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_play")
+text = "MAINKAN"
 
-[node name="LoginButton" type="TextureButton" parent="CenterUI/ButtonsVBox"]
+[node name="LoginButton" type="Button" parent="CenterUI/ButtonsVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 76)
+custom_minimum_size = Vector2(260, 62)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("9_login_btn")
-ignore_texture_size = true
-stretch_mode = 5
+theme_override_colors/font_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_colors/font_pressed_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_colors/font_hover_color = Color(0.352941, 0.164706, 0.152941, 1)
+theme_override_fonts/font = ExtResource("2_font_bold")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_login")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_login")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_login_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_login")
+text = "MASUK"
 
-[node name="AuthModal" parent="." instance=ExtResource("10_auth_modal")]
+[node name="AuthModal" parent="." instance=ExtResource("6_auth_modal")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

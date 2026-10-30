@@ -1,26 +1,18 @@
 extends Control
 
 # Node References
-@onready var play_button: TextureButton = %PlayButton
-@onready var login_button: TextureButton = %LoginButton
-@onready var router_mascot: TextureRect = %RouterMascot
-@onready var packet_mascot: TextureRect = %PacketMascot
-@onready var star_top_right: Label = %StarTopRight
-@onready var star_bottom_left: Label = %StarBottomLeft
+@onready var play_button: Button = %PlayButton
+@onready var login_button: Button = %LoginButton
+@onready var logo_ping: TextureRect = %LogoPing
 @onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
 @onready var auth_modal: Control = %AuthModal
 @onready var user_greeting_label: Label = %UserGreetingLabel
 @onready var greeting_badge: PanelContainer = %GreetingBadge
 
-# Animation state variables
 var time_passed: float = 0.0
-var router_base_pos: Vector2
-var packet_base_pos: Vector2
 
 func _ready() -> void:
-	# Set pivot offsets to center for smooth scaling animations
 	await get_tree().process_frame
-	_init_positions_and_pivots()
 	
 	# Connect button events
 	_setup_button(play_button, "PLAY")
@@ -36,43 +28,32 @@ func _ready() -> void:
 		
 	if "--screenshot-title" in OS.get_cmdline_args():
 		await get_tree().process_frame
-		await get_tree().create_timer(0.2).timeout
+		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
 		img.save_png("art/title_render.png")
 		get_tree().quit()
 
 func _update_greeting(username: String) -> void:
 	if user_greeting_label:
-		user_greeting_label.text = "Hello, %s!" % username
+		if username.is_empty() or username == "Tamu":
+			user_greeting_label.text = "Halo, Player"
+		else:
+			user_greeting_label.text = "Halo, %s" % username
 		
 		# Animate small bounce on name update
 		if greeting_badge:
 			greeting_badge.pivot_offset = greeting_badge.size / 2.0
 			var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tween.tween_property(greeting_badge, "scale", Vector2(1.15, 1.15), 0.15)
+			tween.tween_property(greeting_badge, "scale", Vector2(1.1, 1.1), 0.15)
 			tween.tween_property(greeting_badge, "scale", Vector2(1.0, 1.0), 0.15)
 
 func _on_greeting_badge_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
 		play_sfx(659.25)
 		if auth_modal:
 			auth_modal.open("login")
 
-func _init_positions_and_pivots() -> void:
-	if router_mascot:
-		router_base_pos = router_mascot.position
-		router_mascot.pivot_offset = router_mascot.size / 2.0
-		
-	if packet_mascot:
-		packet_base_pos = packet_mascot.position
-		packet_mascot.pivot_offset = packet_mascot.size / 2.0
-		
-	if star_top_right:
-		star_top_right.pivot_offset = star_top_right.size / 2.0
-	if star_bottom_left:
-		star_bottom_left.pivot_offset = star_bottom_left.size / 2.0
-
-func _setup_button(btn: TextureButton, btn_name: String) -> void:
+func _setup_button(btn: Button, btn_name: String) -> void:
 	if not btn:
 		return
 	btn.pivot_offset = btn.size / 2.0
@@ -80,7 +61,7 @@ func _setup_button(btn: TextureButton, btn_name: String) -> void:
 	btn.mouse_entered.connect(func():
 		btn.pivot_offset = btn.size / 2.0
 		_animate_button_scale(btn, Vector2(1.05, 1.05))
-		play_sfx(659.25) # E5 note
+		play_sfx(659.25)
 	)
 	btn.mouse_exited.connect(func():
 		btn.pivot_offset = btn.size / 2.0
@@ -89,7 +70,7 @@ func _setup_button(btn: TextureButton, btn_name: String) -> void:
 	btn.button_down.connect(func():
 		btn.pivot_offset = btn.size / 2.0
 		_animate_button_scale(btn, Vector2(0.95, 0.95))
-		play_sfx(880.0) # A5 note
+		play_sfx(880.0)
 	)
 	btn.button_up.connect(func():
 		btn.pivot_offset = btn.size / 2.0
@@ -100,30 +81,17 @@ func _setup_button(btn: TextureButton, btn_name: String) -> void:
 		_on_button_clicked(btn_name)
 	)
 
-func _animate_button_scale(btn: TextureButton, target_scale: Vector2) -> void:
+func _animate_button_scale(btn: Button, target_scale: Vector2) -> void:
 	var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(btn, "scale", target_scale, 0.12)
 
 func _process(delta: float) -> void:
 	time_passed += delta
-	
-	# Smooth floating animation for Router mascot
-	if router_mascot and router_base_pos != Vector2.ZERO:
-		router_mascot.position.y = router_base_pos.y + sin(time_passed * 2.2) * 10.0
-		router_mascot.rotation_degrees = sin(time_passed * 1.6) * 1.8
-	
-	# Smooth floating & bobbing animation for Packet mascot
-	if packet_mascot and packet_base_pos != Vector2.ZERO:
-		packet_mascot.position.y = packet_base_pos.y + cos(time_passed * 2.6) * 12.0
-		packet_mascot.rotation_degrees = cos(time_passed * 2.0) * -2.5
-
-	# Twinkle stars
-	if star_top_right:
-		var s1 = 1.0 + 0.18 * sin(time_passed * 3.5)
-		star_top_right.scale = Vector2(s1, s1)
-	if star_bottom_left:
-		var s2 = 1.0 + 0.18 * cos(time_passed * 3.0)
-		star_bottom_left.scale = Vector2(s2, s2)
+	# Subtle breathing pulse on PING! logo
+	if logo_ping:
+		var s = 1.0 + sin(time_passed * 1.8) * 0.015
+		logo_ping.scale = Vector2(s, s)
+		logo_ping.pivot_offset = logo_ping.size / 2.0
 
 func _on_button_clicked(button_name: String) -> void:
 	match button_name:
@@ -148,13 +116,12 @@ func play_sfx(freq: float) -> void:
 	
 	var data = PackedByteArray()
 	data.resize(num_samples * 2)
-	
 	for i in range(num_samples):
-		var t = float(i) / sample_rate
-		var envelope = exp(-t * 40.0)
-		var sample_val = sin(t * freq * TAU) * envelope * 0.4
-		var int_val = int(clamp(sample_val * 32767.0, -32768.0, 32767.0))
-		data.encode_s16(i * 2, int_val)
+		var t = float(i) / float(sample_rate)
+		var env = 1.0 - (float(i) / float(num_samples))
+		var val = sin(2.0 * PI * freq * t) * env * 0.3
+		var sample_val = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample_val)
 		
 	stream.data = data
 	audio_player.stream = stream
