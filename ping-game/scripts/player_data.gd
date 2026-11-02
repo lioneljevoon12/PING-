@@ -31,6 +31,17 @@ func set_level_stars(stage_num: int, level_num: int, stars: int) -> void:
 	if stars > 0 and level_num < 3:
 		stage_progress[stage_num]["unlocked_level"] = max(stage_progress[stage_num]["unlocked_level"], level_num + 1)
 
+func get_total_stars() -> int:
+	var total = 0
+	for stage in stage_progress.values():
+		if "stars" in stage:
+			for s in stage["stars"].values():
+				total += s
+	return total
+
+func get_max_stars() -> int:
+	return 57
+
 func _ready() -> void:
 	if OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios"):
 		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_LANDSCAPE)

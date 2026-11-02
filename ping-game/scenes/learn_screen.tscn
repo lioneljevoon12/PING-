@@ -1,0 +1,237 @@
+[gd_scene load_steps=10 format=3 uid="uid://dp7b8c9d0e1f2"]
+
+[ext_resource type="Script" path="res://scenes/learn_screen.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="3_font_bold"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="4_bg"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_icon_bukupanduan.png" id="5_book"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_icon_modelatihan.png" id="6_latihan"]
+[ext_resource type="PackedScene" path="res://scenes/guidebook.tscn" id="7_guidebook"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.996078, 0.815686, 0.811765, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_guide"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(0.796078, 0.952941, 0.941176, 1)
+border_width_left = 3.5
+border_width_top = 3.5
+border_width_right = 3.5
+border_width_bottom = 3.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_practice"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(0.819608, 0.980392, 0.866667, 1)
+border_width_left = 3.5
+border_width_top = 3.5
+border_width_right = 3.5
+border_width_bottom = 3.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[node name="LearnScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HeaderBar" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+
+[node name="LeftBox" type="HBoxContainer" parent="HeaderBar"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 28.0
+offset_right = 360.0
+offset_bottom = 86.0
+theme_override_constants/separation = 16
+alignment = 0
+
+[node name="BackButton" type="Button" parent="HeaderBar/LeftBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_back")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back")
+theme_override_styles/focus = SubResource("StyleBoxFlat_back")
+text = "<"
+
+[node name="Title" type="Label" parent="HeaderBar/LeftBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 32
+text = "BELAJAR"
+vertical_alignment = 1
+
+[node name="CardsContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -150.0
+offset_right = 400.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="BtnGuidebook" type="Button" parent="CardsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 320)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_guide")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_guide")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_guide")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_guide")
+
+[node name="VB" type="VBoxContainer" parent="CardsContainer/BtnGuidebook"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="BookIcon" type="TextureRect" parent="CardsContainer/BtnGuidebook/VB"]
+custom_minimum_size = Vector2(130, 130)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("5_book")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="T" type="Label" parent="CardsContainer/BtnGuidebook/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 26
+text = "Buku Panduan"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="CardsContainer/BtnGuidebook/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.0823529, 0.407843, 0.439216, 1)
+theme_override_fonts/font = ExtResource("3_font_bold")
+theme_override_font_sizes/font_size = 16
+text = "Modul Materi Jaringan"
+horizontal_alignment = 1
+
+[node name="BtnPractice" type="Button" parent="CardsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 320)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_practice")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_practice")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_practice")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_practice")
+
+[node name="VB" type="VBoxContainer" parent="CardsContainer/BtnPractice"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="PracticeIcon" type="TextureRect" parent="CardsContainer/BtnPractice/VB"]
+custom_minimum_size = Vector2(130, 130)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("6_latihan")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="T" type="Label" parent="CardsContainer/BtnPractice/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 26
+text = "Mode Latihan"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="CardsContainer/BtnPractice/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.0823529, 0.501961, 0.239216, 1)
+theme_override_fonts/font = ExtResource("3_font_bold")
+theme_override_font_sizes/font_size = 16
+text = "Simulasi Bebas Waktu"
+horizontal_alignment = 1
+
+[node name="GuidebookModal" parent="." instance=ExtResource("7_guidebook")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

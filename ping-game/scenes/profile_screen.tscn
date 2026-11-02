@@ -1,0 +1,290 @@
+[gd_scene load_steps=10 format=3 uid="uid://e1f2g3h4i5j7m"]
+
+[ext_resource type="Script" path="res://scenes/profile_screen.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_avatar_karakter.png" id="4_char"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_avatar_akun.png" id="5_battery"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_settings.svg" id="6_gear"]
+[ext_resource type="PackedScene" path="res://scenes/auth_modal.tscn" id="7_auth_modal"]
+[ext_resource type="PackedScene" path="res://scenes/settings_modal.tscn" id="8_settings_modal"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.996078, 0.815686, 0.811765, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.29, 0.18, 0.17, 0.22)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_karakter"]
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+bg_color = Color(0.858824, 0.917647, 0.980392, 1)
+border_width_left = 3.5
+border_width_top = 3.5
+border_width_right = 3.5
+border_width_bottom = 3.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_akun"]
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+bg_color = Color(0.996078, 0.815686, 0.811765, 1)
+border_width_left = 3.5
+border_width_top = 3.5
+border_width_right = 3.5
+border_width_bottom = 3.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_bar"]
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+bg_color = Color(0.996078, 0.976471, 0.764706, 1)
+border_width_left = 3.5
+border_width_top = 3.5
+border_width_right = 3.5
+border_width_bottom = 3.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[node name="ProfileScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="HeaderBar" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+
+[node name="LeftBox" type="HBoxContainer" parent="HeaderBar"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 28.0
+offset_right = 360.0
+offset_bottom = 86.0
+theme_override_constants/separation = 16
+alignment = 0
+
+[node name="BackButton" type="Button" parent="HeaderBar/LeftBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_back")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back")
+theme_override_styles/focus = SubResource("StyleBoxFlat_back")
+text = "<"
+
+[node name="Title" type="Label" parent="HeaderBar/LeftBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 32
+text = "PROFIL"
+vertical_alignment = 1
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -180.0
+offset_right = 400.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="TopRow" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+theme_override_constants/separation = 36
+alignment = 1
+
+[node name="BtnKarakter" type="Button" parent="MainContainer/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 270)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_karakter")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_karakter")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_karakter")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_karakter")
+
+[node name="VB" type="VBoxContainer" parent="MainContainer/TopRow/BtnKarakter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CharIcon" type="TextureRect" parent="MainContainer/TopRow/BtnKarakter/VB"]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("4_char")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="T" type="Label" parent="MainContainer/TopRow/BtnKarakter/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 26
+text = "Karakter"
+horizontal_alignment = 1
+
+[node name="BtnAkun" type="Button" parent="MainContainer/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 270)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_card_akun")
+theme_override_styles/hover = SubResource("StyleBoxFlat_card_akun")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_card_akun")
+theme_override_styles/focus = SubResource("StyleBoxFlat_card_akun")
+
+[node name="VB" type="VBoxContainer" parent="MainContainer/TopRow/BtnAkun"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BatteryIcon" type="TextureRect" parent="MainContainer/TopRow/BtnAkun/VB"]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("5_battery")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="T" type="Label" parent="MainContainer/TopRow/BtnAkun/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 26
+text = "Akun"
+horizontal_alignment = 1
+
+[node name="BtnSettings" type="Button" parent="MainContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(796, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_settings_bar")
+theme_override_styles/hover = SubResource("StyleBoxFlat_settings_bar")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_settings_bar")
+theme_override_styles/focus = SubResource("StyleBoxFlat_settings_bar")
+
+[node name="HB" type="HBoxContainer" parent="MainContainer/BtnSettings"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_right = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 0
+
+[node name="GearIcon" type="TextureRect" parent="MainContainer/BtnSettings/HB"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_gear")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SettingsLabel" type="Label" parent="MainContainer/BtnSettings/HB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 24
+text = "Pengaturan"
+vertical_alignment = 1
+
+[node name="AuthModal" parent="." instance=ExtResource("7_auth_modal")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="SettingsModal" parent="." instance=ExtResource("8_settings_modal")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

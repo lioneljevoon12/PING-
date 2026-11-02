@@ -101,6 +101,9 @@ func _connect_signals() -> void:
 	btn_fps_30.pressed.connect(func(): _set_fps(30))
 	btn_fps_60.pressed.connect(func(): _set_fps(60))
 
+func open_settings() -> void:
+	open()
+
 func open() -> void:
 	if is_animating:
 		return

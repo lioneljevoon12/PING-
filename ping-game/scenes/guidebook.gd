@@ -105,6 +105,10 @@ func _ready() -> void:
 	
 	_render_spread(current_spread)
 	
+	if get_parent() == get_tree().root:
+		open(0)
+		closed.connect(func(): get_tree().change_scene_to_file("res://scenes/learn_screen.tscn"))
+	
 	if "--screenshot-guidebook" in OS.get_cmdline_args():
 		open(0)
 		await get_tree().create_timer(0.45).timeout

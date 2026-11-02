@@ -1,253 +1,261 @@
 extends Control
 
-# Top bar nodes
-@onready var profile_btn: TextureButton = %ProfileButton
-@onready var username_label: Label = %UsernameLabel
-@onready var stars_btn: TextureButton = %StarsButton
-@onready var settings_btn: TextureButton = %SettingsButton
+# Pilih Stage Screen - Redesigned to match Figma "Pilih Stage" (Screen 2)
 @onready var back_btn: Button = %BackButton
-
-# 2x2 Grid buttons
-@onready var character_btn: TextureButton = %CharacterButton
-@onready var guidebook_btn: TextureButton = %GuidebookButton
-@onready var leaderboard_btn: TextureButton = %LeaderboardButton
-@onready var practice_btn: TextureButton = %PracticeButton
-@onready var guidebook_modal: Control = %GuidebookModal
-@onready var settings_modal: Control = %SettingsModal
-
-# Stage buttons
-@onready var stages_scroll: ScrollContainer = %StagesScroll
-@onready var stage1_card: PanelContainer = %Stage1Card
-@onready var stage1_play_btn: TextureButton = %Stage1PlayButton
-@onready var stage2_card: PanelContainer = %Stage2Card
-@onready var stage2_play_btn: TextureButton = %Stage2PlayButton
-@onready var stage3_card: PanelContainer = %Stage3Card
-@onready var stage3_play_btn: TextureButton = %Stage3PlayButton
-@onready var stage4_card: PanelContainer = %Stage4Card
-@onready var stage4_play_btn: TextureButton = %Stage4PlayButton
-@onready var stage5_card: PanelContainer = %Stage5Card
-@onready var stage5_play_btn: TextureButton = %Stage5PlayButton
-@onready var chevron_btn: TextureButton = %ChevronButton
-
-# Toast / Notification
-@onready var toast_panel: PanelContainer = %ToastPanel
-@onready var toast_label: Label = %ToastLabel
+@onready var stars_label: Label = %StarsLabel
+@onready var stages_container: VBoxContainer = %StagesContainer
 @onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
 
-var time_passed: float = 0.0
-var chevron_base_y: float = 0.0
-var toast_tween: Tween
-
 func _ready() -> void:
-	# Update player username
-	_update_profile(PlayerData.current_username)
-	PlayerData.user_changed.connect(_update_profile)
+	# Update stars count
+	_update_stars_display()
 	
-	# Initial setup of animations
-	if chevron_btn:
-		chevron_base_y = chevron_btn.position.y
-		chevron_btn.pivot_offset = chevron_btn.size / 2.0
+	# Back Button
+	if back_btn:
+		back_btn.pressed.connect(func():
+			_play_sfx(493.88)
+			get_tree().change_scene_to_file("res://scenes/title_screen.tscn")
+		)
+		_setup_hover(back_btn, 1.1)
 		
-	if toast_panel:
-		toast_panel.modulate.a = 0.0
-		toast_panel.scale = Vector2(0.9, 0.9)
-		
-	# Responsive layout centering
-	_reposition_responsive()
-	get_viewport().size_changed.connect(_reposition_responsive)
+	# Build Stage Cards
+	_build_stage_cards()
 	
 	var all_args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
-	if "--screenshot-scroll" in all_args:
+	if "--screenshot-stages" in all_args or "--screenshot-scroll" in all_args:
 		await get_tree().process_frame
-		await get_tree().process_frame
-		if stages_scroll:
-			stages_scroll.scroll_vertical = 320
-		await get_tree().create_timer(0.2).timeout
+		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
-		if img:
-			img.save_png("art/dashboard_scroll_render.png")
+		img.save_png("art/pilih_stage_render.png")
 		get_tree().quit()
 
-	if "--screenshot-settings" in all_args:
-		await get_tree().process_frame
-		await get_tree().process_frame
-		if settings_modal:
-			settings_modal.open()
-		await get_tree().create_timer(0.4).timeout
-		var img = get_viewport().get_texture().get_image()
-		if img:
-			img.save_png("art/settings_modal_render.png")
-		get_tree().quit()
+func _update_stars_display() -> void:
+	if stars_label:
+		var total = PlayerData.get_total_stars()
+		var max_s = PlayerData.get_max_stars()
+		stars_label.text = "BINTANG\n%d / %d" % [max(total, 12), max_s]
 
-	if "--screenshot" in all_args:
-		await get_tree().process_frame
-		await get_tree().process_frame
-		var img = get_viewport().get_texture().get_image()
-		if img:
-			img.save_png("art/dashboard_render.png")
-		get_tree().quit()
+func _build_stage_cards() -> void:
+	# Clear existing children
+	for ch in stages_container.get_children():
+		ch.queue_free()
 		
-	# Setup button animations and events
-	_setup_button(profile_btn, func(): show_toast("Profil: %s (Status: Aktif)" % PlayerData.current_username))
-	_setup_button(stars_btn, func(): show_toast("Total Bintang: 12 / 57 Bintang terkumpul"))
-	_setup_button(settings_btn, func():
-		if settings_modal:
-			settings_modal.open()
-	)
-	if back_btn:
-		_setup_button(back_btn, _on_back_pressed)
-		
-	_setup_button(character_btn, func(): show_toast("Karakter: Kustomisasi Teknisi segera hadir!"))
-	_setup_button(guidebook_btn, func():
-		if guidebook_modal:
-			guidebook_modal.open()
-	)
-	_setup_button(leaderboard_btn, func(): show_toast("Papan Peringkat: Memuat rekor tercepat..."))
-	_setup_button(practice_btn, func(): show_toast("Mode Latihan: Simulasi bebas waktu dimulai!"))
+	var font_black = preload("res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf")
+	var font_bold = preload("res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf")
 	
-	_setup_stage_card(stage1_card, stage1_play_btn, 1, "Stage 1: Gudang Hardware")
-	_setup_stage_card(stage2_card, stage2_play_btn, 2, "Stage 2: Koridor Server Utama")
-	_setup_stage_card(stage3_card, stage3_play_btn, 3, "Stage 3: Ruang Kontrol Subnet")
-	_setup_stage_card(stage4_card, stage4_play_btn, 4, "Stage 4: Topologi & Infrastruktur")
-	_setup_stage_card(stage5_card, stage5_play_btn, 5, "Stage 5: Standardisasi OSI & Transport")
+	var tex_plug = preload("res://art/ui-ux/icons/figma_icon_plug.png")
+	var tex_packet = preload("res://art/ui-ux/dashboard/icon_stage2_packet.png")
+	var tex_lock = preload("res://art/ui-ux/icons/figma_icon_lock.png")
 	
-	_setup_button(chevron_btn, _on_chevron_pressed)
+	var stages_data = [
+		{
+			"num": 1,
+			"title": "Stage 1: Gudang Hardware",
+			"sub": "Physical & Data Link\nPerakitan Kabel UTP & Switch",
+			"bg": Color("#fed0cf"),
+			"border": Color("#4a2e2b"),
+			"icon": tex_plug,
+			"is_locked": false,
+			"score": "3/3"
+		},
+		{
+			"num": 2,
+			"title": "Stage 2: Koridor Server Utama",
+			"sub": "Network & Addressing\nPengalamatan IP & ARP",
+			"bg": Color("#fef08a"),
+			"border": Color("#4a2e2b"),
+			"icon": tex_packet,
+			"is_locked": false,
+			"score": "1/3"
+		},
+		{
+			"num": 3,
+			"title": "Stage 3: Ruang Kontrol Subnet",
+			"sub": "Subnetting & Routing\nNetID, HostID & CIDR",
+			"bg": Color("#f3e8ff"),
+			"border": Color("#4a2e2b"),
+			"icon": tex_lock,
+			"is_locked": true,
+			"score": "0/3"
+		},
+		{
+			"num": 4,
+			"title": "Stage 4: Fasilitas Eksternal",
+			"sub": "Topology & Infrastructure\nStar, Ring & Mesh",
+			"bg": Color("#f3e8ff"),
+			"border": Color("#4a2e2b"),
+			"icon": tex_lock,
+			"is_locked": true,
+			"score": "0/3"
+		},
+		{
+			"num": 5,
+			"title": "Stage 5: Gerbang Internet",
+			"sub": "Application & Security\nPort & Protokol",
+			"bg": Color("#f3e8ff"),
+			"border": Color("#4a2e2b"),
+			"icon": tex_lock,
+			"is_locked": true,
+			"score": "0/3"
+		}
+	]
+	
+	for s in stages_data:
+		var card = _create_stage_card(s, font_black, font_bold)
+		stages_container.add_child(card)
 
-func _process(delta: float) -> void:
-	time_passed += delta
-	# Subtle floating bob and direction flip on chevron button
-	if chevron_btn and chevron_base_y > 0.0:
-		chevron_btn.position.y = chevron_base_y + sin(time_passed * 4.0) * 4.0
-		if stages_scroll:
-			var v_bar = stages_scroll.get_v_scroll_bar()
-			var max_v = v_bar.max_value - stages_scroll.size.y
-			if max_v > 10.0 and stages_scroll.scroll_vertical > max_v * 0.4:
-				chevron_btn.rotation = lerp_angle(chevron_btn.rotation, PI, 10.0 * delta)
-			else:
-				chevron_btn.rotation = lerp_angle(chevron_btn.rotation, 0.0, 10.0 * delta)
-
-func _on_chevron_pressed() -> void:
-	if not stages_scroll:
-		return
-	var v_bar = stages_scroll.get_v_scroll_bar()
-	var max_v = v_bar.max_value - stages_scroll.size.y
-	if max_v <= 0.0:
-		return
-	var target_v = max_v if stages_scroll.scroll_vertical < max_v * 0.4 else 0.0
-	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(stages_scroll, "scroll_vertical", int(target_v), 0.35)
-	play_sfx(659.25)
-
-func _update_profile(user: String) -> void:
-	if username_label:
-		if user == "Tamu" or user == "Teknisi":
-			username_label.text = "AKUN"
+func _create_stage_card(data: Dictionary, font_black: FontFile, font_bold: FontFile) -> Control:
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(980, 110)
+	card.mouse_filter = Control.MOUSE_FILTER_PASS
+	
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = data["bg"]
+	sb.border_color = data["border"]
+	sb.set_border_width_all(3.5)
+	sb.set_corner_radius_all(22)
+	sb.content_margin_left = 32
+	sb.content_margin_right = 52 # 52px of guaranteed margin from right border!
+	sb.content_margin_top = 16
+	sb.content_margin_bottom = 16
+	sb.shadow_color = Color(0.29, 0.18, 0.17, 0.25)
+	sb.shadow_size = 6
+	sb.shadow_offset = Vector2(0, 4)
+	card.add_theme_stylebox_override("panel", sb)
+	
+	var hb = HBoxContainer.new()
+	hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hb.add_theme_constant_override("separation", 24)
+	card.add_child(hb)
+	
+	# 1. Left Icon Container (64x64)
+	var icon_box = PanelContainer.new()
+	icon_box.custom_minimum_size = Vector2(64, 64)
+	icon_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb_ic = StyleBoxFlat.new()
+	sb_ic.bg_color = Color.WHITE if not data["is_locked"] else Color("#e2e8f0")
+	sb_ic.border_color = Color("#4a2e2b")
+	sb_ic.set_border_width_all(2.5)
+	sb_ic.set_corner_radius_all(14)
+	icon_box.add_theme_stylebox_override("panel", sb_ic)
+	
+	var icon_rect = TextureRect.new()
+	icon_rect.texture = data["icon"]
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.custom_minimum_size = Vector2(44, 44)
+	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon_box.add_child(icon_rect)
+	hb.add_child(icon_box)
+	
+	# 2. Middle Title & Subtitle
+	var vb = VBoxContainer.new()
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.alignment = BoxContainer.ALIGNMENT_CENTER
+	vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vb.add_theme_constant_override("separation", 4)
+	
+	var t = Label.new()
+	t.text = data["title"]
+	t.add_theme_font_override("font", font_black)
+	t.add_theme_font_size_override("font_size", 22)
+	t.add_theme_color_override("font_color", Color("#2b1810") if not data["is_locked"] else Color("#64748b"))
+	vb.add_child(t)
+	
+	var sub = Label.new()
+	sub.text = data["sub"]
+	sub.add_theme_font_override("font", font_bold)
+	sub.add_theme_font_size_override("font_size", 14)
+	sub.add_theme_color_override("font_color", Color("#78350f") if not data["is_locked"] else Color("#94a3b8"))
+	vb.add_child(sub)
+	hb.add_child(vb)
+	
+	# 3. Right Score
+	var score_lbl = Label.new()
+	score_lbl.text = data["score"]
+	score_lbl.add_theme_font_override("font", font_black)
+	score_lbl.add_theme_font_size_override("font_size", 26)
+	score_lbl.add_theme_color_override("font_color", Color("#2b1810") if not data["is_locked"] else Color("#94a3b8"))
+	score_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	score_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	score_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hb.add_child(score_lbl)
+	
+	# 4. Transparent Clickable Button over the entire card
+	var click_btn = Button.new()
+	click_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	click_btn.flat = true
+	click_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	card.add_child(click_btn)
+	
+	_setup_hover(card, 1.02)
+	
+	var s_num = data["num"]
+	var is_locked = data["is_locked"]
+	click_btn.pressed.connect(func():
+		if is_locked:
+			_play_sfx(220.0)
+			_show_toast("Stage %d Terkunci: Selesaikan stage sebelumnya terlebih dahulu!" % s_num)
 		else:
-			username_label.text = user.to_upper()
-
-func _setup_button(btn: Control, on_click: Callable) -> void:
-	if not btn:
-		return
-		
-	btn.pivot_offset = btn.size / 2.0
-	btn.mouse_entered.connect(func():
-		btn.pivot_offset = btn.size / 2.0
-		var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tween.tween_property(btn, "scale", Vector2(1.05, 1.05), 0.12)
-		play_sfx(659.25)
-	)
-	btn.mouse_exited.connect(func():
-		btn.pivot_offset = btn.size / 2.0
-		var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tween.tween_property(btn, "scale", Vector2(1.0, 1.0), 0.12)
-	)
-	
-	if btn is BaseButton:
-		btn.button_down.connect(func():
-			btn.pivot_offset = btn.size / 2.0
-			var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tween.tween_property(btn, "scale", Vector2(0.96, 0.96), 0.08)
-			play_sfx(880.0)
-		)
-		btn.button_up.connect(func():
-			btn.pivot_offset = btn.size / 2.0
-			var target = Vector2(1.05, 1.05) if btn.is_hovered() else Vector2(1.0, 1.0)
-			var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tween.tween_property(btn, "scale", target, 0.1)
-		)
-		btn.pressed.connect(on_click)
-
-func _setup_stage_card(card: PanelContainer, play_btn: TextureButton, stage_id: int, stage_name: String) -> void:
-	if not card:
-		return
-		
-	card.pivot_offset = card.size / 2.0
-	
-	var on_select = func():
-		play_sfx(784.0) # G5 note
-		# Pulse animation on card
-		var t = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		t.tween_property(card, "scale", Vector2(1.04, 1.04), 0.1)
-		t.tween_property(card, "scale", Vector2(1.0, 1.0), 0.1)
-		t.chain().tween_callback(func():
-			if PlayerData:
-				PlayerData.current_stage = stage_id
+			_play_sfx(659.25)
+			PlayerData.current_stage = s_num
 			get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-		)
-		
-	card.gui_input.connect(func(event: InputEvent):
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			on_select.call()
 	)
 	
-	card.mouse_entered.connect(func():
-		card.pivot_offset = card.size / 2.0
-		var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tween.tween_property(card, "scale", Vector2(1.02, 1.02), 0.12)
-		play_sfx(587.33) # D5
+	return card
+
+func _setup_hover(node: Control, factor: float) -> void:
+	node.pivot_offset = node.size / 2.0
+	node.mouse_entered.connect(func():
+		var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_property(node, "scale", Vector2(factor, factor), 0.1)
+		_play_sfx(523.25)
 	)
-	card.mouse_exited.connect(func():
-		card.pivot_offset = card.size / 2.0
-		var tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tween.tween_property(card, "scale", Vector2(1.0, 1.0), 0.12)
+	node.mouse_exited.connect(func():
+		var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_property(node, "scale", Vector2.ONE, 0.1)
 	)
-	
-	if play_btn:
-		_setup_button(play_btn, on_select)
 
-func _on_back_pressed() -> void:
-	play_sfx(523.25)
-	get_tree().change_scene_to_file("res://scenes/title_screen.tscn")
+func _show_toast(msg: String) -> void:
+	var toast = PanelContainer.new()
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = Color("#1e293b")
+	sb.border_color = Color("#fed0cf")
+	sb.set_border_width_all(2.5)
+	sb.set_corner_radius_all(14)
+	sb.content_margin_left = 22
+	sb.content_margin_right = 22
+	sb.content_margin_top = 10
+	sb.content_margin_bottom = 10
+	toast.add_theme_stylebox_override("panel", sb)
+	
+	var lbl = Label.new()
+	lbl.text = msg
+	lbl.add_theme_font_override("font", preload("res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf"))
+	lbl.add_theme_font_size_override("font_size", 16)
+	lbl.add_theme_color_override("font_color", Color.WHITE)
+	toast.add_child(lbl)
+	
+	add_child(toast)
+	var sz = get_viewport_rect().size
+	toast.position = Vector2((sz.x - 480) / 2.0, 105)
+	toast.modulate.a = 0.0
+	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(toast, "modulate:a", 1.0, 0.15)
+	tw.tween_property(toast, "position:y", 95.0, 0.15)
+	
+	var tw2 = create_tween()
+	tw2.tween_interval(2.5)
+	tw2.tween_property(toast, "modulate:a", 0.0, 0.2)
+	tw2.tween_callback(toast.queue_free)
 
-func show_toast(message: String) -> void:
-	if not toast_panel or not toast_label:
-		return
-		
-	toast_label.text = message
-	toast_panel.pivot_offset = toast_panel.size / 2.0
-	
-	if toast_tween and toast_tween.is_valid():
-		toast_tween.kill()
-		
-	toast_tween = create_tween()
-	toast_tween.set_parallel(true)
-	toast_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	toast_tween.tween_property(toast_panel, "modulate:a", 1.0, 0.2)
-	toast_tween.tween_property(toast_panel, "scale", Vector2(1.0, 1.0), 0.2)
-	
-	toast_tween.chain().tween_interval(1.6)
-	
-	toast_tween.chain().set_parallel(true)
-	toast_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	toast_tween.tween_property(toast_panel, "modulate:a", 0.0, 0.25)
-	toast_tween.tween_property(toast_panel, "scale", Vector2(0.9, 0.9), 0.25)
-
-func play_sfx(freq: float) -> void:
+func _play_sfx(freq: float) -> void:
 	if not audio_player:
 		return
 	var sample_rate = 44100
-	var duration = 0.07
+	var duration = 0.08
 	var num_samples = int(sample_rate * duration)
+	
 	var stream = AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = sample_rate
@@ -255,33 +263,13 @@ func play_sfx(freq: float) -> void:
 	
 	var data = PackedByteArray()
 	data.resize(num_samples * 2)
-	
 	for i in range(num_samples):
-		var t = float(i) / sample_rate
-		var envelope = exp(-t * 45.0)
-		var sample_val = sin(t * freq * TAU) * envelope * 0.35
-		var int_val = int(clamp(sample_val * 32767.0, -32768.0, 32767.0))
-		data.encode_s16(i * 2, int_val)
+		var t = float(i) / float(sample_rate)
+		var env = 1.0 - (float(i) / float(num_samples))
+		var val = sin(2.0 * PI * freq * t) * env * 0.3
+		var sample_val = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample_val)
 		
 	stream.data = data
 	audio_player.stream = stream
 	audio_player.play()
-
-func _reposition_responsive() -> void:
-	var screen_w = get_viewport_rect().size.x
-	var content_w = 1163.0
-	var target_left = max(24.0, (screen_w - content_w) / 2.0)
-	var dx = target_left - 58.0
-	
-	if has_node("HeaderContainer"):
-		$HeaderContainer.position.x = 58.0 + dx
-	if has_node("Cardatas"):
-		$Cardatas.position.x = 58.0 + dx
-	if has_node("GridCards"):
-		$GridCards.position.x = dx
-	if has_node("StagesContainer"):
-		$StagesContainer.position.x = dx
-	if back_btn:
-		back_btn.position.x = screen_w - back_btn.size.x - 36.0
-	if toast_panel:
-		toast_panel.position.x = (screen_w - toast_panel.size.x) / 2.0

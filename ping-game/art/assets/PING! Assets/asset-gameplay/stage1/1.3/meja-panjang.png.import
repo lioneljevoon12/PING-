@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4a20i7jp1khj"
-path="res://.godot/imported/test_new_title_preview.png-a180e4d3adce6177c8c8149687b93bd0.ctex"
+uid="uid://c5opexqai5bnt"
+path="res://.godot/imported/meja-panjang.png-3a9cf172ea8ec69bde6a57d7c8e1582f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/test_new_title_preview.png"
-dest_files=["res://.godot/imported/test_new_title_preview.png-a180e4d3adce6177c8c8149687b93bd0.ctex"]
+source_file="res://art/assets/PING! Assets/asset-gameplay/stage1/1.3/meja-panjang.png"
+dest_files=["res://.godot/imported/meja-panjang.png-3a9cf172ea8ec69bde6a57d7c8e1582f.ctex"]
 
 [params]
 

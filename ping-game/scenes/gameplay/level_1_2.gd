@@ -1920,7 +1920,7 @@ func _build_win_gameover_modals() -> void:
 	vb_w.add_child(btn_map)
 	
 	var btn_next = _create_modal_btn("Lanjut Level", Color("#bbf7d0"), Color("#14532d"))
-	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
+	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_1_3.tscn"))
 	vb_w.add_child(btn_next)
 	
 	# Game Over Modal
