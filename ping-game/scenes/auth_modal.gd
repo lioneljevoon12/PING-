@@ -13,7 +13,7 @@ signal auth_successful(username: String)
 @onready var submit_btn_label: Label = %SubmitBtnLabel
 @onready var submit_button: Button = %SubmitButton
 @onready var google_btn: TextureButton = %GooglePlayButton
-@onready var close_btn: TextureButton = %CloseButton
+@onready var close_btn: CloseButton = %CloseButton
 
 const TAB_LOGIN_TEX = preload("res://art/ui-ux/masuk-left-button.png")
 const TAB_SIGNUP_TEX = preload("res://art/ui-ux/daftar-right-button.png")
@@ -24,7 +24,7 @@ func _ready() -> void:
 	visible = false
 	modulate.a = 0.0
 	
-	close_btn.pressed.connect(close_modal)
+	close_btn.closed.connect(close_modal)
 	google_btn.pressed.connect(_on_google_play_pressed)
 	submit_button.pressed.connect(_on_submit_pressed)
 	

@@ -1,0 +1,165 @@
+[gd_scene load_steps=8 format=3 uid="uid://lbmodal001abc"]
+
+[ext_resource type="Script" path="res://scenes/leaderboard_modal.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="FontFile" uid="uid://dwd0sb6ffhlic" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="3_font_extrabold"]
+[ext_resource type="FontFile" uid="uid://dsqq4nxtdx5u7" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="4_font_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+bg_color = Color(0.996078, 0.988235, 0.968627, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.29, 0.18, 0.17, 0.3)
+shadow_size = 14
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header_pill"]
+content_margin_left = 16.0
+content_margin_top = 6.0
+content_margin_right = 16.0
+content_margin_bottom = 6.0
+bg_color = Color(0.996078, 0.843137, 0.666667, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="LeaderboardModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.05, 0.05, 0.65)
+
+[node name="CardWrapper" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -480.0
+offset_top = -320.0
+offset_right = 480.0
+offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(480, 320)
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="MainVBox" type="VBoxContainer" parent="CardWrapper"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderHBox" type="HBoxContainer" parent="CardWrapper/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitlePill" type="PanelContainer" parent="CardWrapper/MainVBox/HeaderHBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header_pill")
+
+[node name="TitleLabel" type="Label" parent="CardWrapper/MainVBox/HeaderHBox/TitlePill"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 18
+text = "🏆 PAPAN PERINGKAT TEKNISI"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="CardWrapper/MainVBox/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TabsContainer" type="HBoxContainer" parent="CardWrapper/MainVBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CloseButtonSlot" type="Control" parent="CardWrapper/MainVBox/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+
+[node name="ContentSplitHBox" type="HBoxContainer" parent="CardWrapper/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LeftPodiumVBox" type="VBoxContainer" parent="CardWrapper/MainVBox/ContentSplitHBox"]
+custom_minimum_size = Vector2(510, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="PodiumTitle" type="Label" parent="CardWrapper/MainVBox/ContentSplitHBox/LeftPodiumVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.470588, 0.207843, 0.0588235, 1)
+theme_override_fonts/font = ExtResource("3_font_extrabold")
+theme_override_font_sizes/font_size = 13
+text = "⭐ TOP 3 TEKNISI TERBAIK"
+horizontal_alignment = 1
+
+[node name="PodiumContainer" type="HBoxContainer" parent="CardWrapper/MainVBox/ContentSplitHBox/LeftPodiumVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="RightListVBox" type="VBoxContainer" parent="CardWrapper/MainVBox/ContentSplitHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ListTitle" type="Label" parent="CardWrapper/MainVBox/ContentSplitHBox/RightListVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.470588, 0.207843, 0.0588235, 1)
+theme_override_fonts/font = ExtResource("3_font_extrabold")
+theme_override_font_sizes/font_size = 13
+text = "📋 DAFTAR PERINGKAT LANJUTAN"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CardWrapper/MainVBox/ContentSplitHBox/RightListVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ListContainer" type="VBoxContainer" parent="CardWrapper/MainVBox/ContentSplitHBox/RightListVBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="PlayerRowContainer" type="PanelContainer" parent="CardWrapper/MainVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2

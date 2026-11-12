@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://b1y3uqfsjsmc3"]
+
+[ext_resource type="Script" path="res://scenes/stage_row_icon.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2.5
+border_width_top = 2.5
+border_width_right = 2.5
+border_width_bottom = 2.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="StageRowIcon" type="PanelContainer"]
+custom_minimum_size = Vector2(56, 56)
+offset_right = 56.0
+offset_bottom = 56.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_icon")
+script = ExtResource("1_script")
+
+[node name="IconRect" type="TextureRect" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

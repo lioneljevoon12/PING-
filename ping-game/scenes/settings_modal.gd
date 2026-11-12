@@ -7,7 +7,7 @@ const TEX_SOUND_OFF = preload("res://art/ui-ux/icons/icon_sound_off.svg")
 # Node References
 @onready var modal_card: PanelContainer = %ModalCard
 @onready var dim_overlay: ColorRect = %DimOverlay
-@onready var close_button: TextureButton = %CloseButton
+@onready var close_button: CloseButton = %CloseButton
 @onready var save_close_button: Button = %SaveCloseButton
 
 # Audio Controls
@@ -78,7 +78,7 @@ func _init_styles() -> void:
 	style_inactive.content_margin_bottom = 6
 
 func _connect_signals() -> void:
-	close_button.pressed.connect(close)
+	close_button.closed.connect(close)
 	save_close_button.pressed.connect(close)
 	
 	# BGM Slider & Mute

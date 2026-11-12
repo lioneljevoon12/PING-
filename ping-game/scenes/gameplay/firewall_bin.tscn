@@ -1,0 +1,80 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8d9e0f1a2b34"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/firewall_bin.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="3_font_bold"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-SemiBold.ttf" id="4_font_semibold"]
+
+[node name="FirewallBin" type="PanelContainer"]
+custom_minimum_size = Vector2(290, 230)
+offset_right = 290.0
+offset_bottom = 230.0
+pivot_offset = Vector2(145, 115)
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IconRow" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="IconRect" type="TextureRect" parent="VBox/IconRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 65)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BadgePanel" type="PanelContainer" parent="VBox/IconRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="BadgeLabel" type="Label" parent="VBox/IconRow/BadgePanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 18
+text = "✓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ActionBtn" type="Button" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 42)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 13
+text = "✓ IZINKAN MASUK (ALLOW IP PRIVAT)"
+
+[node name="InfoVBox" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 1
+
+[node name="RangeLabel" type="Label" parent="VBox/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font_bold")
+theme_override_font_sizes/font_size = 11
+text = "10.0.0.0/8 • 172.16.0.0/12 • 192.168.0.0/16"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DescLabel" type="Label" parent="VBox/InfoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_semibold")
+theme_override_font_sizes/font_size = 10
+text = "Arahkan paket jaringan lokal (LAN) yang sah ke sini"
+horizontal_alignment = 1
+autowrap_mode = 2

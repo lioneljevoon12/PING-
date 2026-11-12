@@ -32,7 +32,7 @@ func _ready() -> void:
 		btn_practice.pressed.connect(func():
 			_play_sfx(659.25)
 			# Practice Mode: Start Stage 1 Level 1 without timer pressure
-			get_tree().change_scene_to_file("res://scenes/gameplay/level_1_1.tscn")
+			get_tree().change_scene_to_file("res://scenes/gameplay/practice_mode.tscn")
 		)
 		_setup_hover(btn_practice, 1.04)
 		

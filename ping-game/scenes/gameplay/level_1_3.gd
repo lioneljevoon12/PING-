@@ -75,6 +75,12 @@ var hearts: int = 3
 
 var held_device: String = "" # "switch", "hub", or ""
 var placed_device: String = "" # "switch", "hub", or ""
+var cabling_connected: Dictionary = {1: false, 2: false, 3: false, 4: false}
+var selected_cable_type: String = "straight"
+var btn_cable_straight: Button
+var btn_cable_cross: Button
+var btn_finish_cabling: Button
+var pc_rows_box: VBoxContainer
 var cables_installed: bool = false
 var is_simulating: bool = false
 var has_won: bool = false
@@ -119,6 +125,8 @@ var header_ui: Control
 var timer_label: Label
 var hearts_container: HBoxContainer
 var hearts_rects: Array[TextureRect] = []
+var broken_labels: Array[Label] = []
+var game_dialog: Control
 var toast_panel: PanelContainer
 var toast_label: Label
 var toast_tween: Tween
@@ -263,13 +271,19 @@ func _process(delta: float) -> void:
 			
 	if move_vec.length() > 0.05:
 		move_vec = move_vec.normalized()
-		var next_pos = char_pos + move_vec * MOVE_SPEED * delta
-		
-		# Clamp to room playable boundary
+		var delta_mov = move_vec * MOVE_SPEED * delta
 		var vp_sz = get_viewport_rect().size
-		next_pos.x = clamp(next_pos.x, 20.0, vp_sz.x - 260.0)
-		next_pos.y = clamp(next_pos.y, 220.0, vp_sz.y - 170.0)
-		char_pos = next_pos
+		
+		# Independent X movement & obstacle sliding
+		var test_x = clamp(char_pos.x + delta_mov.x, 20.0, vp_sz.x - 260.0)
+		if not _is_room_collision(Vector2(test_x, char_pos.y)):
+			char_pos.x = test_x
+			
+		# Independent Y movement & obstacle sliding
+		var test_y = clamp(char_pos.y + delta_mov.y, 220.0, vp_sz.y - 170.0)
+		if not _is_room_collision(Vector2(char_pos.x, test_y)):
+			char_pos.y = test_y
+			
 		character_mascot.position = char_pos
 		
 		# Update walk animation
@@ -293,6 +307,48 @@ func _process(delta: float) -> void:
 			
 	_update_proximity_prompts()
 
+func _is_room_collision(pos: Vector2) -> bool:
+	var feet_l = pos.x + 85.0
+	var feet_r = pos.x + 170.0
+	var feet_t = pos.y + 75.0
+	var feet_b = pos.y + 138.0
+	
+	# 1. Top Wall
+	if feet_t < 240.0:
+		return true
+		
+	# 2. Left Rack Cabinet (x: 80 to 350, y: 220 to 570)
+	if feet_r > 75.0 and feet_l < 350.0:
+		if feet_b > 240.0 and feet_t < 570.0:
+			return true
+			
+	# 3. Center Table (x: 620 to 940, y: 410 to 535)
+	if feet_r > 620.0 and feet_l < 940.0:
+		if feet_b > 410.0 and feet_t < 535.0:
+			return true
+			
+	# 4. PC 1 Station (x: 400 to 565, y: 360 to 495)
+	if feet_r > 400.0 and feet_l < 565.0:
+		if feet_b > 360.0 and feet_t < 495.0:
+			return true
+			
+	# 5. PC 2 Station (x: 400 to 565, y: 560 to 690)
+	if feet_r > 400.0 and feet_l < 565.0:
+		if feet_b > 560.0 and feet_t < 690.0:
+			return true
+			
+	# 6. PC 3 Station (x: 1000 to 1165, y: 560 to 690)
+	if feet_r > 1000.0 and feet_l < 1165.0:
+		if feet_b > 560.0 and feet_t < 690.0:
+			return true
+			
+	# 7. PC 4 Station (x: 1000 to 1165, y: 360 to 495)
+	if feet_r > 1000.0 and feet_l < 1165.0:
+		if feet_b > 360.0 and feet_t < 495.0:
+			return true
+			
+	return false
+
 func _trigger_context_action() -> void:
 	var char_center = char_pos + Vector2(128.0, 72.0)
 	var rack_center = left_rack_node.position + left_rack_node.size / 2.0
@@ -315,11 +371,11 @@ func _update_proximity_prompts() -> void:
 	var rack_center = left_rack_node.position + left_rack_node.size / 2.0
 	var table_center = cable_table_node.position + cable_table_node.size / 2.0
 	
-	var near_rack = char_center.distance_to(rack_center) < 230.0
+	var near_rack = char_center.distance_to(rack_center) < 260.0
 	var near_table = char_center.distance_to(table_center) < 230.0
 	
-	rack_prompt_pill.visible = is_game_active and (near_rack or placed_device == "")
-	table_prompt_pill.visible = is_game_active and (near_table or placed_device != "")
+	rack_prompt_pill.visible = is_game_active and near_rack and (placed_device == "")
+	table_prompt_pill.visible = is_game_active and near_table and (held_device != "" or placed_device != "")
 	
 	if placed_device == "":
 		if held_device != "":
@@ -406,14 +462,27 @@ func _build_room_visuals() -> void:
 	
 	# Rack prompt pill
 	rack_prompt_pill = _create_interaction_pill("🔍 Pilih Perangkat")
-	rack_prompt_pill.position = Vector2(40, -42)
+	rack_prompt_pill.position = Vector2(45, 12)
+	var pill_b = Button.new()
+	pill_b.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pill_b.flat = true
+	pill_b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	pill_b.pressed.connect(_open_device_modal)
+	rack_prompt_pill.add_child(pill_b)
 	left_rack_node.add_child(rack_prompt_pill)
 	rack_prompt_label = rack_prompt_pill.get_node("Label") as Label
 	var rack_btn = Button.new()
 	rack_btn.set_anchors_preset(Control.PRESET_FULL_RECT)
 	rack_btn.flat = true
 	rack_btn.mouse_filter = Control.MOUSE_FILTER_PASS
-	rack_btn.pressed.connect(_open_device_modal)
+	rack_btn.pressed.connect(func():
+		var char_center = char_pos + Vector2(128.0, 72.0)
+		var rack_center = left_rack_node.position + left_rack_node.size / 2.0
+		if char_center.distance_to(rack_center) < 260.0:
+			_open_device_modal()
+		else:
+			show_toast("Dekati rak di sebelah kiri untuk memilih perangkat!", 2.5)
+	)
 	left_rack_node.add_child(rack_btn)
 	
 	# 2. Center Table (Meja Panjang)
@@ -768,14 +837,36 @@ func _build_header_ui() -> void:
 	hearts_panel.add_child(hearts_container)
 	
 	hearts_rects.clear()
+	broken_labels.clear()
 	for i in range(3):
+		var slot = Control.new()
+		slot.custom_minimum_size = Vector2(40, 36)
+		slot.size = Vector2(40, 36)
+		hearts_container.add_child(slot)
+		
 		var h = TextureRect.new()
 		h.texture = tex_vector_heart
+		h.set_anchors_preset(Control.PRESET_FULL_RECT)
 		h.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		h.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		h.custom_minimum_size = Vector2(32, 28)
-		hearts_container.add_child(h)
+		h.pivot_offset = Vector2(20, 18)
+		h.modulate = Color(1.0, 0.28, 0.4, 1.0)
+		slot.add_child(h)
 		hearts_rects.append(h)
+		
+		var b_lbl = Label.new()
+		b_lbl.text = "✕"
+		b_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+		b_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		b_lbl.add_theme_font_override("font", font_black)
+		b_lbl.add_theme_font_size_override("font_size", 22)
+		b_lbl.add_theme_color_override("font_color", Color("#dc2626"))
+		b_lbl.visible = false
+		slot.add_child(b_lbl)
+		broken_labels.append(b_lbl)
+		
+	_update_hearts_display()
 	header_ui.add_child(hearts_panel)
 	
 	# Level 3 Badge
@@ -884,13 +975,40 @@ func _update_timer_display() -> void:
 	else:
 		timer_label.add_theme_color_override("font_color", Color("#1e293b"))
 
+func _update_hearts_display(is_damage_event: bool = false) -> void:
+	for idx in range(hearts_rects.size()):
+		var hr = hearts_rects[idx]
+		var bl = broken_labels[idx] if idx < broken_labels.size() else null
+		if hr:
+			if idx < hearts:
+				hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
+				hr.scale = Vector2.ONE
+				if bl: bl.visible = false
+			else:
+				if is_damage_event and idx == hearts:
+					hr.modulate = Color(1.0, 0.1, 0.1, 1.0)
+					var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+					tw.tween_property(hr, "scale", Vector2(1.25, 1.25), 0.1)
+					tw.tween_property(hr, "scale", Vector2(0.85, 0.85), 0.15)
+					tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
+					if bl:
+						bl.visible = true
+						bl.modulate.a = 0.0
+						var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+						tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
+				else:
+					hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
+					hr.scale = Vector2(0.85, 0.85)
+					if bl:
+						bl.visible = true
+						bl.modulate.a = 1.0
+
 func _deduct_heart() -> void:
 	if hearts > 0:
 		hearts -= 1
 		_play_tone(180.0, 0.35, 0.3)
-		if hearts < hearts_rects.size():
-			hearts_rects[hearts].modulate = Color(0.4, 0.4, 0.4, 0.4)
-			
+		_update_hearts_display(true)
+		
 		# Gentle screen bounce
 		var tw = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tw.tween_property(room_container, "position:y", 12.0, 0.08)
@@ -997,12 +1115,11 @@ func _build_intro_modal() -> void:
 	sb_av.set_corner_radius_all(38)
 	sb_av.set_content_margin_all(6)
 	avatar_badge.add_theme_stylebox_override("panel", sb_av)
-	var av_lbl = Label.new()
-	av_lbl.text = "👷"
-	av_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	av_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	av_lbl.add_theme_font_size_override("font_size", 34)
-	avatar_badge.add_child(av_lbl)
+	var av_img = TextureRect.new()
+	av_img.texture = preload("res://art/ui-ux/icons/figma_avatar_karakter.png")
+	av_img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	av_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	avatar_badge.add_child(av_img)
 	intro_card.add_child(avatar_badge)
 
 func _start_gameplay() -> void:
@@ -1105,12 +1222,8 @@ func _build_device_modal() -> void:
 	d_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb_top.add_child(d_title)
 	
-	var close_b = Button.new()
-	close_b.text = "✕"
-	close_b.custom_minimum_size = Vector2(40, 40)
-	close_b.add_theme_font_override("font", font_black)
-	close_b.add_theme_font_size_override("font_size", 18)
-	close_b.pressed.connect(func(): device_modal.visible = false)
+	var close_b = preload("res://scenes/close_button.tscn").instantiate()
+	close_b.closed.connect(func(): device_modal.visible = false)
 	hb_top.add_child(close_b)
 	vb.add_child(hb_top)
 	
@@ -1242,19 +1355,19 @@ func _build_cabling_modal() -> void:
 	cabling_modal.add_child(bd)
 	
 	cabling_card = Control.new()
-	cabling_card.size = Vector2(740, 460)
-	cabling_card.pivot_offset = Vector2(370, 230)
+	cabling_card.size = Vector2(760, 480)
+	cabling_card.pivot_offset = Vector2(380, 240)
 	cabling_modal.add_child(cabling_card)
 	
-	# Main Outer Container with Lavender Header (Image 3)
+	# Main Outer Container with Lavender Header
 	var vb_wrap = VBoxContainer.new()
-	vb_wrap.size = Vector2(740, 460)
+	vb_wrap.size = Vector2(760, 480)
 	vb_wrap.add_theme_constant_override("separation", 0)
 	cabling_card.add_child(vb_wrap)
 	
 	# Lavender Header Bar
 	var header_bar = PanelContainer.new()
-	header_bar.custom_minimum_size = Vector2(740, 50)
+	header_bar.custom_minimum_size = Vector2(760, 48)
 	var sb_top = StyleBoxFlat.new()
 	sb_top.bg_color = Color("#e9d5ff")
 	sb_top.border_color = Color("#4a2e2b")
@@ -1274,17 +1387,13 @@ func _build_cabling_modal() -> void:
 	h_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb_hb.add_child(h_title)
 	
-	var btn_x = Button.new()
-	btn_x.text = "✕"
-	btn_x.custom_minimum_size = Vector2(34, 34)
-	btn_x.add_theme_font_override("font", font_black)
-	btn_x.add_theme_font_size_override("font_size", 16)
-	btn_x.pressed.connect(func(): cabling_modal.visible = false)
+	var btn_x = preload("res://scenes/close_button.tscn").instantiate()
+	btn_x.closed.connect(func(): cabling_modal.visible = false)
 	hb_hb.add_child(btn_x)
 	header_bar.add_child(hb_hb)
 	vb_wrap.add_child(header_bar)
 	
-	# Dashed Card Area (Image 3)
+	# Dashed Card Area
 	var body_panel = PanelContainer.new()
 	body_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var sb_body = StyleBoxFlat.new()
@@ -1293,13 +1402,14 @@ func _build_cabling_modal() -> void:
 	sb_body.set_border_width_all(3.5)
 	sb_body.corner_radius_bottom_left = 22
 	sb_body.corner_radius_bottom_right = 22
-	sb_body.set_content_margin_all(20)
+	sb_body.set_content_margin_all(16)
 	body_panel.add_theme_stylebox_override("panel", sb_body)
 	vb_wrap.add_child(body_panel)
 	
 	# Dashed inner box
 	var dashed_box = Control.new()
 	dashed_box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dashed_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dashed_box.draw.connect(func():
 		var col = Color("#ca8a04")
 		var lw = 2.5
@@ -1313,99 +1423,268 @@ func _build_cabling_modal() -> void:
 	body_panel.add_child(dashed_box)
 	
 	var hb_content = HBoxContainer.new()
-	hb_content.add_theme_constant_override("separation", 40)
+	hb_content.add_theme_constant_override("separation", 24)
 	body_panel.add_child(hb_content)
 	
 	# Left: Vertical View of Switch / Hub with 8 ports
 	var left_box = VBoxContainer.new()
 	left_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	left_box.custom_minimum_size = Vector2(180, 300)
+	left_box.custom_minimum_size = Vector2(160, 360)
 	hb_content.add_child(left_box)
 	
 	var dev_vertical = TextureRect.new()
 	dev_vertical.texture = tex_switch_vertical
 	dev_vertical.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	dev_vertical.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	dev_vertical.custom_minimum_size = Vector2(140, 300)
+	dev_vertical.custom_minimum_size = Vector2(140, 340)
 	left_box.add_child(dev_vertical)
 	
-	# Right: 4 PC stations with connect status
+	# Right: Challenge Panel
 	var right_box = VBoxContainer.new()
 	right_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	right_box.add_theme_constant_override("separation", 14)
+	right_box.add_theme_constant_override("separation", 8)
 	hb_content.add_child(right_box)
 	
-	for i in range(1, 5):
-		var pc_row = _create_cabling_pc_row("PC %d" % i, "Port %d (T568B Straight)" % i)
-		right_box.add_child(pc_row)
-		
-	var btn_connect_all = Button.new()
-	btn_connect_all.text = "🔌 Pasang Semua Kabel Straight ke PC 1-4"
-	btn_connect_all.custom_minimum_size = Vector2(340, 44)
-	btn_connect_all.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	btn_connect_all.add_theme_font_override("font", font_black)
-	btn_connect_all.add_theme_font_size_override("font_size", 15)
-	var sb_ca = StyleBoxFlat.new()
-	sb_ca.bg_color = Color("#bbf7d0")
-	sb_ca.border_color = Color("#4a2e2b")
-	sb_ca.set_border_width_all(2.5)
-	sb_ca.set_corner_radius_all(12)
-	btn_connect_all.add_theme_stylebox_override("normal", sb_ca)
-	btn_connect_all.add_theme_color_override("font_color", Color("#14532d"))
-	btn_connect_all.pressed.connect(_on_cables_connected_done)
-	_setup_hover_scale(btn_connect_all, 1.08)
-	right_box.add_child(btn_connect_all)
+	# Challenge Instruction
+	var chal_lbl = Label.new()
+	chal_lbl.text = "TANTANGAN: HUBUNGKAN 4 PC KE KONSENTRATOR"
+	chal_lbl.add_theme_font_override("font", font_black)
+	chal_lbl.add_theme_font_size_override("font_size", 13)
+	chal_lbl.add_theme_color_override("font_color", Color("#581c87"))
+	right_box.add_child(chal_lbl)
+	
+	# Cable Selector Buttons
+	var cable_sel_box = HBoxContainer.new()
+	cable_sel_box.add_theme_constant_override("separation", 8)
+	right_box.add_child(cable_sel_box)
+	
+	btn_cable_straight = Button.new()
+	btn_cable_straight.text = "🟢 Kabel Straight (T568B)"
+	btn_cable_straight.custom_minimum_size = Vector2(240, 36)
+	btn_cable_straight.add_theme_font_override("font", font_black)
+	btn_cable_straight.add_theme_font_size_override("font_size", 12)
+	btn_cable_straight.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn_cable_straight.pressed.connect(func(): _select_cable_type("straight"))
+	cable_sel_box.add_child(btn_cable_straight)
+	
+	btn_cable_cross = Button.new()
+	btn_cable_cross.text = "🟠 Kabel Cross (T568A/B)"
+	btn_cable_cross.custom_minimum_size = Vector2(240, 36)
+	btn_cable_cross.add_theme_font_override("font", font_black)
+	btn_cable_cross.add_theme_font_size_override("font_size", 12)
+	btn_cable_cross.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn_cable_cross.pressed.connect(func(): _select_cable_type("cross"))
+	cable_sel_box.add_child(btn_cable_cross)
+	
+	# 4 PC Rows Container
+	pc_rows_box = VBoxContainer.new()
+	pc_rows_box.add_theme_constant_override("separation", 6)
+	right_box.add_child(pc_rows_box)
+	
+	# Bottom Finish Button
+	btn_finish_cabling = Button.new()
+	btn_finish_cabling.text = "Colokkan Semua PC Terlebih Dahulu (0/4)"
+	btn_finish_cabling.custom_minimum_size = Vector2(380, 42)
+	btn_finish_cabling.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	btn_finish_cabling.add_theme_font_override("font", font_black)
+	btn_finish_cabling.add_theme_font_size_override("font_size", 14)
+	btn_finish_cabling.disabled = true
+	btn_finish_cabling.pressed.connect(_on_cables_connected_done)
+	_setup_hover_scale(btn_finish_cabling, 1.05)
+	right_box.add_child(btn_finish_cabling)
+	
+	_update_cable_selector_buttons()
+	_refresh_pc_rows()
 
-func _create_cabling_pc_row(pc_name: String, port_name: String) -> Control:
+func _select_cable_type(type: String) -> void:
+	selected_cable_type = type
+	_play_sweep(440.0, 580.0, 0.08, 0.12)
+	_update_cable_selector_buttons()
+
+func _update_cable_selector_buttons() -> void:
+	if not btn_cable_straight or not btn_cable_cross:
+		return
+		
+	var sb_st = StyleBoxFlat.new()
+	sb_st.set_corner_radius_all(10)
+	sb_st.set_border_width_all(2.5)
+	sb_st.content_margin_left = 12
+	sb_st.content_margin_right = 12
+	sb_st.content_margin_top = 6
+	sb_st.content_margin_bottom = 6
+	
+	var sb_cr = sb_st.duplicate()
+	
+	if selected_cable_type == "straight":
+		sb_st.bg_color = Color("#bbf7d0")
+		sb_st.border_color = Color("#15803d")
+		btn_cable_straight.add_theme_color_override("font_color", Color("#14532d"))
+		
+		sb_cr.bg_color = Color("#f1f5f9")
+		sb_cr.border_color = Color("#cbd5e1")
+		btn_cable_cross.add_theme_color_override("font_color", Color("#64748b"))
+	else:
+		sb_st.bg_color = Color("#f1f5f9")
+		sb_st.border_color = Color("#cbd5e1")
+		btn_cable_straight.add_theme_color_override("font_color", Color("#64748b"))
+		
+		sb_cr.bg_color = Color("#fed7aa")
+		sb_cr.border_color = Color("#c2410c")
+		btn_cable_cross.add_theme_color_override("font_color", Color("#9a3412"))
+		
+	btn_cable_straight.add_theme_stylebox_override("normal", sb_st)
+	btn_cable_straight.add_theme_stylebox_override("hover", sb_st)
+	btn_cable_straight.add_theme_stylebox_override("pressed", sb_st)
+	
+	btn_cable_cross.add_theme_stylebox_override("normal", sb_cr)
+	btn_cable_cross.add_theme_stylebox_override("hover", sb_cr)
+	btn_cable_cross.add_theme_stylebox_override("pressed", sb_cr)
+
+func _refresh_pc_rows() -> void:
+	if not pc_rows_box:
+		return
+	for ch in pc_rows_box.get_children():
+		ch.queue_free()
+		
+	var count = 0
+	for i in range(1, 5):
+		var is_conn = cabling_connected.get(i, false)
+		if is_conn:
+			count += 1
+		var row = _create_cabling_pc_row("PC %d" % i, "Port %d" % i, is_conn, i)
+		pc_rows_box.add_child(row)
+		
+	var sb_fin = StyleBoxFlat.new()
+	sb_fin.set_corner_radius_all(12)
+	sb_fin.set_border_width_all(2.5)
+	sb_fin.content_margin_left = 16
+	sb_fin.content_margin_right = 16
+	sb_fin.content_margin_top = 8
+	sb_fin.content_margin_bottom = 8
+	
+	if count >= 4:
+		btn_finish_cabling.disabled = false
+		btn_finish_cabling.text = "▶ Semua PC Terhubung! Lanjut Uji Transmisi"
+		btn_finish_cabling.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		sb_fin.bg_color = Color("#bbf7d0")
+		sb_fin.border_color = Color("#4a2e2b")
+		btn_finish_cabling.add_theme_color_override("font_color", Color("#14532d"))
+		btn_finish_cabling.add_theme_color_override("font_disabled_color", Color("#14532d"))
+	else:
+		btn_finish_cabling.disabled = true
+		btn_finish_cabling.text = "Colokkan Semua PC Terlebih Dahulu (%d/4)" % count
+		btn_finish_cabling.mouse_default_cursor_shape = Control.CURSOR_FORBIDDEN
+		sb_fin.bg_color = Color("#e2e8f0")
+		sb_fin.border_color = Color("#94a3b8")
+		btn_finish_cabling.add_theme_color_override("font_color", Color("#94a3b8"))
+		btn_finish_cabling.add_theme_color_override("font_disabled_color", Color("#94a3b8"))
+		
+	btn_finish_cabling.add_theme_stylebox_override("normal", sb_fin)
+	btn_finish_cabling.add_theme_stylebox_override("hover", sb_fin)
+	btn_finish_cabling.add_theme_stylebox_override("pressed", sb_fin)
+	btn_finish_cabling.add_theme_stylebox_override("disabled", sb_fin)
+
+func _create_cabling_pc_row(pc_name: String, port_name: String, is_conn: bool, pc_idx: int) -> Control:
 	var row = PanelContainer.new()
 	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#f8fafc")
-	sb.border_color = Color("#cbd5e1")
+	sb.bg_color = Color("#f0fdf4") if is_conn else Color("#f8fafc")
+	sb.border_color = Color("#16a34a") if is_conn else Color("#cbd5e1")
 	sb.set_border_width_all(2)
 	sb.set_corner_radius_all(10)
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
-	sb.content_margin_top = 6
-	sb.content_margin_bottom = 6
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 4
 	row.add_theme_stylebox_override("panel", sb)
 	
 	var hb = HBoxContainer.new()
-	hb.add_theme_constant_override("separation", 12)
+	hb.add_theme_constant_override("separation", 10)
 	row.add_child(hb)
 	
 	var pc_icon = TextureRect.new()
 	pc_icon.texture = tex_pc
 	pc_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	pc_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	pc_icon.custom_minimum_size = Vector2(40, 36)
+	pc_icon.custom_minimum_size = Vector2(36, 32)
 	hb.add_child(pc_icon)
 	
 	var vb_info = VBoxContainer.new()
 	vb_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb_info.alignment = BoxContainer.ALIGNMENT_CENTER
+	
 	var lbl_pc = Label.new()
 	lbl_pc.text = pc_name
 	lbl_pc.add_theme_font_override("font", font_black)
-	lbl_pc.add_theme_font_size_override("font_size", 14)
+	lbl_pc.add_theme_font_size_override("font_size", 13)
 	lbl_pc.add_theme_color_override("font_color", Color("#1e293b"))
 	vb_info.add_child(lbl_pc)
 	
 	var lbl_p = Label.new()
-	lbl_p.text = port_name
+	lbl_p.text = "Target: %s" % port_name
 	lbl_p.add_theme_font_override("font", font_regular)
 	lbl_p.add_theme_font_size_override("font_size", 11)
 	lbl_p.add_theme_color_override("font_color", Color("#64748b"))
 	vb_info.add_child(lbl_p)
 	hb.add_child(vb_info)
 	
-	var status_lbl = Label.new()
-	status_lbl.text = "✓ Terhubung"
-	status_lbl.add_theme_font_override("font", font_bold)
-	status_lbl.add_theme_font_size_override("font_size", 12)
-	status_lbl.add_theme_color_override("font_color", Color("#16a34a"))
-	hb.add_child(status_lbl)
-	
+	if is_conn:
+		var status_lbl = Label.new()
+		status_lbl.text = "✓ Terhubung (Straight)"
+		status_lbl.add_theme_font_override("font", font_bold)
+		status_lbl.add_theme_font_size_override("font_size", 12)
+		status_lbl.add_theme_color_override("font_color", Color("#16a34a"))
+		status_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		hb.add_child(status_lbl)
+	else:
+		var btn_plug = Button.new()
+		btn_plug.text = "🔌 Pasang Kabel"
+		btn_plug.custom_minimum_size = Vector2(130, 32)
+		btn_plug.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		btn_plug.add_theme_font_override("font", font_black)
+		btn_plug.add_theme_font_size_override("font_size", 11)
+		var sb_p = StyleBoxFlat.new()
+		sb_p.bg_color = Color("#e0e7ff")
+		sb_p.border_color = Color("#4a2e2b")
+		sb_p.set_border_width_all(2)
+		sb_p.set_corner_radius_all(8)
+		sb_p.content_margin_left = 8
+		sb_p.content_margin_right = 8
+		btn_plug.add_theme_stylebox_override("normal", sb_p)
+		btn_plug.add_theme_stylebox_override("hover", sb_p)
+		btn_plug.add_theme_stylebox_override("pressed", sb_p)
+		btn_plug.add_theme_color_override("font_color", Color("#3730a3"))
+		btn_plug.pressed.connect(func(): _try_connect_pc(pc_idx))
+		_setup_hover_scale(btn_plug, 1.05)
+		hb.add_child(btn_plug)
+		
 	return row
+
+func _try_connect_pc(pc_num: int) -> void:
+	if cabling_connected.get(pc_num, false):
+		return
+		
+	if selected_cable_type == "cross":
+		_play_sweep(220.0, 140.0, 0.2, 0.25)
+		hearts = max(0, hearts - 1)
+		_update_hearts_display()
+		show_toast("❌ SALAH KABEL! Kabel Cross hanya untuk PC ke PC. Menghubungkan PC ke Switch/Hub harus pakai Kabel Straight (T568B)!", 4.0)
+		if hearts <= 0:
+			cabling_modal.visible = false
+			_trigger_game_over("Nyawa habis karena salah memilih jenis kabel jaringan!")
+		return
+		
+	_play_sweep(523.25, 784.0, 0.1, 0.18)
+	cabling_connected[pc_num] = true
+	show_toast("✓ PC %d berhasil terhubung ke Port %d dengan Kabel Straight!" % [pc_num, pc_num], 2.0)
+	_refresh_pc_rows()
+	
+	var count = 0
+	for v in cabling_connected.values():
+		if v: count += 1
+		
+	if count >= 4:
+		_play_sweep(659.25, 1046.5, 0.2, 0.3)
+		show_toast("🎉 Semua 4 PC berhasil terhubung! Tekan tombol di bawah untuk menguji transmisi data.", 3.5)
 
 func _open_cabling_modal() -> void:
 	if toast_panel:
@@ -1414,6 +1693,8 @@ func _open_cabling_modal() -> void:
 	cabling_modal.visible = true
 	var vp_sz = get_viewport_rect().size
 	cabling_card.position = Vector2((vp_sz.x - cabling_card.size.x) / 2.0, (vp_sz.y - cabling_card.size.y) / 2.0)
+	_refresh_pc_rows()
+	_update_cable_selector_buttons()
 
 func _on_cables_connected_done() -> void:
 	cables_installed = true
@@ -1614,12 +1895,8 @@ func _build_guidebook_modal() -> void:
 	g_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb_top.add_child(g_title)
 	
-	var btn_close_g = Button.new()
-	btn_close_g.text = "✕"
-	btn_close_g.custom_minimum_size = Vector2(40, 40)
-	btn_close_g.add_theme_font_override("font", font_black)
-	btn_close_g.add_theme_font_size_override("font_size", 18)
-	btn_close_g.pressed.connect(func(): guidebook_modal.visible = false)
+	var btn_close_g = preload("res://scenes/close_button.tscn").instantiate()
+	btn_close_g.closed.connect(func(): guidebook_modal.visible = false)
 	hb_top.add_child(btn_close_g)
 	vb.add_child(hb_top)
 	
@@ -1655,206 +1932,25 @@ func _open_guidebook_modal() -> void:
 
 # --- PAUSE, WIN, & GAME OVER MODALS ---
 func _build_pause_modal() -> void:
-	pause_modal = Control.new()
-	pause_modal.name = "PauseModal"
-	pause_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	pause_modal.mouse_filter = Control.MOUSE_FILTER_STOP
-	pause_modal.visible = false
-	pause_modal.z_index = 220
+	pause_modal = preload("res://scenes/pause_modal.tscn").instantiate()
+	pause_modal.z_index = 240
+	pause_modal.settings_modal = settings_modal
 	add_child(pause_modal)
-	
-	var bd_p = ColorRect.new()
-	bd_p.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_p.color = Color(0, 0, 0, 0.6)
-	pause_modal.add_child(bd_p)
-	
-	pause_card = Control.new()
-	pause_card.name = "PauseCard"
-	pause_card.size = Vector2(360, 360)
-	pause_card.pivot_offset = Vector2(180, 180)
-	pause_modal.add_child(pause_card)
-	
-	var bg_p = PanelContainer.new()
-	bg_p.size = Vector2(360, 360)
-	var sb_p = StyleBoxFlat.new()
-	sb_p.bg_color = Color("#fffdf7")
-	sb_p.border_color = Color("#4a2e2b")
-	sb_p.set_border_width_all(3.5)
-	sb_p.set_corner_radius_all(20)
-	sb_p.set_content_margin_all(24)
-	bg_p.add_theme_stylebox_override("panel", sb_p)
-	pause_card.add_child(bg_p)
-	
-	var vb_p = VBoxContainer.new()
-	vb_p.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb_p.add_theme_constant_override("separation", 14)
-	bg_p.add_child(vb_p)
-	
-	var p_title = Label.new()
-	p_title.text = "PERMAINAN JEDA"
-	p_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	p_title.add_theme_font_override("font", font_black)
-	p_title.add_theme_font_size_override("font_size", 20)
-	p_title.add_theme_color_override("font_color", Color("#4a2e2b"))
-	vb_p.add_child(p_title)
-	
-	var btn_resume = _create_modal_btn("Lanjut Main", Color("#bbf7d0"), Color("#14532d"))
-	btn_resume.pressed.connect(_close_pause_modal)
-	vb_p.add_child(btn_resume)
-	
-	var btn_p_restart = _create_modal_btn("Ulangi Level", Color("#fed7aa"), Color("#7c2d12"))
-	btn_p_restart.pressed.connect(func(): get_tree().reload_current_scene())
-	vb_p.add_child(btn_p_restart)
-	
-	var btn_p_settings = _create_modal_btn("Pengaturan", Color("#e9d5ff"), Color("#581c87"))
-	btn_p_settings.pressed.connect(func():
-		if settings_modal and settings_modal.has_method("open_settings"):
-			settings_modal.open_settings()
-	)
-	vb_p.add_child(btn_p_settings)
-	
-	var btn_p_exit = _create_modal_btn("Kembali ke Peta", Color("#fee2e2"), Color("#991b1b"))
-	btn_p_exit.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	vb_p.add_child(btn_p_exit)
 
 func _open_pause_modal() -> void:
-	_play_sweep(659.25, 440.0, 0.1, 0.15)
-	pause_modal.visible = true
-	var vp_sz = get_viewport_rect().size
-	pause_card.position = Vector2((vp_sz.x - pause_card.size.x) / 2.0, (vp_sz.y - pause_card.size.y) / 2.0)
+	if pause_modal and pause_modal.has_method("open"):
+		pause_modal.open()
 
 func _close_pause_modal() -> void:
-	_play_sweep(440.0, 659.25, 0.1, 0.15)
-	pause_modal.visible = false
+	if pause_modal and pause_modal.has_method("close"):
+		pause_modal.close()
 
 func _build_win_gameover_modals() -> void:
-	# WIN MODAL
-	win_modal = Control.new()
-	win_modal.name = "WinModal"
-	win_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	win_modal.visible = false
-	win_modal.z_index = 220
-	add_child(win_modal)
-	
-	var bd_w = ColorRect.new()
-	bd_w.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_w.color = Color(0, 0, 0, 0.7)
-	win_modal.add_child(bd_w)
-	
-	win_card = Control.new()
-	win_card.size = Vector2(440, 440)
-	win_card.pivot_offset = Vector2(220, 220)
-	win_modal.add_child(win_card)
-	
-	var bg_w = PanelContainer.new()
-	bg_w.size = Vector2(440, 440)
-	var sb_win = StyleBoxFlat.new()
-	sb_win.bg_color = Color("#fffdf7")
-	sb_win.border_color = Color("#4a2e2b")
-	sb_win.set_border_width_all(3.5)
-	sb_win.set_corner_radius_all(22)
-	sb_win.set_content_margin_all(24)
-	bg_w.add_theme_stylebox_override("panel", sb_win)
-	win_card.add_child(bg_w)
-	
-	var vb_w = VBoxContainer.new()
-	vb_w.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb_w.add_theme_constant_override("separation", 14)
-	bg_w.add_child(vb_w)
-	
-	var w_title = Label.new()
-	w_title.text = "LEVEL 1.3 SELESAI!"
-	w_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	w_title.add_theme_font_override("font", font_black)
-	w_title.add_theme_font_size_override("font_size", 22)
-	w_title.add_theme_color_override("font_color", Color("#15803d"))
-	vb_w.add_child(w_title)
-	
-	win_stars_row = HBoxContainer.new()
-	win_stars_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	win_stars_row.add_theme_constant_override("separation", 16)
-	for i in range(3):
-		var star = TextureRect.new()
-		star.texture = tex_star_gold
-		star.custom_minimum_size = Vector2(48, 48)
-		star.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		win_stars_row.add_child(star)
-	vb_w.add_child(win_stars_row)
-	
-	win_time_lbl = Label.new()
-	win_time_lbl.text = "Waktu Tersisa: 02:45"
-	win_time_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	win_time_lbl.add_theme_font_override("font", font_bold)
-	win_time_lbl.add_theme_font_size_override("font_size", 16)
-	win_time_lbl.add_theme_color_override("font_color", Color("#4a2e2b"))
-	vb_w.add_child(win_time_lbl)
-	
-	var btn_map = _create_modal_btn("Kembali ke Peta", Color("#f1f5f9"), Color("#334155"))
-	btn_map.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	vb_w.add_child(btn_map)
-	
-	var btn_next = _create_modal_btn("Peta Stage (Stage 2)", Color("#bbf7d0"), Color("#14532d"))
-	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	vb_w.add_child(btn_next)
-	
-	# GAME OVER MODAL
-	gameover_modal = Control.new()
-	gameover_modal.name = "GameOverModal"
-	gameover_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	gameover_modal.visible = false
-	gameover_modal.z_index = 220
-	add_child(gameover_modal)
-	
-	var bd_go = ColorRect.new()
-	bd_go.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_go.color = Color(0, 0, 0, 0.7)
-	gameover_modal.add_child(bd_go)
-	
-	gameover_card = Control.new()
-	gameover_card.size = Vector2(440, 380)
-	gameover_card.pivot_offset = Vector2(220, 190)
-	gameover_modal.add_child(gameover_card)
-	
-	var bg_go = PanelContainer.new()
-	bg_go.size = Vector2(440, 380)
-	var sb_go = StyleBoxFlat.new()
-	sb_go.bg_color = Color("#fffdf7")
-	sb_go.border_color = Color("#4a2e2b")
-	sb_go.set_border_width_all(3.5)
-	sb_go.set_corner_radius_all(22)
-	sb_go.set_content_margin_all(24)
-	bg_go.add_theme_stylebox_override("panel", sb_go)
-	gameover_card.add_child(bg_go)
-	
-	var vb_go = VBoxContainer.new()
-	vb_go.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb_go.add_theme_constant_override("separation", 14)
-	bg_go.add_child(vb_go)
-	
-	var go_title = Label.new()
-	go_title.text = "MISI GAGAL"
-	go_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	go_title.add_theme_font_override("font", font_black)
-	go_title.add_theme_font_size_override("font_size", 24)
-	go_title.add_theme_color_override("font_color", Color("#dc2626"))
-	vb_go.add_child(go_title)
-	
-	gameover_reason_lbl = Label.new()
-	gameover_reason_lbl.text = "Waktu habis atau nyawa teknisi habis!"
-	gameover_reason_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	gameover_reason_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	gameover_reason_lbl.add_theme_font_override("font", font_bold)
-	gameover_reason_lbl.add_theme_font_size_override("font_size", 15)
-	gameover_reason_lbl.add_theme_color_override("font_color", Color("#7f1d1d"))
-	vb_go.add_child(gameover_reason_lbl)
-	
-	var btn_retry = _create_modal_btn("Coba Lagi", Color("#fecaca"), Color("#991b1b"))
-	btn_retry.pressed.connect(func(): get_tree().reload_current_scene())
-	vb_go.add_child(btn_retry)
-	
-	var btn_go_map = _create_modal_btn("Kembali ke Peta", Color("#f1f5f9"), Color("#334155"))
-	btn_go_map.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	vb_go.add_child(btn_go_map)
+	game_dialog = preload("res://scenes/game_dialog.tscn").instantiate()
+	game_dialog.name = "GameDialog"
+	add_child(game_dialog)
+	win_modal = game_dialog
+	gameover_modal = game_dialog
 
 func _create_modal_btn(text: String, bg_col: Color, font_col: Color) -> Button:
 	var btn = Button.new()
@@ -1875,33 +1971,31 @@ func _create_modal_btn(text: String, bg_col: Color, font_col: Color) -> Button:
 func _trigger_win() -> void:
 	has_won = true
 	is_game_active = false
-	win_modal.visible = true
-	
+	if PlayerData:
+		PlayerData.set_level_stars(1, 3, hearts)
+		
 	var mins = int(time_remaining) / 60
 	var secs = int(time_remaining) % 60
-	win_time_lbl.text = "Sisa Waktu: %02d:%02d" % [mins, secs]
-	
-	for i in range(3):
-		var star_img = win_stars_row.get_child(i) as TextureRect
-		star_img.texture = tex_star_gold if (i < hearts) else tex_star_gray
-		
-	# Update player progress
-	PlayerData.set_level_stars(1, 3, hearts)
-	
-	var vp_sz = get_viewport_rect().size
-	win_card.position = Vector2((vp_sz.x - win_card.size.x) / 2.0, (vp_sz.y - win_card.size.y) / 2.0)
-	win_card.scale = Vector2(0.85, 0.85)
-	win_card.modulate.a = 0.0
-	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tw.tween_property(win_card, "scale", Vector2.ONE, 0.22)
-	tw.tween_property(win_card, "modulate:a", 1.0, 0.18)
+	var time_str = "Sisa Waktu: %02d:%02d" % [mins, secs]
+	var desc = "Luar biasa! Konsentrator Switch berhasil dipasang dan kabel Straight terhubung ke semua PC tanpa collision!"
+	game_dialog.show_win(
+		"LEVEL 1.3 SELESAI!",
+		desc,
+		hearts,
+		time_str,
+		func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_2_1.tscn"),
+		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
+		"STAGE 2 LEVEL 2.1"
+	)
 
 func _trigger_game_over(reason: String) -> void:
 	is_game_active = false
-	gameover_reason_lbl.text = reason
-	gameover_modal.visible = true
-	var vp_sz = get_viewport_rect().size
-	gameover_card.position = Vector2((vp_sz.x - gameover_card.size.x) / 2.0, (vp_sz.y - gameover_card.size.y) / 2.0)
+	_update_hearts_display(true)
+	game_dialog.show_game_over(
+		reason,
+		func(): get_tree().reload_current_scene(),
+		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+	)
 
 # --- TOAST NOTIFICATIONS ---
 func _build_toast_ui() -> void:

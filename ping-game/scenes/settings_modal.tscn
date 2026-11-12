@@ -6,7 +6,7 @@
 [ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="4_font_black"]
 [ext_resource type="FontFile" uid="uid://dwd0sb6ffhlic" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="5_font_extrabold"]
 [ext_resource type="FontFile" uid="uid://dsqq4nxtdx5u7" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="6_font_bold"]
-[ext_resource type="Texture2D" uid="uid://1ts4rqqvwb0a" path="res://art/ui-ux/close-removebg-preview.png" id="7_close_btn"]
+[ext_resource type="PackedScene" path="res://scenes/close_button.tscn" id="7_close_btn"]
 [ext_resource type="Texture2D" path="res://art/assets/PING! Assets/TAMPILANNNNNN/Home/vectorsistem.png" id="8_icon_gear"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_sound.svg" id="9_icon_sound"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_sound_off.svg" id="10_icon_sound_off"]
@@ -197,15 +197,10 @@ theme_override_font_sizes/font_size = 21
 text = "PENGATURAN SISTEM"
 vertical_alignment = 1
 
-[node name="CloseButton" type="TextureButton" parent="CenterBox/ModalCard/VBox/HeaderHBox"]
+[node name="CloseButton" parent="CenterBox/ModalCard/VBox/HeaderHBox" instance=ExtResource("7_close_btn")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 size_flags_horizontal = 8
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("7_close_btn")
-ignore_texture_size = true
-stretch_mode = 5
 
 [node name="HSeparator1" type="HSeparator" parent="CenterBox/ModalCard/VBox"]
 layout_mode = 2

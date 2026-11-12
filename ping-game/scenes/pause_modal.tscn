@@ -1,0 +1,207 @@
+[gd_scene load_steps=8 format=3 uid="uid://b2p3m4n5o6q7r"]
+
+[ext_resource type="Script" path="res://scenes/pause_modal.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
+bg_color = Color(1, 0.992157, 0.968627, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_mint"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.733333, 0.968627, 0.815686, 1)
+border_width_left = 2.5
+border_width_top = 2.5
+border_width_right = 2.5
+border_width_bottom = 2.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_peach"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.996078, 0.843137, 0.666667, 1)
+border_width_left = 2.5
+border_width_top = 2.5
+border_width_right = 2.5
+border_width_bottom = 2.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_lavender"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.913725, 0.835294, 1, 1)
+border_width_left = 2.5
+border_width_top = 2.5
+border_width_right = 2.5
+border_width_bottom = 2.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_coral"]
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+bg_color = Color(0.996078, 0.886275, 0.886275, 1)
+border_width_left = 2.5
+border_width_top = 2.5
+border_width_right = 2.5
+border_width_bottom = 2.5
+border_color = Color(0.290196, 0.180392, 0.168627, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="PauseModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="PauseCard" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -180.0
+offset_right = 180.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(180, 180)
+
+[node name="CardPanel" type="PanelContainer" parent="PauseCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VB" type="VBoxContainer" parent="PauseCard/CardPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Title" type="Label" parent="PauseCard/CardPanel/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 20
+text = "PERMAINAN JEDA"
+horizontal_alignment = 1
+
+[node name="BtnResume" type="Button" parent="PauseCard/CardPanel/VB"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.0784314, 0.32549, 0.176471, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_mint")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_mint")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_mint")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_mint")
+text = "Lanjut Main"
+
+[node name="BtnRestart" type="Button" parent="PauseCard/CardPanel/VB"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.486275, 0.176471, 0.0705882, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_peach")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_peach")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_peach")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_peach")
+text = "Ulangi Level"
+
+[node name="BtnSettings" type="Button" parent="PauseCard/CardPanel/VB"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.345098, 0.109804, 0.529412, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_lavender")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_lavender")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_lavender")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_lavender")
+text = "Pengaturan"
+
+[node name="BtnExit" type="Button" parent="PauseCard/CardPanel/VB"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.6, 0.105882, 0.105882, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_coral")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_coral")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_coral")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btn_coral")
+text = "Kembali ke Peta"
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

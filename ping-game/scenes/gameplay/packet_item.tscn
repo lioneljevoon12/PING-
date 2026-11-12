@@ -1,0 +1,86 @@
+[gd_scene load_steps=6 format=3 uid="uid://d1a2b3c4e5f60"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/packet_item.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Sprite animation/paket data/1.png" id="2_envelope"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="3_font_bold"]
+[ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-ExtraBold.ttf" id="4_font_ebold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill"]
+bg_color = Color(1, 0.94902, 0.901961, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.917647, 0.345098, 0.0470588, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+
+[node name="PacketItem" type="PanelContainer"]
+custom_minimum_size = Vector2(165, 88)
+offset_right = 165.0
+offset_bottom = 88.0
+pivot_offset = Vector2(82, 44)
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="TopRow" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="EnvelopeRect" type="TextureRect" parent="VBox/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 20)
+layout_mode = 2
+texture = ExtResource("2_envelope")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="IndexLabel" type="Label" parent="VBox/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.28, 0.33, 0.41, 1)
+theme_override_fonts/font = ExtResource("3_font_bold")
+theme_override_font_sizes/font_size = 11
+text = "PAKET DATA #01"
+vertical_alignment = 1
+
+[node name="IPRow" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="OctetPill" type="PanelContainer" parent="VBox/IPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="OctetLabel" type="Label" parent="VBox/IPRow/OctetPill"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.203922, 0.0705882, 1)
+theme_override_fonts/font = ExtResource("4_font_ebold")
+theme_override_font_sizes/font_size = 15
+text = "192"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestIPLabel" type="Label" parent="VBox/IPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.16, 0.23, 1)
+theme_override_fonts/font = ExtResource("3_font_bold")
+theme_override_font_sizes/font_size = 14
+text = ".168.1.10"
+vertical_alignment = 1

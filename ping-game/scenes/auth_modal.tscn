@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/auth_modal.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://2b0j6ww185b1" path="res://fonts/MADE Tommy Soft Bold PERSONAL USE.otf" id="2_font_bold"]
 [ext_resource type="FontFile" uid="uid://dyvkugdedh0xm" path="res://fonts/MADE Tommy Soft Regular PERSONAL USE.otf" id="3_font_reg"]
-[ext_resource type="Texture2D" uid="uid://1ts4rqqvwb0a" path="res://art/ui-ux/close-removebg-preview.png" id="4_close_btn"]
+[ext_resource type="PackedScene" path="res://scenes/close_button.tscn" id="4_close_btn"]
 [ext_resource type="Texture2D" uid="uid://cru5tdc844esc" path="res://art/ui-ux/lanjut_googleplay.png" id="5_google_btn"]
 [ext_resource type="Texture2D" uid="uid://k1irk35jes4f" path="res://art/ui-ux/masuk-left-button.png" id="6_tab_tex"]
 
@@ -172,15 +172,10 @@ theme_override_font_sizes/font_size = 18
 text = "Masuk ke PING!"
 vertical_alignment = 1
 
-[node name="CloseButton" type="TextureButton" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox"]
+[node name="CloseButton" parent="CenterBox/ModalCard/MarginContainer/VBox/HeaderHBox" instance=ExtResource("4_close_btn")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 size_flags_horizontal = 8
-mouse_default_cursor_shape = 2
-texture_normal = ExtResource("4_close_btn")
-ignore_texture_size = true
-stretch_mode = 5
 
 [node name="GooglePlayButton" type="TextureButton" parent="CenterBox/ModalCard/MarginContainer/VBox"]
 unique_name_in_owner = true

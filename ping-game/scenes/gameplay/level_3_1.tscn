@@ -1,0 +1,167 @@
+[gd_scene load_steps=12 format=3 uid="uid://c3d4e5f6a7b81"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/level_3_1.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/bg_stage3.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/Gerbang.png" id="3_door"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/31_papan_materi.png" id="4_whiteboard"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/31_papan_topologi.png" id="5_topology"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/lemari_kecil.png" id="6_cabinet"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/31_rak_jaringan.png" id="7_rack"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/kursi.png" id="8_chair"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/31_meja_teknisi.png" id="9_meja_teknisi"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/meja_pc.png" id="10_meja_pc"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Character/main-char-router.png" id="11_char"]
+
+[node name="Level3_1" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+volume_db = -8.0
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FloorCarpet" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 340.0
+offset_top = 220.0
+offset_right = 1460.0
+offset_bottom = 675.0
+
+[node name="DoorArch" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 620.0
+offset_top = 35.0
+offset_right = 940.0
+offset_bottom = 225.0
+texture = ExtResource("3_door")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WhiteboardNode" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 220.0
+offset_top = 60.0
+offset_right = 560.0
+offset_bottom = 235.0
+texture = ExtResource("4_whiteboard")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TopologyMonitor" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1140.0
+offset_top = 60.0
+offset_right = 1420.0
+offset_bottom = 225.0
+texture = ExtResource("5_topology")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ServerCabinet" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1425.0
+offset_top = 90.0
+offset_right = 1535.0
+offset_bottom = 265.0
+texture = ExtResource("6_cabinet")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CablesContainer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftRack" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 260.0
+offset_right = 300.0
+offset_bottom = 590.0
+texture = ExtResource("7_rack")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ChairNode" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 245.0
+offset_right = 1140.0
+offset_bottom = 325.0
+texture = ExtResource("8_chair")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MejaTeknisi" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 860.0
+offset_top = 270.0
+offset_right = 1340.0
+offset_bottom = 480.0
+
+[node name="PC1Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 460.0
+offset_top = 480.0
+offset_right = 660.0
+offset_bottom = 660.0
+
+[node name="PC2Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1210.0
+offset_top = 480.0
+offset_right = 1410.0
+offset_bottom = 660.0
+
+[node name="CharacterNode" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 720.0
+offset_top = 380.0
+offset_right = 840.0
+offset_bottom = 500.0
+
+[node name="MobileControlsRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

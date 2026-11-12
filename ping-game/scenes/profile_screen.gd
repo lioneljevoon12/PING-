@@ -7,6 +7,7 @@ extends Control
 @onready var btn_settings: Button = %BtnSettings
 @onready var auth_modal: Control = %AuthModal
 @onready var settings_modal: Control = %SettingsModal
+@onready var character_customization_modal: Control = %CharacterCustomizationModal
 @onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
 
 func _ready() -> void:
@@ -22,7 +23,8 @@ func _ready() -> void:
 	if btn_karakter:
 		btn_karakter.pressed.connect(func():
 			_play_sfx(659.25)
-			_show_toast("Karakter: Teknisi Jaringan Muda • Peringkat Junior Specialist")
+			if character_customization_modal:
+				character_customization_modal.open()
 		)
 		_setup_hover(btn_karakter, 1.04)
 		

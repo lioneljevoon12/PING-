@@ -1,16 +1,16 @@
-[gd_scene load_steps=12 format=3 uid="uid://c6xk7b2v1y5np"]
+[gd_scene format=3 uid="uid://c6xk7b2v1y5np"]
 
-[ext_resource type="Script" path="res://scenes/title_screen.gd" id="1_script"]
-[ext_resource type="FontFile" uid="uid://bwha75e0v4u7t" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
-[ext_resource type="FontFile" uid="uid://2b0j6ww185b1" path="res://fonts/MADE Tommy Soft Bold PERSONAL USE.otf" id="3_font_bold"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="4_bg"]
-[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Titles/PING-JUDUL.png" id="5_logo"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/star_gold.png" id="6_star"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_settings.svg" id="7_gear"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/btn_play_circle.png" id="8_circle_play"]
-[ext_resource type="Texture2D" path="res://art/assets/scattered/Paket_data-removebg-preview.png" id="9_packet"]
-[ext_resource type="PackedScene" path="res://scenes/auth_modal.tscn" id="10_auth_modal"]
-[ext_resource type="PackedScene" path="res://scenes/settings_modal.tscn" id="11_settings_modal"]
+[ext_resource type="Script" uid="uid://psttdv68pe2h" path="res://scenes/title_screen.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="Texture2D" uid="uid://bvqylweq5fgyd" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="4_bg"]
+[ext_resource type="Texture2D" uid="uid://t8e38iid0fc8" path="res://art/assets/PING! Assets/Titles/PING-JUDUL.png" id="5_logo"]
+[ext_resource type="Texture2D" uid="uid://cex0rkoviyxgm" path="res://art/ui-ux/levelpath/star_gold.png" id="6_star"]
+[ext_resource type="Texture2D" uid="uid://c71q2wlxf4hrv" path="res://art/ui-ux/icons/icon_settings.svg" id="7_gear"]
+[ext_resource type="Texture2D" uid="uid://b5ynpfee8uslk" path="res://art/ui-ux/dashboard/btn_play_circle.png" id="8_circle_play"]
+[ext_resource type="Texture2D" uid="uid://75ukddvk2pe8" path="res://art/assets/scattered/Paket_data-removebg-preview.png" id="9_packet"]
+[ext_resource type="PackedScene" uid="uid://b3y7kx8v4pq2n" path="res://scenes/auth_modal.tscn" id="10_auth_modal"]
+[ext_resource type="PackedScene" uid="uid://cxvsetmod001a" path="res://scenes/settings_modal.tscn" id="11_settings_modal"]
+[ext_resource type="PackedScene" path="res://scenes/leaderboard_modal.tscn" id="12_leaderboard_modal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile"]
 content_margin_left = 12.0
@@ -75,10 +75,10 @@ content_margin_top = 14.0
 content_margin_right = 24.0
 content_margin_bottom = 14.0
 bg_color = Color(0.858824, 0.917647, 0.980392, 1)
-border_width_left = 3.5
-border_width_top = 3.5
-border_width_right = 3.5
-border_width_bottom = 3.5
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.290196, 0.180392, 0.168627, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
@@ -94,10 +94,10 @@ content_margin_top = 14.0
 content_margin_right = 18.0
 content_margin_bottom = 14.0
 bg_color = Color(0.996078, 0.815686, 0.811765, 1)
-border_width_left = 3.5
-border_width_top = 3.5
-border_width_right = 3.5
-border_width_bottom = 3.5
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.290196, 0.180392, 0.168627, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
@@ -113,10 +113,10 @@ content_margin_top = 14.0
 content_margin_right = 18.0
 content_margin_bottom = 14.0
 bg_color = Color(0.996078, 0.87451, 0.690196, 1)
-border_width_left = 3.5
-border_width_top = 3.5
-border_width_right = 3.5
-border_width_bottom = 3.5
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.290196, 0.180392, 0.168627, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
@@ -126,7 +126,7 @@ shadow_color = Color(0.29, 0.18, 0.17, 0.25)
 shadow_size = 6
 shadow_offset = Vector2(0, 4)
 
-[node name="TitleScreen" type="Control"]
+[node name="TitleScreen" type="Control" unique_id=1150551300]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -135,26 +135,30 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=25885429]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -13.0
+offset_top = -17.0
+offset_right = -13.0
+offset_bottom = -17.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("4_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="HeaderBar" type="Control" parent="."]
+[node name="HeaderBar" type="Control" parent="." unique_id=1402603891]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 100.0
 grow_horizontal = 2
 
-[node name="ProfileButton" type="Button" parent="HeaderBar"]
+[node name="ProfileButton" type="Button" parent="HeaderBar" unique_id=1521887430]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 50.0
@@ -163,11 +167,11 @@ offset_right = 220.0
 offset_bottom = 86.0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_profile")
-theme_override_styles/hover = SubResource("StyleBoxFlat_profile")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_profile")
+theme_override_styles/hover = SubResource("StyleBoxFlat_profile")
 theme_override_styles/focus = SubResource("StyleBoxFlat_profile")
 
-[node name="HBox" type="HBoxContainer" parent="HeaderBar/ProfileButton"]
+[node name="HBox" type="HBoxContainer" parent="HeaderBar/ProfileButton" unique_id=104922142]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,22 +181,23 @@ grow_vertical = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="HeaderBar/ProfileButton/HBox"]
+[node name="Icon" type="TextureRect" parent="HeaderBar/ProfileButton/HBox" unique_id=1117228601]
 custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 texture = ExtResource("9_packet")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="HeaderBar/ProfileButton/HBox"]
+[node name="Label" type="Label" parent="HeaderBar/ProfileButton/HBox" unique_id=1827184161]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 13
-text = "PROFIL\nAKUN"
+text = "PROFIL
+AKUN"
 vertical_alignment = 1
 
-[node name="StarsCard" type="PanelContainer" parent="HeaderBar"]
+[node name="StarsCard" type="PanelContainer" parent="HeaderBar" unique_id=417781609]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -204,29 +209,30 @@ offset_bottom = 86.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_stars")
 
-[node name="HBox" type="HBoxContainer" parent="HeaderBar/StarsCard"]
+[node name="HBox" type="HBoxContainer" parent="HeaderBar/StarsCard" unique_id=1685011860]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="StarIcon" type="TextureRect" parent="HeaderBar/StarsCard/HBox"]
+[node name="StarIcon" type="TextureRect" parent="HeaderBar/StarsCard/HBox" unique_id=2005127417]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 texture = ExtResource("6_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="StarsLabel" type="Label" parent="HeaderBar/StarsCard/HBox"]
+[node name="StarsLabel" type="Label" parent="HeaderBar/StarsCard/HBox" unique_id=1479575578]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 14
-text = "BINTANG\n12 / 57"
+text = "BINTANG
+12 / 57"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SettingsButton" type="Button" parent="HeaderBar"]
+[node name="SettingsButton" type="Button" parent="HeaderBar" unique_id=2121705530]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -239,11 +245,11 @@ offset_bottom = 86.0
 grow_horizontal = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_gear")
-theme_override_styles/hover = SubResource("StyleBoxFlat_gear")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_gear")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gear")
 theme_override_styles/focus = SubResource("StyleBoxFlat_gear")
 
-[node name="GearIcon" type="TextureRect" parent="HeaderBar/SettingsButton"]
+[node name="GearIcon" type="TextureRect" parent="HeaderBar/SettingsButton" unique_id=521691628]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -260,7 +266,7 @@ texture = ExtResource("7_gear")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CenterUI" type="VBoxContainer" parent="."]
+[node name="CenterUI" type="VBoxContainer" parent="." unique_id=1858706814]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -276,7 +282,7 @@ grow_vertical = 2
 theme_override_constants/separation = 22
 alignment = 1
 
-[node name="LogoPing" type="TextureRect" parent="CenterUI"]
+[node name="LogoPing" type="TextureRect" parent="CenterUI" unique_id=436905914]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(440, 180)
 layout_mode = 2
@@ -285,7 +291,7 @@ texture = ExtResource("5_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BtnMain" type="Button" parent="CenterUI"]
+[node name="BtnMain" type="Button" parent="CenterUI" unique_id=555996586]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(660, 68)
 layout_mode = 2
@@ -295,17 +301,17 @@ theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_main")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_main")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_main")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_main")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_main")
 text = "MAIN"
 
-[node name="SubButtonsRow" type="HBoxContainer" parent="CenterUI"]
+[node name="SubButtonsRow" type="HBoxContainer" parent="CenterUI" unique_id=1709789716]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="BtnBelajar" type="Button" parent="CenterUI/SubButtonsRow"]
+[node name="BtnBelajar" type="Button" parent="CenterUI/SubButtonsRow" unique_id=481121209]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 64)
 layout_mode = 2
@@ -314,11 +320,11 @@ theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_belajar")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_belajar")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_belajar")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_belajar")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_belajar")
 
-[node name="HBox" type="HBoxContainer" parent="CenterUI/SubButtonsRow/BtnBelajar"]
+[node name="HBox" type="HBoxContainer" parent="CenterUI/SubButtonsRow/BtnBelajar" unique_id=1424062792]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -327,7 +333,7 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="CenterUI/SubButtonsRow/BtnBelajar/HBox"]
+[node name="Label" type="Label" parent="CenterUI/SubButtonsRow/BtnBelajar/HBox" unique_id=2011363639]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
@@ -337,14 +343,14 @@ text = "BELAJAR"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayIcon" type="TextureRect" parent="CenterUI/SubButtonsRow/BtnBelajar/HBox"]
+[node name="PlayIcon" type="TextureRect" parent="CenterUI/SubButtonsRow/BtnBelajar/HBox" unique_id=730531502]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("8_circle_play")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BtnPeringkat" type="Button" parent="CenterUI/SubButtonsRow"]
+[node name="BtnPeringkat" type="Button" parent="CenterUI/SubButtonsRow" unique_id=913518920]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 64)
 layout_mode = 2
@@ -353,11 +359,11 @@ theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 22
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_peringkat")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_peringkat")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_peringkat")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_peringkat")
 theme_override_styles/focus = SubResource("StyleBoxFlat_btn_peringkat")
 
-[node name="HBox" type="HBoxContainer" parent="CenterUI/SubButtonsRow/BtnPeringkat"]
+[node name="HBox" type="HBoxContainer" parent="CenterUI/SubButtonsRow/BtnPeringkat" unique_id=521824284]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -366,7 +372,7 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="CenterUI/SubButtonsRow/BtnPeringkat/HBox"]
+[node name="Label" type="Label" parent="CenterUI/SubButtonsRow/BtnPeringkat/HBox" unique_id=891275622]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
@@ -376,22 +382,27 @@ text = "PERINGKAT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayIcon" type="TextureRect" parent="CenterUI/SubButtonsRow/BtnPeringkat/HBox"]
+[node name="PlayIcon" type="TextureRect" parent="CenterUI/SubButtonsRow/BtnPeringkat/HBox" unique_id=1830769359]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("8_circle_play")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AuthModal" parent="." instance=ExtResource("10_auth_modal")]
+[node name="AuthModal" parent="." unique_id=220589684 instance=ExtResource("10_auth_modal")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
 
-[node name="SettingsModal" parent="." instance=ExtResource("11_settings_modal")]
+[node name="SettingsModal" parent="." unique_id=834921002 instance=ExtResource("11_settings_modal")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="LeaderboardModal" parent="." instance=ExtResource("12_leaderboard_modal")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=196393785]
 unique_name_in_owner = true

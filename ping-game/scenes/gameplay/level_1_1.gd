@@ -56,6 +56,8 @@ var time_passed: float = 0.0
 # Gameplay State
 var hearts: int = 3
 var hearts_rects: Array[TextureRect] = []
+var broken_labels: Array[Label] = []
+var game_dialog: Control
 var time_remaining: float = 165.0 # 02:45
 var is_game_active: bool = false
 var carried_cable_data = null
@@ -521,16 +523,35 @@ func _add_cable_to_rack_display(rack_type: String, tex: Texture2D) -> void:
 			tw.tween_property(slot, "scale", Vector2.ONE, 0.2)
 			break
 
-func _update_hearts_display() -> void:
-	for i in range(3):
-		var heart_label = hearts_container.get_child(i) as Label
-		if heart_label:
-			if i < hearts:
-				heart_label.text = "❤️"
-				heart_label.modulate = Color(1.0, 1.0, 1.0, 1.0)
+func _update_hearts_display(is_damage_event: bool = false) -> void:
+	if not hearts_container:
+		return
+	for idx in range(hearts_rects.size()):
+		var hr = hearts_rects[idx]
+		var bl = broken_labels[idx] if idx < broken_labels.size() else null
+		if hr:
+			if idx < hearts:
+				hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
+				hr.scale = Vector2.ONE
+				if bl: bl.visible = false
 			else:
-				heart_label.text = "🖤"
-				heart_label.modulate = Color(0.6, 0.6, 0.6, 0.5)
+				if is_damage_event and idx == hearts:
+					hr.modulate = Color(1.0, 0.1, 0.1, 1.0)
+					var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+					tw.tween_property(hr, "scale", Vector2(1.25, 1.25), 0.1)
+					tw.tween_property(hr, "scale", Vector2(0.85, 0.85), 0.15)
+					tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
+					if bl:
+						bl.visible = true
+						bl.modulate.a = 0.0
+						var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+						tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
+				else:
+					hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
+					hr.scale = Vector2(0.85, 0.85)
+					if bl:
+						bl.visible = true
+						bl.modulate.a = 1.0
 
 func _update_timer_display() -> void:
 	var total_sec = int(time_remaining)
@@ -552,40 +573,29 @@ func _trigger_victory() -> void:
 	is_game_active = false
 	_play_notes([523.25, 659.25, 783.99, 1046.5, 1318.5], 0.1, 0.22)
 	
-	# Save progress in PlayerData
 	if PlayerData:
 		PlayerData.set_level_stars(1, 1, hearts)
 		
-	win_modal.visible = true
-	if win_card:
-		var vp_sz_w = get_viewport_rect().size
-		win_card.position = Vector2((vp_sz_w.x - win_card.size.x) / 2.0, (vp_sz_w.y - win_card.size.y) / 2.0)
-		win_card.scale = Vector2(0.7, 0.7)
-		win_card.modulate.a = 0.0
-		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tw.tween_property(win_card, "scale", Vector2.ONE, 0.28)
-		tw.tween_property(win_card, "modulate:a", 1.0, 0.2)
-	
-	# Update stars in modal
-	if win_stars_row:
-		for i in range(3):
-			var s_rect = win_stars_row.get_child(i) as TextureRect
-			s_rect.texture = tex_star_gold if (i < hearts) else tex_star_gray
+	var desc = "Hebat! Semua kabel Straight dan Cross berhasil dikelompokkan dengan benar ke dalam rak hardware."
+	game_dialog.show_win(
+		"MISI SELESAI!",
+		desc,
+		hearts,
+		"",
+		func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_1_2.tscn"),
+		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
+		"LANJUT LEVEL 1.2"
+	)
 
 func _trigger_game_over(msg: String) -> void:
 	is_game_active = false
 	_play_tone(130.0, 0.35, 0.25)
-	gameover_modal.visible = true
-	if gameover_reason_lbl:
-		gameover_reason_lbl.text = msg
-	if gameover_card:
-		var vp_sz_go = get_viewport_rect().size
-		gameover_card.position = Vector2((vp_sz_go.x - gameover_card.size.x) / 2.0, (vp_sz_go.y - gameover_card.size.y) / 2.0)
-		gameover_card.scale = Vector2(0.7, 0.7)
-		gameover_card.modulate.a = 0.0
-		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tw.tween_property(gameover_card, "scale", Vector2.ONE, 0.28)
-		tw.tween_property(gameover_card, "modulate:a", 1.0, 0.2)
+	_update_hearts_display(true)
+	game_dialog.show_game_over(
+		msg,
+		func(): get_tree().reload_current_scene(),
+		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+	)
 
 # --- INSPECTION MODAL ---
 
@@ -633,26 +643,12 @@ func _close_pinout_modal() -> void:
 		pinout_modal.visible = false
 
 func _open_pause_modal() -> void:
-	_play_sweep(659.25, 523.25, 0.1, 0.15)
-	if pause_card:
-		var vp_sz = get_viewport_rect().size
-		pause_card.position = Vector2((vp_sz.x - pause_card.size.x) / 2.0, (vp_sz.y - pause_card.size.y) / 2.0)
-		pause_card.scale = Vector2(0.85, 0.85)
-		pause_card.modulate.a = 0.0
-		var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tw.tween_property(pause_card, "scale", Vector2.ONE, 0.22)
-		tw.tween_property(pause_card, "modulate:a", 1.0, 0.18)
-	pause_modal.visible = true
+	if pause_modal and pause_modal.has_method("open"):
+		pause_modal.open()
 
 func _close_pause_modal() -> void:
-	_play_sweep(523.25, 659.25, 0.1, 0.15)
-	if pause_card:
-		var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		tw.tween_property(pause_card, "scale", Vector2(0.85, 0.85), 0.12)
-		tw.tween_property(pause_card, "modulate:a", 0.0, 0.12)
-		tw.tween_callback(func(): pause_modal.visible = false)
-	else:
-		pause_modal.visible = false
+	if pause_modal and pause_modal.has_method("close"):
+		pause_modal.close()
 
 func _open_inspect_modal(c_data: Dictionary = {}) -> void:
 	if SettingsManager: SettingsManager.vibrate(35)
@@ -897,21 +893,42 @@ func _build_header_ui() -> void:
 	hearts_panel.add_theme_stylebox_override("panel", sb_h)
 	header_ui.add_child(hearts_panel)
 	
-	var hb_hearts = HBoxContainer.new()
-	hb_hearts.alignment = BoxContainer.ALIGNMENT_CENTER
-	hb_hearts.add_theme_constant_override("separation", 8)
-	hearts_panel.add_child(hb_hearts)
+	hearts_container = HBoxContainer.new()
+	hearts_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	hearts_container.add_theme_constant_override("separation", 10)
+	hearts_panel.add_child(hearts_container)
 	
 	hearts_rects.clear()
+	broken_labels.clear()
 	for i in range(3):
+		var slot = Control.new()
+		slot.custom_minimum_size = Vector2(42, 38)
+		slot.size = Vector2(42, 38)
+		hearts_container.add_child(slot)
+		
 		var h_rect = TextureRect.new()
 		h_rect.texture = tex_vector_heart
-		h_rect.custom_minimum_size = Vector2(46, 42)
-		h_rect.size = Vector2(46, 42)
+		h_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 		h_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		h_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		hb_hearts.add_child(h_rect)
+		h_rect.pivot_offset = Vector2(21, 19)
+		h_rect.modulate = Color(1.0, 0.28, 0.4, 1.0)
+		slot.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		
+		var b_lbl = Label.new()
+		b_lbl.text = "✕"
+		b_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+		b_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		b_lbl.add_theme_font_override("font", font_black)
+		b_lbl.add_theme_font_size_override("font_size", 22)
+		b_lbl.add_theme_color_override("font_color", Color("#dc2626"))
+		b_lbl.visible = false
+		slot.add_child(b_lbl)
+		broken_labels.append(b_lbl)
+		
+	_update_hearts_display()
 	
 	# 3. Level Badge (Level 1) - 2-row card matching Figma (80x64)
 	var lvl_panel = PanelContainer.new()
@@ -1273,26 +1290,8 @@ func _build_pinout_modal() -> void:
 	h_box_hdr.add_child(title_lbl)
 	
 	# Circular Close Button at top-right
-	var close_btn = Button.new()
-	close_btn.text = "\u2715"
-	close_btn.position = Vector2(754 - 44, 7)
-	close_btn.size = Vector2(34, 34)
-	close_btn.custom_minimum_size = Vector2(34, 34)
-	close_btn.pivot_offset = Vector2(17, 17)
-	var sb_close = StyleBoxFlat.new()
-	sb_close.bg_color = Color("#fddede") # Soft peach/pink matching Figma
-	sb_close.border_color = Color("#4a2e2b")
-	sb_close.set_border_width_all(2.5)
-	sb_close.set_corner_radius_all(17)
-	close_btn.add_theme_stylebox_override("normal", sb_close)
-	var sb_close_h = sb_close.duplicate()
-	sb_close_h.bg_color = Color("#fca5a5")
-	close_btn.add_theme_stylebox_override("hover", sb_close_h)
-	close_btn.add_theme_font_override("font", font_black)
-	close_btn.add_theme_font_size_override("font_size", 14)
-	close_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
-	close_btn.pressed.connect(_close_pinout_modal)
-	_setup_hover_scale(close_btn, 1.15)
+	var close_btn = preload("res://scenes/close_button.tscn").instantiate()
+	close_btn.closed.connect(_close_pinout_modal)
 	h_box_hdr.add_child(close_btn)
 	
 	# Content Area
@@ -1437,262 +1436,17 @@ func _build_intro_modal() -> void:
 
 # --- ENDGAME & PAUSE MODALS ---
 func _build_endgame_modals() -> void:
-	# Victory Modal
-	win_modal = Control.new()
-	win_modal.name = "WinModal"
-	win_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	win_modal.visible = false
-	add_child(win_modal)
+	game_dialog = preload("res://scenes/game_dialog.tscn").instantiate()
+	game_dialog.name = "GameDialog"
+	add_child(game_dialog)
+	win_modal = game_dialog
+	gameover_modal = game_dialog
 	
-	var bd_win = ColorRect.new()
-	bd_win.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_win.color = Color(0, 0, 0, 0.75)
-	win_modal.add_child(bd_win)
-	
-	var w_card = PanelContainer.new()
-	w_card.name = "WinCard"
-	w_card.size = Vector2(560, 360)
-	w_card.pivot_offset = Vector2(280, 180)
-	win_card = w_card
-	var sb_win = StyleBoxFlat.new()
-	sb_win.bg_color = Color("#f0fdf4")
-	sb_win.border_color = Color("#16a34a")
-	sb_win.set_border_width_all(4)
-	sb_win.set_corner_radius_all(20)
-	sb_win.set_content_margin_all(24)
-	w_card.add_theme_stylebox_override("panel", sb_win)
-	win_modal.add_child(w_card)
-	
-	var vb_w = VBoxContainer.new()
-	vb_w.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb_w.add_theme_constant_override("separation", 14)
-	w_card.add_child(vb_w)
-	
-	var w_title = Label.new()
-	w_title.text = "MISI SELESAI!"
-	w_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	w_title.add_theme_font_override("font", font_black)
-	w_title.add_theme_font_size_override("font_size", 24)
-	w_title.add_theme_color_override("font_color", Color("#15803d"))
-	vb_w.add_child(w_title)
-	
-	var stars_row = HBoxContainer.new()
-	stars_row.name = "WinStarsRow"
-	stars_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	stars_row.add_theme_constant_override("separation", 12)
-	win_stars_row = stars_row
-	for i in range(3):
-		var star_r = TextureRect.new()
-		star_r.texture = tex_star_gold
-		star_r.custom_minimum_size = Vector2(44, 44)
-		star_r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		star_r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		stars_row.add_child(star_r)
-	vb_w.add_child(stars_row)
-	
-	var w_sub = Label.new()
-	w_sub.text = "Hebat! Semua kabel Straight dan Cross berhasil dikelompokkan dengan benar ke dalam rak hardware."
-	w_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	w_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	w_sub.add_theme_font_override("font", font_semibold)
-	w_sub.add_theme_font_size_override("font_size", 13)
-	w_sub.add_theme_color_override("font_color", Color("#166534"))
-	vb_w.add_child(w_sub)
-	
-	var hb_w_btns = HBoxContainer.new()
-	hb_w_btns.alignment = BoxContainer.ALIGNMENT_CENTER
-	hb_w_btns.add_theme_constant_override("separation", 16)
-	
-	var btn_map = Button.new()
-	btn_map.text = "KEMBALI KE MAP"
-	btn_map.add_theme_font_override("font", font_black)
-	btn_map.add_theme_font_size_override("font_size", 13)
-	var sb_bm = StyleBoxFlat.new()
-	sb_bm.bg_color = Color("#e2e8f0")
-	sb_bm.set_corner_radius_all(10)
-	sb_bm.set_content_margin_all(8)
-	btn_map.add_theme_stylebox_override("normal", sb_bm)
-	btn_map.add_theme_color_override("font_color", Color("#334155"))
-	btn_map.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	hb_w_btns.add_child(btn_map)
-	
-	var btn_next = Button.new()
-	btn_next.text = "LANJUT LEVEL 1.2"
-	btn_next.add_theme_font_override("font", font_black)
-	btn_next.add_theme_font_size_override("font_size", 13)
-	var sb_bn = StyleBoxFlat.new()
-	sb_bn.bg_color = Color("#16a34a")
-	sb_bn.set_corner_radius_all(10)
-	sb_bn.set_content_margin_all(8)
-	btn_next.add_theme_stylebox_override("normal", sb_bn)
-	btn_next.add_theme_color_override("font_color", Color("#ffffff"))
-	btn_next.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_1_2.tscn"))
-	hb_w_btns.add_child(btn_next)
-	vb_w.add_child(hb_w_btns)
-	
-	# Game Over Modal
-	gameover_modal = Control.new()
-	gameover_modal.name = "GameOverModal"
-	gameover_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	gameover_modal.visible = false
-	add_child(gameover_modal)
-	
-	var bd_go = ColorRect.new()
-	bd_go.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_go.color = Color(0, 0, 0, 0.75)
-	gameover_modal.add_child(bd_go)
-	
-	var g_card = PanelContainer.new()
-	g_card.name = "GameOverCard"
-	g_card.size = Vector2(520, 320)
-	g_card.pivot_offset = Vector2(260, 160)
-	gameover_card = g_card
-	var sb_go = StyleBoxFlat.new()
-	sb_go.bg_color = Color("#fef2f2")
-	sb_go.border_color = Color("#dc2626")
-	sb_go.set_border_width_all(4)
-	sb_go.set_corner_radius_all(20)
-	sb_go.set_content_margin_all(24)
-	g_card.add_theme_stylebox_override("panel", sb_go)
-	gameover_modal.add_child(g_card)
-	
-	var vb_go = VBoxContainer.new()
-	vb_go.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb_go.add_theme_constant_override("separation", 14)
-	g_card.add_child(vb_go)
-	
-	var go_title = Label.new()
-	go_title.text = "MISI GAGAL"
-	go_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	go_title.add_theme_font_override("font", font_black)
-	go_title.add_theme_font_size_override("font_size", 24)
-	go_title.add_theme_color_override("font_color", Color("#dc2626"))
-	vb_go.add_child(go_title)
-	
-	var go_reason = Label.new()
-	go_reason.name = "GameOverReason"
-	go_reason.text = "Nyawa teknisi habis!"
-	go_reason.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	go_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	go_reason.add_theme_font_override("font", font_semibold)
-	go_reason.add_theme_font_size_override("font_size", 14)
-	gameover_reason_lbl = go_reason
-	go_reason.add_theme_color_override("font_color", Color("#991b1b"))
-	vb_go.add_child(go_reason)
-	
-	var hb_go_btns = HBoxContainer.new()
-	hb_go_btns.alignment = BoxContainer.ALIGNMENT_CENTER
-	hb_go_btns.add_theme_constant_override("separation", 16)
-	
-	var btn_retry = Button.new()
-	btn_retry.text = "COBA LAGI"
-	btn_retry.add_theme_font_override("font", font_black)
-	btn_retry.add_theme_font_size_override("font_size", 13)
-	var sb_br = StyleBoxFlat.new()
-	sb_br.bg_color = Color("#dc2626")
-	sb_br.set_corner_radius_all(10)
-	sb_br.set_content_margin_all(8)
-	btn_retry.add_theme_stylebox_override("normal", sb_br)
-	btn_retry.add_theme_color_override("font_color", Color("#ffffff"))
-	btn_retry.pressed.connect(func(): get_tree().reload_current_scene())
-	hb_go_btns.add_child(btn_retry)
-	
-	var btn_go_map = Button.new()
-	btn_go_map.text = "KEMBALI KE MAP"
-	btn_go_map.add_theme_font_override("font", font_black)
-	btn_go_map.add_theme_font_size_override("font_size", 13)
-	btn_go_map.add_theme_stylebox_override("normal", sb_bm)
-	btn_go_map.add_theme_color_override("font_color", Color("#334155"))
-	btn_go_map.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	hb_go_btns.add_child(btn_go_map)
-	vb_go.add_child(hb_go_btns)
-	
-	# Pause Modal
-	pause_modal = Control.new()
-	pause_modal.name = "PauseModal"
-	pause_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	pause_modal.visible = false
+	# Modular Pause Modal
+	pause_modal = preload("res://scenes/pause_modal.tscn").instantiate()
+	pause_modal.z_index = 240
+	pause_modal.settings_modal = settings_modal
 	add_child(pause_modal)
-	
-	var bd_p = ColorRect.new()
-	bd_p.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bd_p.color = Color(0, 0, 0, 0.65)
-	bd_p.gui_input.connect(func(ev: InputEvent):
-		if (ev is InputEventMouseButton and ev.pressed) or (ev is InputEventScreenTouch and ev.pressed):
-			_close_pause_modal()
-	)
-	pause_modal.add_child(bd_p)
-	
-	var p_card = PanelContainer.new()
-	p_card.name = "PauseCard"
-	p_card.size = Vector2(460, 365)
-	p_card.pivot_offset = Vector2(230, 182)
-	pause_card = p_card
-	var sb_p = StyleBoxFlat.new()
-	sb_p.bg_color = Color("#fffdf7") # Warm cream
-	sb_p.border_color = Color("#4a2e2b")
-	sb_p.set_border_width_all(3.5)
-	sb_p.set_corner_radius_all(20)
-	sb_p.set_content_margin_all(24)
-	sb_p.shadow_color = Color(0, 0, 0, 0.3)
-	sb_p.shadow_size = 14
-	sb_p.shadow_offset = Vector2(0, 4)
-	p_card.add_theme_stylebox_override("panel", sb_p)
-	pause_modal.add_child(p_card)
-	
-	var vb_p = VBoxContainer.new()
-	vb_p.add_theme_constant_override("separation", 12)
-	p_card.add_child(vb_p)
-	
-	var p_title = Label.new()
-	p_title.text = "GAME DIPERHENTIKAN"
-	p_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	p_title.add_theme_font_override("font", font_black)
-	p_title.add_theme_font_size_override("font_size", 18)
-	p_title.add_theme_color_override("font_color", Color("#4a2e2b"))
-	vb_p.add_child(p_title)
-	
-	var btn_resume = Button.new()
-	btn_resume.text = "LANJUTKAN MAIN"
-	btn_resume.add_theme_font_override("font", font_black)
-	btn_resume.add_theme_font_size_override("font_size", 13)
-	var sb_res = StyleBoxFlat.new()
-	sb_res.bg_color = Color("#0284c7")
-	sb_res.set_corner_radius_all(10)
-	sb_res.set_content_margin_all(8)
-	btn_resume.add_theme_stylebox_override("normal", sb_res)
-	btn_resume.pressed.connect(_close_pause_modal)
-	vb_p.add_child(btn_resume)
-	
-	var btn_p_restart = Button.new()
-	btn_p_restart.text = "ULANGI LEVEL"
-	btn_p_restart.add_theme_font_override("font", font_black)
-	btn_p_restart.add_theme_font_size_override("font_size", 13)
-	btn_p_restart.add_theme_stylebox_override("normal", sb_bm)
-	btn_p_restart.add_theme_color_override("font_color", Color("#334155"))
-	btn_p_restart.pressed.connect(func(): get_tree().reload_current_scene())
-	vb_p.add_child(btn_p_restart)
-	
-	var btn_p_settings = Button.new()
-	btn_p_settings.text = "PENGATURAN"
-	btn_p_settings.add_theme_font_override("font", font_black)
-	btn_p_settings.add_theme_font_size_override("font_size", 13)
-	btn_p_settings.add_theme_stylebox_override("normal", sb_bm)
-	btn_p_settings.add_theme_color_override("font_color", Color("#4a2e2b"))
-	btn_p_settings.pressed.connect(func():
-		if settings_modal:
-			settings_modal.open()
-	)
-	vb_p.add_child(btn_p_settings)
-	
-	var btn_p_exit = Button.new()
-	btn_p_exit.text = "KELUAR KE PETA LEVEL"
-	btn_p_exit.add_theme_font_override("font", font_black)
-	btn_p_exit.add_theme_font_size_override("font_size", 13)
-	btn_p_exit.add_theme_stylebox_override("normal", sb_bm)
-	btn_p_exit.add_theme_color_override("font_color", Color("#dc2626"))
-	btn_p_exit.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
-	vb_p.add_child(btn_p_exit)
 
 func _build_toast_ui() -> void:
 	toast_panel = PanelContainer.new()

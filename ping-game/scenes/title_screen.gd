@@ -13,6 +13,7 @@ extends Control
 @onready var audio_player: AudioStreamPlayer = %AudioStreamPlayer
 @onready var auth_modal: Control = %AuthModal
 @onready var settings_modal: Control = %SettingsModal
+@onready var leaderboard_modal: Control = %LeaderboardModal
 
 var time_passed: float = 0.0
 
@@ -57,7 +58,11 @@ func _ready() -> void:
 	if btn_peringkat:
 		btn_peringkat.pressed.connect(func():
 			_play_sfx(784.0)
-			_show_toast("Peringkat: Fitur Leaderboard lokal & global segera hadir!")
+			if leaderboard_modal:
+				if leaderboard_modal.has_method("open"):
+					leaderboard_modal.open()
+				else:
+					leaderboard_modal.visible = true
 		)
 		_setup_hover(btn_peringkat, 1.05)
 		
@@ -74,7 +79,7 @@ func _update_stars_display() -> void:
 		var total = PlayerData.get_total_stars()
 		var max_s = PlayerData.get_max_stars()
 		# Format matches Figma Home: "12 / 57"
-		stars_label.text = "BINTANG\n%d / %d" % [max(total, 12), max_s]
+		stars_label.text = "BINTANG\n%d / %d" % [total, max_s]
 
 func _setup_hover(node: Control, factor: float) -> void:
 	node.pivot_offset = node.size / 2.0

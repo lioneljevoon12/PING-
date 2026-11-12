@@ -28,39 +28,39 @@ shadow_size = 5
 shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_guide"]
-content_margin_left = 24.0
-content_margin_top = 24.0
-content_margin_right = 24.0
-content_margin_bottom = 24.0
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
 bg_color = Color(0.796078, 0.952941, 0.941176, 1)
 border_width_left = 3.5
 border_width_top = 3.5
 border_width_right = 3.5
 border_width_bottom = 3.5
 border_color = Color(0.290196, 0.180392, 0.168627, 1)
-corner_radius_top_left = 26
-corner_radius_top_right = 26
-corner_radius_bottom_right = 26
-corner_radius_bottom_left = 26
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
 shadow_color = Color(0.29, 0.18, 0.17, 0.25)
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_practice"]
-content_margin_left = 24.0
-content_margin_top = 24.0
-content_margin_right = 24.0
-content_margin_bottom = 24.0
+content_margin_left = 20.0
+content_margin_top = 18.0
+content_margin_right = 20.0
+content_margin_bottom = 18.0
 bg_color = Color(0.819608, 0.980392, 0.866667, 1)
 border_width_left = 3.5
 border_width_top = 3.5
 border_width_right = 3.5
 border_width_bottom = 3.5
 border_color = Color(0.290196, 0.180392, 0.168627, 1)
-corner_radius_top_left = 26
-corner_radius_top_right = 26
-corner_radius_bottom_right = 26
-corner_radius_bottom_left = 26
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
 shadow_color = Color(0.29, 0.18, 0.17, 0.25)
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
@@ -131,18 +131,18 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -150.0
-offset_right = 400.0
-offset_bottom = 200.0
+offset_left = -370.0
+offset_top = -135.0
+offset_right = 370.0
+offset_bottom = 155.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 36
 alignment = 1
 
 [node name="BtnGuidebook" type="Button" parent="CardsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(380, 320)
+custom_minimum_size = Vector2(340, 260)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_card_guide")
@@ -157,11 +157,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="BookIcon" type="TextureRect" parent="CardsContainer/BtnGuidebook/VB"]
-custom_minimum_size = Vector2(130, 130)
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 texture = ExtResource("5_book")
@@ -172,7 +172,7 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 22
 text = "Buku Panduan"
 horizontal_alignment = 1
 
@@ -180,13 +180,13 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.0823529, 0.407843, 0.439216, 1)
 theme_override_fonts/font = ExtResource("3_font_bold")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = "Modul Materi Jaringan"
 horizontal_alignment = 1
 
 [node name="BtnPractice" type="Button" parent="CardsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(380, 320)
+custom_minimum_size = Vector2(340, 260)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_card_practice")
@@ -201,11 +201,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="PracticeIcon" type="TextureRect" parent="CardsContainer/BtnPractice/VB"]
-custom_minimum_size = Vector2(130, 130)
+custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 texture = ExtResource("6_latihan")
@@ -216,7 +216,7 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 22
 text = "Mode Latihan"
 horizontal_alignment = 1
 
@@ -224,7 +224,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.0823529, 0.501961, 0.239216, 1)
 theme_override_fonts/font = ExtResource("3_font_bold")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = "Simulasi Bebas Waktu"
 horizontal_alignment = 1
 

@@ -1,11 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://d1k2m3n4p5q6r"]
+[gd_scene format=3 uid="uid://d1k2m3n4p5q6r"]
 
-[ext_resource type="Script" path="res://scenes/gameplay/level_1_2.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/bg_stage1.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/crisp_door.png" id="3_door"]
-[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Map/pot-bunga.png" id="4_plant"]
+[ext_resource type="Script" uid="uid://c34gslxsjtoya" path="res://scenes/gameplay/level_1_2.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b014rc3dj4h6i" path="res://art/ui-ux/levelpath/bg_stage1.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://clj60j1fufm5x" path="res://art/ui-ux/levelpath/crisp_door.png" id="3_door"]
+[ext_resource type="Texture2D" uid="uid://drrblm5thl0fw" path="res://art/assets/PING! Assets/Map/pot-bunga.png" id="4_plant"]
 
-[node name="Level1_2" type="Control"]
+[node name="Level1_2" type="Control" unique_id=2108726399]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +14,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1601050489]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -26,7 +26,8 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="TopDarkWall" type="ColorRect" parent="."]
+[node name="TopDarkWall" type="ColorRect" parent="." unique_id=1071239118]
+visible = false
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
@@ -35,7 +36,7 @@ offset_bottom = 220.0
 grow_horizontal = 2
 color = Color(0.06, 0.08, 0.16, 0.95)
 
-[node name="DoorArch" type="TextureRect" parent="."]
+[node name="DoorArch" type="TextureRect" parent="." unique_id=1667682464]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 616.0
@@ -46,7 +47,7 @@ texture = ExtResource("3_door")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PottedPlant" type="TextureRect" parent="."]
+[node name="PottedPlant" type="TextureRect" parent="." unique_id=618759850]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 960.0
@@ -57,8 +58,9 @@ texture = ExtResource("4_plant")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RoomContainer" type="Control" parent="."]
+[node name="RoomContainer" type="Control" parent="." unique_id=1029456025]
 unique_name_in_owner = true
+propagate_maximum_size = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -67,42 +69,42 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="LeftRack" type="Control" parent="RoomContainer"]
+[node name="LeftRack" type="Control" parent="RoomContainer" unique_id=222899031]
 unique_name_in_owner = true
-layout_mode = 0
+anchors_preset = 0
 offset_left = 200.0
 offset_top = 220.0
 offset_right = 470.0
 offset_bottom = 560.0
 
-[node name="RightRack" type="Control" parent="RoomContainer"]
+[node name="RightRack" type="Control" parent="RoomContainer" unique_id=1754246916]
 unique_name_in_owner = true
-layout_mode = 0
+anchors_preset = 0
 offset_left = 1090.0
 offset_top = 220.0
 offset_right = 1360.0
 offset_bottom = 560.0
 
-[node name="CableTable" type="Control" parent="RoomContainer"]
+[node name="CableTable" type="Control" parent="RoomContainer" unique_id=1938730380]
 unique_name_in_owner = true
-layout_mode = 0
+anchors_preset = 0
 offset_left = 550.0
 offset_top = 490.0
 offset_right = 1010.0
 offset_bottom = 630.0
 
-[node name="CharacterMascot" type="Control" parent="RoomContainer"]
+[node name="CharacterMascot" type="Control" parent="RoomContainer" unique_id=730127172]
 unique_name_in_owner = true
-layout_mode = 0
+anchors_preset = 0
 offset_left = 652.0
 offset_top = 270.0
 offset_right = 908.0
 offset_bottom = 414.0
 pivot_offset = Vector2(128, 72)
 
-[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="." unique_id=1847999334]
 unique_name_in_owner = true
 
-[node name="FootstepPlayer" type="AudioStreamPlayer" parent="."]
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="." unique_id=2039627098]
 unique_name_in_owner = true
 volume_db = -8.0

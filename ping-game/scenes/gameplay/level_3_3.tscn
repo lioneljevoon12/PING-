@@ -1,0 +1,150 @@
+[gd_scene load_steps=12 format=3 uid="uid://e4f5a6b7c8d93"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/level_3_3.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/bg_stage3.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/Gerbang.png" id="3_door"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Map/pot-bunga.png" id="4_plant"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/33_Wall_Info_Boards.png" id="5_whiteboard"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/31_rak_jaringan.png" id="6_rack"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/IPUseableChecker.png" id="7_checker"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Character/main-char-router.png" id="8_char"]
+
+[node name="Level3_3" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+volume_db = -8.0
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FloorCarpet" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 220.0
+offset_right = 1000.0
+offset_bottom = 675.0
+
+[node name="DoorArch" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 740.0
+offset_top = 35.0
+offset_right = 1060.0
+offset_bottom = 225.0
+texture = ExtResource("3_door")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PottedPlant" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 205.0
+offset_top = 80.0
+offset_right = 285.0
+offset_bottom = 220.0
+texture = ExtResource("4_plant")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WhiteboardTexture" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 280.0
+offset_top = 60.0
+offset_right = 720.0
+offset_bottom = 210.0
+texture = ExtResource("5_whiteboard")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CablesContainer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RackNode" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 55.0
+offset_top = 260.0
+offset_right = 265.0
+offset_bottom = 580.0
+texture = ExtResource("6_rack")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CheckerStation" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 320.0
+offset_top = 275.0
+offset_right = 710.0
+offset_bottom = 495.0
+
+[node name="PC1Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 280.0
+offset_top = 500.0
+offset_right = 460.0
+offset_bottom = 660.0
+
+[node name="PC2Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 520.0
+offset_top = 500.0
+offset_right = 700.0
+offset_bottom = 660.0
+
+[node name="PC3Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 760.0
+offset_top = 500.0
+offset_right = 940.0
+offset_bottom = 660.0
+
+[node name="CharacterNode" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 730.0
+offset_top = 340.0
+offset_right = 850.0
+offset_bottom = 460.0
+
+[node name="MobileControlsRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

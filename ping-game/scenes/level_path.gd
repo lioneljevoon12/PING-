@@ -6,7 +6,7 @@ extends Control
 @onready var potted_plant: TextureButton = %PottedPlant
 @onready var path_line: Line2D = %PathLine
 @onready var desks_container: Control = %DesksContainer
-@onready var desk_nodes: Array[Control] = [%Desk1, %Desk2, %Desk3]
+@onready var desk_nodes: Array[Control] = [%Desk1, %Desk2, %Desk3, %Desk4]
 @onready var character_mascot: TextureRect = %CharacterMascot
 
 @onready var back_btn: TextureButton = %BackButton
@@ -130,28 +130,39 @@ var stages_info: Dictionary = {
 	},
 	3: {
 		"title": "STAGE 3",
-		"subtitle": "Routing & Subnetting",
+		"subtitle": "Subnetting & Routing",
 		"bg": preload("res://art/ui-ux/levelpath/bg_stage3.png"),
 		"levels": [
 			{
 				"num": 1,
-				"name": "Prefix CIDR & Subnet Mask",
-				"desc": "Hitung jumlah host valid dan network range menggunakan notasi CIDR /24 hingga /30 secara efisien.",
-				"target": "Hitung alokasi IP efisien untuk 3 divisi lab",
+				"tag": "3.1",
+				"name": "Menentukan NetID dan HostID",
+				"desc": "Pemeriksaan ruang kontrol dimulai! Buka komputer klien yang mengalami masalah IP (10.20.30.55/24), lalu pisahkan dan masukkan alamat jaringan ke kategori NetID serta identitas perangkat ke kategori HostID agar koneksi kembali aktif.",
+				"target": "Pisahkan NetID dan HostID pada IP 10.20.30.55/24",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
-				"name": "Tabel Routing Statis",
-				"desc": "Konfigurasi rute statis (next-hop IP) agar router dapat meneruskan paket ke subnet tujuan tanpa loop.",
-				"target": "Bangun rute jalur koneksi antar switch & router",
+				"tag": "3.2",
+				"name": "Mencocokkan CIDR & Subnet Mask",
+				"desc": "Mini-game mencocokkan Subnet Mask desimal dengan nilai notasi prefix CIDR yang tepat.",
+				"target": "Cocokkan Subnet Mask desimal dengan nilai CIDR",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
-				"name": "Simulasi Pengiriman Paket (PING)",
-				"desc": "Kirim paket ICMP echo request dan analisis latency (RTT) serta hop count antar router.",
-				"target": "Pastikan status: PING SUCCESS! (0% packet loss)",
+				"tag": "3.3",
+				"name": "Identifikasi IP Usable",
+				"desc": "Mengidentifikasi IP Usable untuk menyalakan PC Klien tanpa menyentuh alamat Broadcast atau Network.",
+				"target": "Nyalakan PC Klien dengan IP Usable yang valid",
+				"char_offset": Vector2(-85, 20)
+			},
+			{
+				"num": 4,
+				"tag": "3.4",
+				"name": "Memperbaiki Routing Table",
+				"desc": "Konfigurasi IP komputer sudah benar, namun belum dapat terhubung ke jaringan Server! Buka Routing Table pada R-01, lalu lengkapi Destination Network, Subnet Mask, Next-Hop, serta Interface agar paket data berhasil mencapai Server.",
+				"target": "Lengkapi baris Routing Table R-01 menuju jaringan Server",
 				"char_offset": Vector2(-85, 20)
 			}
 		]
@@ -268,6 +279,14 @@ func _ready() -> void:
 		img.save_png("art/stage2_render.png")
 		get_tree().quit()
 
+	if "--screenshot-stage3" in all_args:
+		await get_tree().process_frame
+		load_stage(3)
+		await get_tree().create_timer(0.3).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/stage3_render.png")
+		get_tree().quit()
+
 	if "--screenshot-walk" in all_args:
 		await get_tree().process_frame
 		await get_tree().create_timer(0.2).timeout
@@ -333,18 +352,35 @@ func load_stage(stage_num: int) -> void:
 	stage_title_label.text = s_data["title"]
 	stage_subtitle_label.text = s_data["subtitle"]
 	
-	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 1
-	level_fraction_label.text = "%d.%d / %d.3" % [current_stage, unlocked_lvl, current_stage]
+	var stage_is_unlocked = PlayerData.is_stage_unlocked(current_stage) if PlayerData else true
+	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if (PlayerData and stage_is_unlocked) else 0
+	var total_levels = s_data["levels"].size()
+	if not stage_is_unlocked:
+		level_fraction_label.text = "%d.0 / %d.%d (Terkunci)" % [current_stage, current_stage, total_levels]
+	else:
+		level_fraction_label.text = "%d.%d / %d.%d" % [current_stage, unlocked_lvl, current_stage, total_levels]
 	
-	# Update 3 Desks
+	# Find first level that hasn't reached 3 stars for alert bubble and initial mascot position
+	var first_unstarred_idx = -1
+	for idx in range(total_levels):
+		var s_count = PlayerData.get_level_stars(current_stage, idx + 1) if PlayerData else 0
+		if s_count < 3:
+			first_unstarred_idx = idx
+			break
+			
+	# Update Desks
 	active_alert_node = null
-	for i in range(3):
+	for i in range(desk_data_nodes.size()):
 		var desk_dict = desk_data_nodes[i]
 		var lvl_num = i + 1
+		if i >= total_levels:
+			desk_dict["root"].visible = false
+			continue
+		desk_dict["root"].visible = true
 		var is_unlocked = (lvl_num <= unlocked_lvl)
 		var stars_count = PlayerData.get_level_stars(current_stage, lvl_num) if PlayerData else 0
 		
-		# Number label: Stage.Level e.g. 1.1, 1.2, 1.3 or 2.1, 2.2, 2.3
+		# Number label: Stage.Level e.g. 1.1, 1.2, 1.3 or 3.1, 3.2, 3.3, 3.4
 		desk_dict["num_label"].text = "%d.%d" % [current_stage, lvl_num]
 		
 		# Stars
@@ -358,8 +394,8 @@ func load_stage(stage_num: int) -> void:
 			desk_dict["lock_badge"].visible = false
 			desk_dict["num_badge"].visible = true
 			
-			# Exclamation alert on the highest unlocked level that player hasn't 3-starred
-			if lvl_num == unlocked_lvl and stars_count < 3 and active_alert_node == null:
+			# Exclamation alert on first level not yet 3-starred
+			if i == first_unstarred_idx and active_alert_node == null:
 				desk_dict["alert"].visible = true
 				active_alert_node = desk_dict["alert"]
 			else:
@@ -370,8 +406,9 @@ func load_stage(stage_num: int) -> void:
 			desk_dict["num_badge"].visible = false
 			desk_dict["alert"].visible = false
 
-	# Position character at the current active level desk
-	var target_desk_idx = clamp(unlocked_lvl - 1, 0, 2)
+	# Position character at first unstarred level desk, or desk 0
+	var target_desk_idx = first_unstarred_idx if first_unstarred_idx != -1 else 0
+	_reposition_responsive()
 	_move_character_to_desk(target_desk_idx, false)
 
 func _move_character_to_desk(desk_idx: int, animate: bool = false) -> void:
@@ -421,12 +458,12 @@ func _walk_character_to_desk(target_desk_idx: int, on_arrived: Callable = Callab
 	var waypoints: Array[int] = []
 	
 	# Determine intermediate waypoints along the level path
-	if abs(target_desk_idx - start_idx) == 2:
-		# Always pass through desk 1 when traveling between 0 and 2
-		waypoints.append(1)
-		waypoints.append(target_desk_idx)
+	if target_desk_idx > start_idx:
+		for w in range(start_idx + 1, target_desk_idx + 1):
+			waypoints.append(w)
 	else:
-		waypoints.append(target_desk_idx)
+		for w in range(start_idx - 1, target_desk_idx - 1, -1):
+			waypoints.append(w)
 		
 	is_walking = true
 	walk_anim_timer = 0.0
@@ -484,8 +521,14 @@ func _on_desk_clicked(desk_idx: int) -> void:
 	if is_walking:
 		return
 		
+	var stage_is_unlocked = PlayerData.is_stage_unlocked(current_stage) if PlayerData else true
+	if not stage_is_unlocked:
+		play_synth_lock()
+		show_toast("Stage %d masih terkunci! Selesaikan Stage %d terlebih dahulu." % [current_stage, current_stage - 1])
+		return
+
 	var lvl_num = desk_idx + 1
-	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 1
+	var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 3
 	
 	if lvl_num > unlocked_lvl:
 		play_synth_lock()
@@ -564,6 +607,20 @@ func _start_selected_level() -> void:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_1_2.tscn")
 	elif current_stage == 1 and selected_level_index == 2:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_1_3.tscn")
+	elif current_stage == 2 and selected_level_index == 0:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_1.tscn")
+	elif current_stage == 2 and selected_level_index == 1:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_2.tscn")
+	elif current_stage == 2 and selected_level_index == 2:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_3.tscn")
+	elif current_stage == 3 and selected_level_index == 0:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_1.tscn")
+	elif current_stage == 3 and selected_level_index == 1:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_2.tscn")
+	elif current_stage == 3 and selected_level_index == 2:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_3.tscn")
+	elif current_stage == 3 and selected_level_index == 3:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_4.tscn")
 	else:
 		show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
 
@@ -637,6 +694,10 @@ func _build_header_ui() -> void:
 	btn_next_stage.custom_minimum_size = Vector2(24, 0)
 	btn_next_stage.pressed.connect(func():
 		if current_stage < 5:
+			if PlayerData and not PlayerData.is_stage_unlocked(current_stage + 1):
+				play_synth_lock()
+				show_toast("Stage %d masih terkunci! Selesaikan Stage %d terlebih dahulu." % [current_stage + 1, current_stage])
+				return
 			play_synth_tone(659.25, 0.1)
 			load_stage(current_stage + 1)
 	)
@@ -676,7 +737,7 @@ func _build_header_ui() -> void:
 
 func _build_desks() -> void:
 	desk_data_nodes.clear()
-	for i in range(3):
+	for i in range(desk_nodes.size()):
 		var desk_node = desk_nodes[i]
 		
 		# Desk Button (clickable table with laptop)
@@ -968,8 +1029,9 @@ func _setup_easter_eggs() -> void:
 	
 	# Doorway arch interaction
 	door_arch.pressed.connect(func():
-		var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else 1
-		if unlocked_lvl >= 3 and PlayerData and PlayerData.get_level_stars(current_stage, 3) > 0:
+		var total_lvls = stages_info[current_stage]["levels"].size() if current_stage in stages_info else 3
+		var unlocked_lvl = PlayerData.get_stage_unlocked_level(current_stage) if PlayerData else total_lvls
+		if unlocked_lvl >= total_lvls and PlayerData and PlayerData.get_level_stars(current_stage, total_lvls) > 0:
 			play_synth_chime([523.25, 659.25, 783.99, 1046.5], 0.1)
 			if current_stage < 5:
 				show_toast("🚪 Gerbang terbuka! Melanjutkan ke Stage %d..." % (current_stage + 1))
@@ -981,7 +1043,7 @@ func _setup_easter_eggs() -> void:
 			var t = create_tween()
 			t.tween_property(door_arch, "scale", Vector2(1.03, 1.03), 0.06)
 			t.chain().tween_property(door_arch, "scale", Vector2.ONE, 0.1)
-			show_toast("🚪 Gerbang terkunci! Selesaikan semua 3 level di stage ini untuk membuka pintu stage berikutnya.")
+			show_toast("🚪 Gerbang terkunci! Selesaikan semua level di stage ini untuk membuka pintu stage berikutnya.")
 	)
 	_setup_hover_scale(door_arch, 1.03)
 
@@ -1120,15 +1182,34 @@ func _reposition_responsive() -> void:
 		potted_plant.pivot_offset = Vector2(60, 150)
 		
 	# Reposition Desks spread across the center
-	if desk_nodes.size() > 0 and desk_nodes[0]:
-		desk_nodes[0].position = Vector2(center_x - 560.0, 460.0)
-		desk_nodes[0].size = Vector2(180.0, 126.0)
-	if desk_nodes.size() > 1 and desk_nodes[1]:
-		desk_nodes[1].position = Vector2(center_x - 90.0, 460.0)
-		desk_nodes[1].size = Vector2(180.0, 126.0)
-	if desk_nodes.size() > 2 and desk_nodes[2]:
-		desk_nodes[2].position = Vector2(center_x + 390.0, 210.0)
-		desk_nodes[2].size = Vector2(180.0, 126.0)
+	var num_lvls = stages_info[current_stage]["levels"].size() if current_stage in stages_info else 3
+	if num_lvls == 4:
+		# 4 Desks for Stage 3!
+		if desk_nodes.size() > 0 and desk_nodes[0]:
+			desk_nodes[0].position = Vector2(center_x - 580.0, 460.0)
+			desk_nodes[0].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 1 and desk_nodes[1]:
+			desk_nodes[1].position = Vector2(center_x - 210.0, 460.0)
+			desk_nodes[1].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 2 and desk_nodes[2]:
+			desk_nodes[2].position = Vector2(center_x + 160.0, 460.0)
+			desk_nodes[2].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 3 and desk_nodes[3]:
+			desk_nodes[3].position = Vector2(center_x + 460.0, 220.0)
+			desk_nodes[3].size = Vector2(180.0, 126.0)
+	else:
+		# 3 Desks for Stage 1, 2, 4, 5
+		if desk_nodes.size() > 0 and desk_nodes[0]:
+			desk_nodes[0].position = Vector2(center_x - 560.0, 460.0)
+			desk_nodes[0].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 1 and desk_nodes[1]:
+			desk_nodes[1].position = Vector2(center_x - 90.0, 460.0)
+			desk_nodes[1].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 2 and desk_nodes[2]:
+			desk_nodes[2].position = Vector2(center_x + 390.0, 210.0)
+			desk_nodes[2].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 3 and desk_nodes[3]:
+			desk_nodes[3].visible = false
 		
 	# Path line hidden as per user request: "gak usah dikasih garis garis gitu"
 	if path_line:

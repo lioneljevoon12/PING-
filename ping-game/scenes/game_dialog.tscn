@@ -1,0 +1,130 @@
+[gd_scene load_steps=5 format=3 uid="uid://bgame_dialog01"]
+
+[ext_resource type="Script" path="res://scenes/game_dialog.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://mdjxuauhw7j0" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
+[ext_resource type="PackedScene" uid="uid://cbclosebtn01" path="res://scenes/close_button.tscn" id="3_close_btn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_default"]
+content_margin_left = 32.0
+content_margin_top = 28.0
+content_margin_right = 32.0
+content_margin_bottom = 28.0
+bg_color = Color(1, 0.960784, 0.960784, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.862745, 0.14902, 0.14902, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[node name="GameDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="CardWrapper" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -180.0
+offset_right = 250.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(250, 180)
+
+[node name="CardPanel" type="PanelContainer" parent="CardWrapper"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_default")
+
+[node name="VBox" type="VBoxContainer" parent="CardWrapper/CardPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CardWrapper/CardPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.14902, 0.14902, 1)
+theme_override_fonts/font = ExtResource("2_font_black")
+theme_override_font_sizes/font_size = 24
+text = "MISI GAGAL"
+horizontal_alignment = 1
+
+[node name="StarsContainer" type="HBoxContainer" parent="CardWrapper/CardPanel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="DetailLabel" type="Label" parent="CardWrapper/CardPanel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_font_sizes/font_size = 15
+text = "Sisa Waktu: 02:45"
+horizontal_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="CardWrapper/CardPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.498039, 0.113725, 0.113725, 1)
+theme_override_font_sizes/font_size = 14
+text = "Nyawa teknisi habis! Pelajari kembali standar kabel T568A dan T568B."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="CardWrapper/CardPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="CloseButton" parent="CardWrapper" instance=ExtResource("3_close_btn")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -46.0
+offset_top = 10.0
+offset_right = -8.0
+offset_bottom = 48.0
+grow_horizontal = 0
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

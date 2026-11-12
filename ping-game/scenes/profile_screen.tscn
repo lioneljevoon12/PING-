@@ -4,10 +4,11 @@
 [ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="3_bg"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_avatar_karakter.png" id="4_char"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_avatar_akun.png" id="5_battery"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Sprite animation/paket data/1.png" id="5_packet"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_settings.svg" id="6_gear"]
 [ext_resource type="PackedScene" path="res://scenes/auth_modal.tscn" id="7_auth_modal"]
 [ext_resource type="PackedScene" path="res://scenes/settings_modal.tscn" id="8_settings_modal"]
+[ext_resource type="PackedScene" path="res://scenes/character_customization_modal.tscn" id="9_custom_modal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back"]
 content_margin_left = 14.0
@@ -225,7 +226,7 @@ alignment = 1
 custom_minimum_size = Vector2(140, 140)
 layout_mode = 2
 size_flags_horizontal = 4
-texture = ExtResource("5_battery")
+texture = ExtResource("5_packet")
 expand_mode = 1
 stretch_mode = 5
 
@@ -282,6 +283,11 @@ visible = false
 layout_mode = 1
 
 [node name="SettingsModal" parent="." instance=ExtResource("8_settings_modal")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="CharacterCustomizationModal" parent="." instance=ExtResource("9_custom_modal")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

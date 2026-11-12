@@ -1,0 +1,175 @@
+[gd_scene load_steps=12 format=3 uid="uid://c8d9e0f1a2b34"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/level_3_4.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/bg_stage3.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/Gerbang.png" id="3_door"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Map/pot-bunga.png" id="4_plant"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/34_Wall_Network_Topology_Map.png" id="5_topo_wall"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/34_Wall_Routing_Table_Monitor.png" id="6_rt_wall"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/34_Main_Technician_Desk.png" id="7_main_desk"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage3/Assets Stage 3/34_Server_Destination_Zone.png" id="8_server_zone"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Character/main-char-router.png" id="9_char"]
+
+[node name="Level3_4" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+volume_db = -8.0
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FloorCarpet" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 260.0
+offset_right = 1500.0
+offset_bottom = 690.0
+
+[node name="DoorArch" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1140.0
+offset_top = 40.0
+offset_right = 1460.0
+offset_bottom = 240.0
+texture = ExtResource("3_door")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PottedPlant" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1045.0
+offset_top = 85.0
+offset_right = 1135.0
+offset_bottom = 235.0
+texture = ExtResource("4_plant")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WallTopologyMap" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 110.0
+offset_top = 50.0
+offset_right = 530.0
+offset_bottom = 235.0
+texture = ExtResource("5_topo_wall")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WallRoutingMonitor" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 550.0
+offset_top = 50.0
+offset_right = 970.0
+offset_bottom = 240.0
+texture = ExtResource("6_rt_wall")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CablesContainer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MainTechnicianDesk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 560.0
+offset_top = 280.0
+offset_right = 990.0
+offset_bottom = 470.0
+
+[node name="PC1Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 370.0
+offset_right = 260.0
+offset_bottom = 510.0
+
+[node name="PC2Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 80.0
+offset_top = 535.0
+offset_right = 260.0
+offset_bottom = 675.0
+
+[node name="SwitchStation" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 285.0
+offset_top = 450.0
+offset_right = 475.0
+offset_bottom = 560.0
+
+[node name="Router1Station" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 550.0
+offset_top = 520.0
+offset_right = 730.0
+offset_bottom = 650.0
+
+[node name="Router2Station" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 820.0
+offset_top = 520.0
+offset_right = 1000.0
+offset_bottom = 650.0
+
+[node name="ServerZone" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1100.0
+offset_top = 360.0
+offset_right = 1440.0
+offset_bottom = 675.0
+
+[node name="CharacterNode" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 480.0
+offset_top = 380.0
+offset_right = 600.0
+offset_bottom = 500.0
+
+[node name="MobileControlsRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

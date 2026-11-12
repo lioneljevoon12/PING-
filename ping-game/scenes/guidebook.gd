@@ -4,7 +4,7 @@ signal closed
 
 @onready var dim_backdrop: ColorRect = %DimBackdrop
 @onready var book_wrapper: Control = %BookWrapper
-@onready var close_btn: TextureButton = %CloseButton
+@onready var close_btn: CloseButton = %CloseButton
 @onready var prev_btn: Button = %PrevButton
 @onready var next_btn: Button = %NextButton
 @onready var prev_dimmer: ColorRect = %PrevDimmer
@@ -90,7 +90,7 @@ func _ready() -> void:
 	prev_btn.pivot_offset = prev_btn.size / 2.0
 	next_btn.pivot_offset = next_btn.size / 2.0
 	
-	close_btn.pressed.connect(close)
+	close_btn.closed.connect(close)
 	prev_btn.pressed.connect(_on_prev_pressed)
 	next_btn.pressed.connect(_on_next_pressed)
 	

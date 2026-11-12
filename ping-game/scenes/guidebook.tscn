@@ -7,7 +7,7 @@
 [ext_resource type="FontFile" uid="uid://ttjv12iqtqdn" path="res://art/assets/PING! Assets/Fonts/Nunito-SemiBold.ttf" id="5_font_semibold"]
 [ext_resource type="Texture2D" uid="uid://c0r2grioiypwd" path="res://art/assets/PING! Assets/correction v1/guidebook_book.png" id="6_book_bg"]
 [ext_resource type="Texture2D" uid="uid://5147ddy5eo12" path="res://art/ui-ux/guidebook/page_sheet.png" id="7_page_sheet"]
-[ext_resource type="Texture2D" uid="uid://biw5x582lb2dy" path="res://art/ui-ux/guidebook/btn_close.png" id="8_btn_close"]
+[ext_resource type="PackedScene" path="res://scenes/close_button.tscn" id="8_btn_close"]
 [ext_resource type="Texture2D" uid="uid://ckwfutx405ch3" path="res://art/ui-ux/guidebook/btn_prev_square.png" id="9_btn_prev"]
 [ext_resource type="Texture2D" uid="uid://br6vual7xo34w" path="res://art/ui-ux/guidebook/btn_next_square.png" id="10_btn_next"]
 [ext_resource type="Texture2D" uid="uid://c8i2aubm4leoe" path="res://art/ui-ux/guidebook/rj45_graphic.png" id="11_rj45"]
@@ -303,7 +303,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.2, 0.15, 0.15, 0)
 
-[node name="CloseButton" type="TextureButton" parent="BookWrapper"]
+[node name="CloseButton" parent="BookWrapper" instance=ExtResource("8_btn_close")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -311,12 +311,9 @@ anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -20.0
 offset_top = -12.0
-offset_right = 28.0
-offset_bottom = 36.0
+offset_right = 18.0
+offset_bottom = 26.0
 grow_horizontal = 0
-texture_normal = ExtResource("8_btn_close")
-ignore_texture_size = true
-stretch_mode = 5
 
 [node name="BottomCaption" type="Label" parent="BookWrapper"]
 layout_mode = 1
