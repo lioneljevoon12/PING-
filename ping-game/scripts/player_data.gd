@@ -83,7 +83,7 @@ func _ready() -> void:
 # --- UNLOCK & PROGRESSION SYSTEM ---
 
 # Mode testing dimatikan agar kunci stage/level aktif dari sangat awal sesuai request user
-var test_mode_all_unlocked: bool = true
+var test_mode_all_unlocked: bool = false
 
 # Jumlah level per stage (Stage 2 & 3 = 4 level, Stage 5 = 5 level, lainnya = 3 level)
 func get_stage_level_count(stage_num: int) -> int:
