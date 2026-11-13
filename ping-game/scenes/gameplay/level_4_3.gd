@@ -1203,7 +1203,7 @@ func _on_victory() -> void:
 			time_str,
 			Callable(self, "_on_next_level"),
 			Callable(self, "_on_map_pressed"),
-			"SELESAI"
+			"LANJUT KE 5.1"
 		)
 
 func _trigger_game_over(msg: String) -> void:
@@ -1216,7 +1216,7 @@ func _trigger_game_over(msg: String) -> void:
 		)
 
 func _on_next_level() -> void:
-	get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+	get_tree().change_scene_to_file("res://scenes/gameplay/level_5_1.tscn")
 
 func _on_restart_level() -> void:
 	get_tree().reload_current_scene()

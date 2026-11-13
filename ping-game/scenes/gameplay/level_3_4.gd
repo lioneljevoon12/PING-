@@ -1492,10 +1492,10 @@ func _show_victory_dialog() -> void:
 		time_str,
 		func():
 			_play_synth_sequence([523.25, 659.25, 783.99], 0.08)
-			get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
+			get_tree().change_scene_to_file("res://scenes/gameplay/level_4_1.tscn"),
 		func():
 			get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
-		"SELESAI"
+		"LANJUT KE 4.1"
 	)
 
 func _game_over(custom_reason: String = "") -> void:

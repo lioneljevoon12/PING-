@@ -1597,7 +1597,7 @@ func _trigger_win() -> void:
 	]
 	
 	var act_next = func():
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_3.tscn")
 	var act_map = func():
 		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
 		
@@ -1606,7 +1606,7 @@ func _trigger_win() -> void:
 		{ "text": "Kembali ke Map", "action": act_map, "color": "blue" }
 	]
 	
-	game_dialog.setup("MISI BERHASIL!", win_msg, btn_list, "success")
+	game_dialog.setup_dialog("MISI BERHASIL!", win_msg, btn_list, "sukses")
 	game_dialog.open()
 
 func _trigger_game_over(reason: String) -> void:
@@ -1631,7 +1631,7 @@ func _trigger_game_over(reason: String) -> void:
 		{ "text": "Kembali ke Map", "action": act_map, "color": "blue" }
 	]
 	
-	game_dialog.setup_dialog("MISI GAGAL", reason, btn_list, "fail")
+	game_dialog.setup_dialog("MISI GAGAL", reason, btn_list, "gagal")
 	game_dialog.open()
 
 # --- TOAST NOTIFICATION ---

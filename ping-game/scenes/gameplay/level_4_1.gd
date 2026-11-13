@@ -1817,7 +1817,7 @@ func _show_victory_dialog() -> void:
 		
 	var act_next = func():
 		_play_synth_sequence([523.25, 659.25, 783.99], 0.08)
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_4_2.tscn")
 	var act_map = func():
 		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
 		

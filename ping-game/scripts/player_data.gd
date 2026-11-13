@@ -249,32 +249,11 @@ func apply_to_character(char_sprite: Node) -> void:
 	elif "modulate" in char_sprite:
 		char_sprite.modulate = skin_col
 		
-	var acc_tex = get_active_accessory_texture()
-	var acc_node = char_sprite.get_node_or_null("AccessoryOverlay") as TextureRect
-	
-	if acc_tex:
-		if not acc_node:
-			acc_node = TextureRect.new()
-			acc_node.name = "AccessoryOverlay"
-			acc_node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			acc_node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			acc_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			acc_node.set_anchors_preset(Control.PRESET_FULL_RECT)
-			acc_node.anchor_left = 0.0
-			acc_node.anchor_top = 0.0
-			acc_node.anchor_right = 1.0
-			acc_node.anchor_bottom = 1.0
-			acc_node.offset_left = 0
-			acc_node.offset_top = 0
-			acc_node.offset_right = 0
-			acc_node.offset_bottom = 0
-			char_sprite.add_child(acc_node)
-			
-		acc_node.texture = acc_tex
-		acc_node.visible = true
-	else:
-		if acc_node:
-			acc_node.visible = false
+	if char_sprite is TextureRect:
+		var path = ""
+		if current_accessory in ACCESSORY_CONFIG:
+			path = ACCESSORY_CONFIG[current_accessory].get("texture_path", "")
+		AccessoryOverlay.apply(char_sprite, current_accessory, path)
 
 # --- SAVE & LOAD SYSTEM ---
 

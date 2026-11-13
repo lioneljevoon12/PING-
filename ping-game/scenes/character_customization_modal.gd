@@ -154,26 +154,11 @@ func _update_live_preview() -> void:
 	preview_mascot.self_modulate = skin_color
 	preview_desc_label.text = skin_desc
 	
-	# 2. Accessory texture overlay
-	var acc_overlay = preview_mascot.get_node_or_null("PreviewAccOverlay") as TextureRect
-	if not acc_overlay:
-		acc_overlay = TextureRect.new()
-		acc_overlay.name = "PreviewAccOverlay"
-		acc_overlay.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		acc_overlay.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		acc_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		acc_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-		preview_mascot.add_child(acc_overlay)
-		
+	# 2. Accessory overlay (posisi mengikuti badan karakter, tidak menutupi wajah)
 	var acc_path = ""
 	if PlayerData and temp_accessory in PlayerData.ACCESSORY_CONFIG:
 		acc_path = PlayerData.ACCESSORY_CONFIG[temp_accessory].get("texture_path", "")
-		
-	if acc_path != "" and ResourceLoader.exists(acc_path):
-		acc_overlay.texture = load(acc_path)
-		acc_overlay.visible = true
-	else:
-		acc_overlay.visible = false
+	AccessoryOverlay.apply(preview_mascot, temp_accessory, acc_path)
 		
 	if preview_accessory_label:
 		preview_accessory_label.text = ""

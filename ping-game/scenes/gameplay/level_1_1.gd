@@ -375,29 +375,26 @@ func _update_interaction_prompts() -> void:
 	var dist_left_rack = char_center.distance_to(left_rack_pos)
 	var dist_right_rack = char_center.distance_to(right_rack_pos)
 	
-	# Table Prompts (Lihat & Ambil pills on left of table / cable)
+	# Tombol Lihat & Ambil berada di atas SETIAP kabel (muncul saat pemain dekat meja)
 	if table_prompts_container:
-		if dist_table < 220.0:
-			table_prompts_container.visible = true
+		table_prompts_container.visible = false
+	_ensure_cable_prompts()
+	var near_table = dist_table < 220.0
+	for i in range(cables_data.size()):
+		var box: Control = cable_prompt_boxes[i]
+		var show_box = false
+		var ambil_text = "Ambil"
+		if near_table:
 			if carried_cable_data == null:
-				var first_idx = _get_first_available_cable_idx()
-				if active_focused_cable_idx < 0 or active_focused_cable_idx >= cables_data.size() or cables_data[active_focused_cable_idx]["state"] != "on_table":
-					active_focused_cable_idx = first_idx
-				
-				if active_focused_cable_idx != -1:
-					btn_ambil.text = "Ambil"
-					btn_ambil.visible = true
-					btn_lihat.visible = true
-				else:
-					btn_ambil.visible = false
-					btn_lihat.visible = false
-					table_prompts_container.visible = false
-			else:
-				btn_ambil.text = "Kembalikan"
-				btn_ambil.visible = true
-				btn_lihat.visible = true
-		else:
-			table_prompts_container.visible = false
+				show_box = (cables_data[i]["state"] == "on_table")
+			elif int(carried_cable_data["id"]) == int(cables_data[i]["id"]):
+				show_box = true
+				ambil_text = "Kembalikan"
+		box.visible = show_box
+		if show_box:
+			(box.get_child(1) as Button).text = ambil_text
+			var cn: Control = cable_item_nodes[i]
+			box.position = (cn.global_position - cable_table_node.global_position) + Vector2((cn.size.x - 76.0) / 2.0, -44.0)
 			
 	# Left Rack Prompt (Letakkan Kabel pill on right rim of left rack)
 	if rack_prompt_left:
@@ -406,6 +403,68 @@ func _update_interaction_prompts() -> void:
 	# Right Rack Prompt (Letakkan Kabel pill on left rim of right rack)
 	if rack_prompt_right:
 		rack_prompt_right.visible = (carried_cable_data != null and dist_right_rack < 250.0)
+
+var cable_prompt_boxes: Array[Control] = []
+
+func _make_cable_pill(btn_text: String) -> Button:
+	var b = Button.new()
+	b.text = btn_text
+	b.custom_minimum_size = Vector2(76, 24)
+	b.size = Vector2(76, 24)
+	b.add_theme_font_override("font", font_black)
+	b.add_theme_font_size_override("font_size", 11)
+	b.add_theme_color_override("font_color", Color("#4a2e2b"))
+	var sb_norm = StyleBoxFlat.new()
+	sb_norm.bg_color = Color("#fbcfe8")
+	sb_norm.border_color = Color("#4a2e2b")
+	sb_norm.set_border_width_all(2)
+	sb_norm.set_corner_radius_all(11)
+	sb_norm.set_content_margin_all(2)
+	b.add_theme_stylebox_override("normal", sb_norm)
+	var sb_hover = sb_norm.duplicate()
+	sb_hover.bg_color = Color("#f472b6")
+	b.add_theme_stylebox_override("hover", sb_hover)
+	var sb_press = sb_norm.duplicate()
+	sb_press.bg_color = Color("#db2777")
+	b.add_theme_stylebox_override("pressed", sb_press)
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	return b
+
+func _ensure_cable_prompts() -> void:
+	if cable_prompt_boxes.size() == cables_data.size() and cables_data.size() > 0:
+		return
+	if cable_table_node == null or cable_item_nodes.size() != cables_data.size():
+		return
+	for old in cable_prompt_boxes:
+		if is_instance_valid(old):
+			old.queue_free()
+	cable_prompt_boxes.clear()
+	for i in range(cables_data.size()):
+		var box = Control.new()
+		box.name = "CablePrompt%d" % i
+		box.size = Vector2(76, 52)
+		box.z_index = 20
+		box.visible = false
+		var idx = i
+		var b_lihat = _make_cable_pill("Lihat")
+		b_lihat.position = Vector2(0, 0)
+		b_lihat.pressed.connect(func():
+			active_focused_cable_idx = idx
+			_open_pinout_modal(cables_data[idx])
+		)
+		var b_ambil = _make_cable_pill("Ambil")
+		b_ambil.position = Vector2(0, 28)
+		b_ambil.pressed.connect(func():
+			if carried_cable_data == null:
+				active_focused_cable_idx = idx
+				_pickup_cable(idx)
+			else:
+				_return_cable_to_table()
+		)
+		box.add_child(b_lihat)
+		box.add_child(b_ambil)
+		cable_table_node.add_child(box)
+		cable_prompt_boxes.append(box)
 
 func _get_first_available_cable_idx() -> int:
 	for i in range(cables_data.size()):
@@ -722,12 +781,6 @@ func _select_cable_on_table(cable_idx: int) -> void:
 	tw.tween_property(c_node, "scale", Vector2(1.15, 1.15), 0.1)
 	tw.chain().tween_property(c_node, "scale", Vector2.ONE, 0.1)
 	
-	# Update prompts
-	if table_prompts_container:
-		table_prompts_container.visible = true
-		btn_ambil.text = "Ambil" if carried_cable_data == null else "Kembalikan"
-		btn_ambil.visible = true
-		btn_lihat.visible = true
 
 func _setup_cable_workbench() -> void:
 	cable_item_nodes.clear()
@@ -787,10 +840,12 @@ func _setup_cable_workbench() -> void:
 		cable_item_nodes.append(c_box)
 
 func _build_character_mascot() -> void:
+	character_mascot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	character_mascot.size = Vector2(256, 144)
 	character_mascot.pivot_offset = Vector2(128, 72)
 	
 	mascot_sprite = TextureRect.new()
+	mascot_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mascot_sprite.size = Vector2(340, 191)
 	mascot_sprite.position = Vector2(-42, -24)
 	mascot_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -1668,7 +1723,7 @@ func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 1.1", "text": "Periksa kabel di meja kerja: mana yang Straight dan mana yang Cross, lalu masukkan ke rak yang sesuai. Yuk lihat caranya!" },
 		TutorialOverlay.step_move(self),
-		{ "title": "1. Meja Kerja Kabel", "text": "Dekati meja ini. Klik Lihat untuk memeriksa urutan pin warna kabel, lalu klik Ambil untuk membawa kabelnya. Straight = urutan pin sama di kedua ujung, Cross = urutan berbeda.", "target": cable_table_node, "pointer": "both" },
+		{ "title": "1. Meja Kerja Kabel", "text": "Dekati meja ini. Di atas setiap kabel muncul tombol Lihat (periksa urutan pin warna) dan Ambil (bawa kabelnya). Straight = urutan pin sama di kedua ujung, Cross = urutan berbeda.", "target": cable_table_node, "pointer": "both" },
 		{ "title": "2. Rak Cross", "text": "Bawa kabel Cross ke rak di sebelah kiri ini, lalu klik tombol simpan yang muncul.", "target": left_rack_node, "pointer": "hand" },
 		{ "title": "3. Rak Straight", "text": "Kabel Straight disimpan di rak sebelah kanan ini. Salah rak akan mengurangi nyawa.", "target": right_rack_node, "pointer": "hand" },
 		TutorialOverlay.step_hearts(self),

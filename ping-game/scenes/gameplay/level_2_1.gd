@@ -1519,9 +1519,9 @@ func _trigger_win() -> void:
 		desc,
 		earned_stars,
 		time_str,
+		func(): get_tree().change_scene_to_file("res://scenes/gameplay/level_2_2.tscn"),
 		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
-		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"),
-		"KEMBALI KE MAP"
+		"LANJUT KE 2.2"
 	)
 
 func _trigger_game_over(reason: String) -> void:
