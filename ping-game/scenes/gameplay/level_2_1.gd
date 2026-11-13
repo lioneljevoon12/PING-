@@ -662,9 +662,7 @@ func _build_header_ui() -> void:
 	sb_back.shadow_offset = Vector2(0, 2)
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
-	back_btn.pressed.connect(func():
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
 	
@@ -1346,18 +1344,16 @@ func _tutorial_room_steps() -> Array:
 	var dpad = mobile_controls_root.get_node_or_null("DpadBase") if mobile_controls_root else null
 	return [
 		{ "title": "Selamat datang, Teknisi!", "text": "Tugasmu: sortir paket alamat IPv4 ke Kelas A, B, atau C sebelum waktu habis. Yuk lihat caranya!" },
-		{ "title": "1. Berjalan", "text": "Geser joystick ini dengan mouse/jari, atau tekan tombol W A S D / panah di keyboard untuk menggerakkan karakter.", "target": dpad, "pointer": "hand" },
-		{ "title": "2. Meja Sortir", "text": "Dekati meja ini, lalu klik tombol Sortir (atau tekan Spasi) untuk membuka mesin sortir paket.", "target": center_desk, "pointer": "both" },
-		{ "title": "3. Papan Contekan", "text": "Papan di atas berisi rentang oktet pertama tiap kelas. Dekati dan klik papan kapan saja kamu lupa.", "target": whiteboard_node, "pointer": "hand" },
-		{ "title": "4. Pad Kelas", "text": "Tiga pad di lantai ini mewakili Kelas A, B, dan C. Paket yang benar akan menyala hijau di sini.", "target": func(): return _union_rect([bin_a_pad, bin_b_pad, bin_c_pad]), "pointer": "arrow" },
+		{ "title": "1. Meja Sortir", "text": "Dekati meja ini, lalu klik tombol Sortir (atau tekan Spasi) untuk membuka mesin sortir paket.", "target": center_desk, "pointer": "both" },
+		{ "title": "2. Papan Contekan", "text": "Papan di atas berisi rentang oktet pertama tiap kelas. Dekati dan klik papan kapan saja kamu lupa.", "target": whiteboard_node, "pointer": "hand" },
+		{ "title": "3. Pad Kelas", "text": "Tiga pad di lantai ini mewakili Kelas A, B, dan C. Paket yang benar akan menyala hijau di sini.", "target": func(): return _union_rect([bin_a_pad, bin_b_pad, bin_c_pad]), "pointer": "arrow" },
 	]
 
 func _tutorial_sort_steps() -> Array:
 	var hearts_panel = header_ui.get_node_or_null("HeartsPanel") if header_ui else null
 	return [
-		{ "title": "5. Antrean Paket", "text": "Ini paket IPv4 yang harus disortir. Lihat angka PERTAMA pada alamatnya (oktet pertama), lalu klik paketnya.", "target": sorting_queue_container.get_parent(), "pointer": "hand" },
-		{ "title": "6. Masukkan ke Kelas", "text": "Seret paket ke kelas yang tepat, atau klik paket lalu klik kelasnya.\nKelas A: 1–126  |  Kelas B: 128–191  |  Kelas C: 192–223.", "target": func(): return _union_rect(sorting_bins_dict.values()), "pointer": "both" },
-		{ "title": "7. Nyawa", "text": "Salah memilih kelas mengurangi 1 nyawa (hati). Nyawa habis = misi gagal, jadi teliti ya!", "target": hearts_panel, "pointer": "hand" },
+		{ "title": "4. Antrean Paket", "text": "Ini paket IPv4 yang harus disortir. Lihat angka PERTAMA pada alamatnya (oktet pertama), lalu klik paketnya.", "target": sorting_queue_container.get_parent(), "pointer": "hand" },
+		{ "title": "5. Masukkan ke Kelas", "text": "Seret paket ke kelas yang tepat, atau klik paket lalu klik kelasnya.\nKelas A: 1–126  |  Kelas B: 128–191  |  Kelas C: 192–223.", "target": func(): return _union_rect(sorting_bins_dict.values()), "pointer": "both" },
 		{ "title": "Siap?", "text": "Sortir semua paket sebelum waktu habis. Butuh bantuan lagi? Tekan tombol ? di pojok kanan atas." },
 	]
 

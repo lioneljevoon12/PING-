@@ -604,10 +604,7 @@ func _build_header_ui() -> void:
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	back_btn.pressed.connect(func():
-		_play_chime_sound()
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
 	
@@ -2364,11 +2361,9 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 2.4", "text": "Pemilik IP 192.168.1.50 harus membalas dengan MAC Address-nya (ARP-Reply), lalu disimpan ke Tabel ARP." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Pemilik IP", "text": "PC 3 memegang IP yang dicari. Ia membalas dengan ARP-Reply berisi MAC Address-nya.", "target": pc3_desk, "pointer": "hand" },
 		{ "title": "2. Kawal ARP-Reply", "text": "Dekati perangkat di tengah lalu klik tombol Kawal agar balasan ARP-Reply sampai ke PC pengirim.", "target": center_desk, "pointer": "both" },
 		{ "title": "3. PC Pengirim", "text": "PC 1 menerima balasan lalu menyimpan MAC Address ke Tabel ARP (ARP Cache) supaya tidak perlu bertanya lagi.", "target": pc1_desk, "pointer": "arrow" },
 		{ "title": "4. Papan Referensi", "text": "Papan ini membedakan ARP-Request (bertanya) dan ARP-Reply (menjawab).", "target": whiteboard_node, "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

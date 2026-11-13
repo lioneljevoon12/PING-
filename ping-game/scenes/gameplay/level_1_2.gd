@@ -2020,12 +2020,10 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 1.2", "text": "Rakit kabel UTP dengan urutan pin warna standar TIA/EIA 568A atau 568B sebelum waktu habis." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Meja Kerja", "text": "Dekati meja ini lalu tekan Urutkan Kabel untuk membuka panel perakitan pin warna.", "target": cable_table_node, "pointer": "both" },
 		{ "title": "2. Tombol AKSI", "text": "Tombol ini melakukan aksi pada objek terdekat, misalnya membuka perakitan di meja atau menyimpan kabel ke rak.", "target": action_btn_node, "pointer": "hand" },
 		{ "title": "3. Panduan Pin", "text": "Lupa urutan warna pin 568A/568B? Buka Panduan Pin di sini kapan saja.", "target": header_ui.get_node_or_null("GuidebookTopBtn"), "pointer": "hand" },
 		{ "title": "4. Rak Cross", "text": "Kabel Cross (urutan pin kedua ujung berbeda) disimpan di rak sebelah kiri ini.", "target": left_rack_node, "pointer": "hand" },
 		{ "title": "5. Rak Straight", "text": "Kabel Straight (urutan pin sama di kedua ujung) disimpan di rak sebelah kanan ini.", "target": right_rack_node, "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

@@ -1640,10 +1640,8 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 3.3", "text": "Tentukan IP host yang valid: bukan alamat Network (angka host 0) dan bukan Broadcast (angka host 255)." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Panel Informasi", "text": "Baca rentang jaringan di papan ini: Network ujungnya .0, host valid .1 sampai .254, Broadcast ujungnya .255.", "target": whiteboard_texture, "pointer": "hand" },
 		{ "title": "2. IP Usable Checker", "text": "Klik mesin pemeriksa ini untuk membuka tugas. Di pop up, seret kartu IP ke slot yang tepat.", "target": checker_station, "pointer": "both" },
 		{ "title": "3. PC Bermasalah", "text": "PC merah memakai IP yang tidak valid. Klik PC untuk membuka tugas memperbaikinya.", "target": (func(): return TutorialOverlay.union_of([pc2_desk, pc3_desk])), "pointer": "arrow" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

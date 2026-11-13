@@ -117,6 +117,11 @@ static func refresh(rects: Array, hearts: int, _is_damage: bool = false) -> void
 			bl.visible = true
 			bl.modulate.a = 1.0
 	if damage:
+		var tree_ml = Engine.get_main_loop() as SceneTree
+		if tree_ml:
+			var sm = tree_ml.root.get_node_or_null("SettingsManager")
+			if sm and sm.has_method("vibrate"):
+				sm.vibrate(70)
 		var panel = _find_panel(rects[0].get_parent())
 		if panel:
 			var tw_p = panel.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

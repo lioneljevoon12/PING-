@@ -637,10 +637,7 @@ func _build_header_ui() -> void:
 	back_btn.position = Vector2(30, 20)
 	back_btn.ignore_texture_size = true
 	back_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	back_btn.pressed.connect(func():
-		_play_synth_sequence([440.0, 392.0], 0.08)
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	back_btn.pressed.connect(_on_pause_pressed)
 	header_ui.add_child(back_btn)
 	
 	# Hearts Container (3 Nyawa)
@@ -1527,9 +1524,17 @@ func _game_over(custom_reason: String = "") -> void:
 
 func _on_pause_pressed() -> void:
 	_play_synth_sequence([440.0, 392.0], 0.08)
-	pause_modal = PauseModalScene.instantiate()
-	add_child(pause_modal)
-	pause_modal.z_index = 350
+	if pause_modal and is_instance_valid(pause_modal) and pause_modal.visible:
+		return
+	if pause_modal == null or not is_instance_valid(pause_modal):
+		pause_modal = PauseModalScene.instantiate()
+		add_child(pause_modal)
+		pause_modal.z_index = 350
+		pause_modal.resume_requested.connect(func():
+			if not is_completed and not is_game_over and not is_modal_open:
+				is_game_active = true
+		)
+	is_game_active = false
 	pause_modal.open()
 
 func _process(delta: float) -> void:
@@ -1774,11 +1779,9 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 3.4", "text": "Perbaiki tabel routing supaya paket dari PC bisa melewati Switch dan Router sampai ke Server Utama." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Tabel Routing", "text": "Monitor ini menampilkan tabel routing. Baris merah berarti rute hilang atau salah. Klik untuk membuka tugas.", "target": wall_rt_monitor, "pointer": "both" },
 		{ "title": "2. Router R1", "text": "Router yang routing-nya bermasalah ditandai merah. Klik router untuk memperbaikinya.", "target": router1_station, "pointer": "both" },
 		{ "title": "3. Meja Teknisi Routing", "text": "Klik meja ini atau tombol Perbaiki Routing untuk membuka pop up tugas.", "target": main_technician_desk, "pointer": "hand" },
 		{ "title": "4. Server Utama", "text": "Tujuan akhirnya: paket harus sampai ke server ini, jadi semua rute harus tersambung.", "target": server_zone, "pointer": "arrow" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

@@ -284,15 +284,24 @@ func _setup_header_ui() -> void:
 	pause_btn.pressed.connect(_on_pause_pressed)
 	header_ui.add_child(pause_btn)
 
+var pause_modal_node: Control = null
+var pause_prev_active: bool = false
+
 func _on_back_pressed() -> void:
-	_play_synth_sequence([350.0], 0.08)
-	get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+	_on_pause_pressed()
 
 func _on_pause_pressed() -> void:
 	_play_synth_sequence([500.0], 0.08)
-	var pause_modal = pause_modal_scene.instantiate()
-	pause_modal.z_index = 300
-	add_child(pause_modal)
+	if pause_modal_node and is_instance_valid(pause_modal_node) and pause_modal_node.visible:
+		return
+	pause_prev_active = is_game_active
+	is_game_active = false
+	if pause_modal_node == null or not is_instance_valid(pause_modal_node):
+		pause_modal_node = pause_modal_scene.instantiate()
+		pause_modal_node.z_index = 300
+		add_child(pause_modal_node)
+		pause_modal_node.resume_requested.connect(func(): is_game_active = pause_prev_active)
+	pause_modal_node.open()
 
 func _process_timer(delta: float) -> void:
 	timer_seconds -= delta
@@ -700,7 +709,7 @@ func _input(event: InputEvent) -> void:
 
 func _update_joystick(pos: Vector2) -> void:
 	var diff = pos - joystick_center
-	var max_r = 50.0
+	var max_r = 50.0 * SettingsManager.get_joystick_scale()
 	if diff.length() > max_r:
 		diff = diff.normalized() * max_r
 	joystick_vector = diff / max_r
@@ -1245,9 +1254,7 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 4.3", "text": "Perbaiki dua topologi yang terganggu: Ring di zona kiri dan Mesh di zona kanan." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Zona 1: Topologi Ring", "text": "Satu segmen kabel melingkar terlepas sehingga paket gagal berputar. Klik PC untuk membuka tugas.", "target": Rect2(80, 310, 620, 380), "pointer": "both" },
 		{ "title": "2. Zona 2: Topologi Mesh", "text": "Jalur silang antar PC harus tersambung semua. Klik PC di zona ini untuk membuka tugasnya.", "target": Rect2(780, 310, 620, 380), "pointer": "both" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

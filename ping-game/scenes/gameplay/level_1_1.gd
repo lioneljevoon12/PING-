@@ -1192,13 +1192,6 @@ func _build_joystick_ui() -> void:
 	
 	# Joystick touch handling
 	joystick_zone.gui_input.connect(_on_joystick_input)
-	if SettingsManager:
-		var j_scale = SettingsManager.get_joystick_scale()
-		joystick_zone.scale = Vector2(j_scale, j_scale)
-		SettingsManager.joystick_size_changed.connect(func(ns: float):
-			if is_instance_valid(joystick_zone):
-				joystick_zone.scale = Vector2(ns, ns)
-		)
 	
 	# Bottom-right quick action touch button (Style C circle button)
 	var action_touch_btn = TextureButton.new()

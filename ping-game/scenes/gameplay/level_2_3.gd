@@ -599,10 +599,7 @@ func _build_header_ui() -> void:
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	back_btn.pressed.connect(func():
-		_play_chime_sound()
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
 	
@@ -2447,11 +2444,9 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 2.3", "text": "PC 1 ingin mengirim data ke 192.168.1.50 tapi belum tahu MAC Address-nya. Bantu kirim ARP-Request lewat broadcast!" },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. PC Pengirim", "text": "PC 1 sudah tahu IP tujuan, tapi belum tahu MAC Address-nya.", "target": pc1_desk, "pointer": "hand" },
 		{ "title": "2. Kawal ARP-Request", "text": "Dekati perangkat di tengah lalu klik tombol Kawal agar paket ARP-Request disiarkan (broadcast) ke seluruh jaringan LAN.", "target": center_desk, "pointer": "both" },
 		{ "title": "3. PC Penerima", "text": "Semua PC menerima broadcast, tapi hanya pemilik IP 192.168.1.50 (bertanda bintang) yang akan membalas.", "target": (func(): return TutorialOverlay.union_of([pc2_desk, pc3_desk, pc4_desk])), "pointer": "arrow" },
 		{ "title": "4. Papan Referensi", "text": "Papan ini berisi ringkasan kelas alamat IPv4 dan cara kerja ARP. Lihat bila lupa.", "target": whiteboard_node, "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

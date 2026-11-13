@@ -1860,9 +1860,17 @@ func _game_over(custom_reason: String = "") -> void:
 
 func _on_pause_pressed() -> void:
 	_play_synth_sequence([440.0, 392.0], 0.08)
-	pause_modal = PauseModalScene.instantiate()
-	add_child(pause_modal)
-	pause_modal.z_index = 350
+	if pause_modal and is_instance_valid(pause_modal) and pause_modal.visible:
+		return
+	if pause_modal == null or not is_instance_valid(pause_modal):
+		pause_modal = PauseModalScene.instantiate()
+		add_child(pause_modal)
+		pause_modal.z_index = 350
+		pause_modal.resume_requested.connect(func():
+			if not is_completed and not is_game_over and not is_modal_open:
+				is_game_active = true
+		)
+	is_game_active = false
 	pause_modal.open()
 
 func _on_back_pressed() -> void:
@@ -2131,9 +2139,7 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 4.1", "text": "Cocokkan setiap kartu situasi jaringan ke kategori yang benar: PAN, LAN, MAN, atau WAN." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Kartu Situasi", "text": "Ini kartu-kartu yang harus dikelompokkan. Tekan lalu seret satu kartu ke kolom yang tepat di papan.", "target": tray_container, "pointer": "both" },
 		{ "title": "2. Papan Klasifikasi", "text": "PAN = area pribadi (HP, smartwatch), LAN = satu gedung, MAN = satu kota, WAN = antarnegara. Lepaskan kartu di kolomnya.", "target": whiteboard_container, "pointer": "both" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

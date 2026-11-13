@@ -93,7 +93,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
 theme_override_fonts/font = ExtResource("2_font_black")
 theme_override_font_sizes/font_size = 18
-text = "🏆 PAPAN PERINGKAT TEKNISI"
+text = "🏆 PERFORMA LEVELMU"
 vertical_alignment = 1
 
 [node name="Spacer" type="Control" parent="CardWrapper/MainVBox/HeaderHBox"]

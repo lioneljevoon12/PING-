@@ -816,7 +816,7 @@ func _build_header_ui() -> void:
 	sb_back.shadow_offset = Vector2(0, 3)
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
-	back_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn"))
+	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
 	
@@ -2187,11 +2187,9 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 1.3", "text": "Hubungkan 4 komputer dengan perangkat yang tepat (Hub atau Switch), lalu kirim amplop data." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Rak Perangkat", "text": "Dekati rak di sebelah kiri untuk mengambil perangkat Hub atau Switch.", "target": left_rack_node, "pointer": "both" },
 		{ "title": "2. Meja Tengah", "text": "Taruh perangkat di meja ini. Hub menyiarkan data ke semua PC sehingga amplop bisa bertabrakan, sedangkan Switch mengirim hanya ke tujuan.", "target": cable_table_node, "pointer": "both" },
 		{ "title": "3. Empat PC", "text": "Semua PC harus terhubung ke perangkat. Setelah itu kirim amplop data ke tujuannya.", "target": (func(): return TutorialOverlay.union_of([pc1_node, pc2_node, pc3_node, pc4_node])), "pointer": "arrow" },
 		{ "title": "4. Tombol AKSI", "text": "Tekan saat dekat rak, meja, atau PC untuk mengambil, menaruh, atau menghubungkan.", "target": Rect2(1409, 555, 110, 110), "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

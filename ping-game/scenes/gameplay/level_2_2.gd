@@ -763,10 +763,7 @@ func _build_header_ui() -> void:
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	back_btn.pressed.connect(func():
-		_play_chime_sound()
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
 	
@@ -1840,10 +1837,8 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 2.2", "text": "Saring trafik yang meminta akses ke server internal: izinkan IP Privat, blokir IP Publik." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Aturan Firewall", "text": "Baca aturannya dulu. ALLOW untuk IP Privat (10.x, 172.16 - 172.31, 192.168.x) dan BLOCK untuk IP Publik.", "target": whiteboard_node, "pointer": "hand" },
 		{ "title": "2. Konsol Filter", "text": "Dekati meja tengah ini lalu klik tombol Filter (atau tekan Spasi) untuk membuka konsol penyaring.", "target": center_desk, "pointer": "both" },
 		{ "title": "3. Zona Hasil", "text": "Di konsol, tempatkan tiap alamat IP ke zona yang benar: IP Privat ke LAN Aman (kiri), IP Publik ke Karantina (kanan).", "target": (func(): return TutorialOverlay.union_of([left_pad, right_pad])), "pointer": "arrow" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

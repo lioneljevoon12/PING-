@@ -104,7 +104,7 @@ func _build_stage_cards() -> void:
 		var s_num = int(raw["num"])
 		var is_locked = not PlayerData.is_stage_unlocked(s_num)
 		var cleared_count = PlayerData.get_stage_cleared_count(s_num)
-		var total_lvls = 4 if s_num == 3 else 3
+		var total_lvls = PlayerData.get_stage_level_count(s_num)
 		var score_str = "%d/%d" % [cleared_count, total_lvls] if not is_locked else "0/%d" % total_lvls
 		
 		var s = {

@@ -3,6 +3,7 @@ extends Node
 # Signal definitions
 signal settings_changed()
 signal joystick_size_changed(scale_factor: float)
+signal text_size_changed(scale_factor: float)
 signal bgm_volume_changed(volume: float, muted: bool)
 signal sfx_volume_changed(volume: float, muted: bool)
 
@@ -21,6 +22,8 @@ var haptic_enabled: bool = true
 
 var fps_limit: int = 60 # 30 or 60
 
+var text_size: String = "normal" # "small", "normal", "large"
+
 # Audio Players
 var bgm_player: AudioStreamPlayer
 var sfx_player: AudioStreamPlayer
@@ -32,6 +35,7 @@ func _ready() -> void:
 	load_settings()
 	apply_all_settings()
 	_start_procedural_bgm()
+	_setup_global_hooks()
 
 func _setup_audio_buses() -> void:
 	# Ensure "Music" bus exists
@@ -69,6 +73,7 @@ func apply_all_settings() -> void:
 	
 	settings_changed.emit()
 	joystick_size_changed.emit(get_joystick_scale())
+	text_size_changed.emit(get_text_scale())
 
 func _apply_bus_volume(bus_name: String, volume_linear: float, muted: bool) -> void:
 	var idx = AudioServer.get_bus_index(bus_name)
@@ -110,8 +115,18 @@ func set_sfx_muted(muted: bool) -> void:
 func set_joystick_size(size_str: String) -> void:
 	if size_str in ["small", "normal", "large"]:
 		joystick_size = size_str
+		_joy_dirty = true
 		joystick_size_changed.emit(get_joystick_scale())
 		save_settings()
+		_sweep()
+
+func set_text_size(size_str: String) -> void:
+	if size_str in ["small", "normal", "large"]:
+		text_size = size_str
+		_text_dirty = true
+		text_size_changed.emit(get_text_scale())
+		save_settings()
+		_sweep()
 
 func set_haptic_enabled(enabled: bool) -> void:
 	haptic_enabled = enabled
@@ -129,6 +144,12 @@ func get_joystick_scale() -> float:
 	match joystick_size:
 		"small": return 0.8
 		"large": return 1.25
+		_: return 1.0
+
+func get_text_scale() -> float:
+	match text_size:
+		"small": return 0.9
+		"large": return 1.15
 		_: return 1.0
 
 func vibrate(duration_ms: int = 40) -> void:
@@ -220,7 +241,8 @@ func save_settings() -> void:
 		"sfx_muted": sfx_muted,
 		"joystick_size": joystick_size,
 		"haptic_enabled": haptic_enabled,
-		"fps_limit": fps_limit
+		"fps_limit": fps_limit,
+		"text_size": text_size
 	}
 	var f = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f:
@@ -247,3 +269,93 @@ func load_settings() -> void:
 		if "joystick_size" in d: joystick_size = str(d["joystick_size"])
 		if "haptic_enabled" in d: haptic_enabled = bool(d["haptic_enabled"])
 		if "fps_limit" in d: fps_limit = int(d["fps_limit"])
+		if "text_size" in d and str(d["text_size"]) in ["small", "normal", "large"]: text_size = str(d["text_size"])
+
+# --- HOOK GLOBAL: SFX bus, getar tombol, ukuran analog, ukuran teks ---
+var _text_dirty: bool = false
+var _joy_dirty: bool = false
+var _joy_scene_id: int = 0
+const JOY_RADIUS_PROPS := { "dpad_radius": 55.0, "joystick_max_radius": 58.0, "joystick_max_dist": 65.0 }
+const TEXT_PROPS_BASIC := ["font_size"]
+const TEXT_PROPS_RICH := ["normal_font_size", "bold_font_size", "italics_font_size", "bold_italics_font_size", "mono_font_size"]
+
+func _setup_global_hooks() -> void:
+	get_tree().node_added.connect(_on_node_added)
+	var t = Timer.new()
+	t.wait_time = 0.25
+	t.autostart = true
+	t.timeout.connect(_sweep)
+	add_child(t)
+
+func _on_node_added(n: Node) -> void:
+	# Semua suara efek level dialihkan ke bus "SFX" agar slider Efek Suara berfungsi
+	if n is AudioStreamPlayer and n != bgm_player and n != sfx_player:
+		if (n as AudioStreamPlayer).bus == &"Master":
+			(n as AudioStreamPlayer).bus = &"SFX"
+	# Getar ringan pada setiap tombol (bila Getar Layar aktif)
+	elif n is BaseButton:
+		var b = n as BaseButton
+		if not b.pressed.is_connected(_on_button_tap):
+			b.pressed.connect(_on_button_tap)
+
+func _on_button_tap() -> void:
+	vibrate(18)
+
+func _sweep() -> void:
+	var tree = get_tree()
+	if tree == null or tree.current_scene == null:
+		return
+	var scene = tree.current_scene
+	var ts = get_text_scale()
+	var js = get_joystick_scale()
+	var scene_changed = (scene.get_instance_id() != _joy_scene_id)
+	_joy_scene_id = scene.get_instance_id()
+	var need_text = (ts != 1.0) or _text_dirty
+	var need_joy = (js != 1.0) or _joy_dirty or (scene_changed and js != 1.0)
+	if not need_text and not need_joy:
+		return
+	if need_joy:
+		for prop in JOY_RADIUS_PROPS:
+			if prop in scene:
+				scene.set(prop, float(JOY_RADIUS_PROPS[prop]) * js)
+	_walk(tree.root, ts, js, need_text, need_joy)
+	_text_dirty = false
+	_joy_dirty = false
+
+func _walk(n: Node, ts: float, js: float, do_text: bool, do_joy: bool) -> void:
+	if do_text and n is Control:
+		if n is RichTextLabel:
+			for p in TEXT_PROPS_RICH:
+				_scale_font(n, p, ts)
+		elif n is Label or n is Button or n is LineEdit:
+			_scale_font(n, "font_size", ts)
+	if do_joy and n is TextureRect:
+		var tr = n as TextureRect
+		if tr.texture and (tr.texture.resource_path.contains("joystick_circle_pad") or tr.texture.resource_path.contains("joystick_circle_nub")):
+			if not tr.has_meta("_joy_base_scale"):
+				tr.set_meta("_joy_base_scale", tr.scale)
+			var bs: Vector2 = tr.get_meta("_joy_base_scale")
+			tr.pivot_offset = tr.size / 2.0
+			tr.scale = bs * js
+	for c in n.get_children():
+		_walk(c, ts, js, do_text, do_joy)
+
+func _scale_font(n: Control, prop: String, s: float) -> void:
+	var key_b = "_fs_b_" + prop
+	var key_a = "_fs_a_" + prop
+	var cur = n.get_theme_font_size(prop)
+	if cur <= 0:
+		return
+	var base = cur
+	if n.has_meta(key_b):
+		base = int(n.get_meta(key_b))
+		# Kode level mengubah ukuran sendiri -> anggap itu ukuran dasar yang baru
+		if cur != int(n.get_meta(key_a)):
+			base = cur
+	elif s == 1.0:
+		return
+	var target = max(8, int(round(float(base) * s)))
+	n.set_meta(key_b, base)
+	n.set_meta(key_a, target)
+	if target != cur or not n.has_theme_font_size_override(prop):
+		n.add_theme_font_size_override(prop, target)

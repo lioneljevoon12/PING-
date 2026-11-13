@@ -1545,10 +1545,8 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 3.2", "text": "Cocokkan Subnet Mask dengan notasi CIDR yang benar (/24, /25, /26, /27) untuk tiap PC." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Papan Konfigurasi", "text": "Klik papan ini (atau tombol Cocokkan CIDR) untuk membuka tugas. Di pop up, seret kartu CIDR ke slot subnet mask yang cocok.", "target": whiteboard_container, "pointer": "both" },
 		{ "title": "2. Meja PC", "text": "Tiap PC punya subnet mask sendiri. Klik meja untuk membuka tugasnya juga.", "target": (func(): return TutorialOverlay.union_of([desk1_container, desk2_container])), "pointer": "arrow" },
 		{ "title": "3. Rak Subnet & Switch", "text": "Saat semua cocok, jalur kabel ke rak ini menyala hijau dan jaringan tersambung.", "target": rack_node, "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

@@ -90,9 +90,17 @@ func _on_settings_pressed() -> void:
 		elif settings_modal.has_method("open_settings"):
 			settings_modal.open_settings()
 	else:
-		# Check if parent or root has settings_modal
-		var p_settings = get_tree().current_scene.find_child("SettingsModal", true, false)
-		if p_settings and p_settings.has_method("open"):
+		# Cari modal pengaturan milik level; bila tidak ada, buat sendiri di dalam modal jeda
+		var p_settings: Node = null
+		if get_tree().current_scene:
+			p_settings = get_tree().current_scene.find_child("SettingsModal", true, false)
+		if p_settings == null:
+			p_settings = load("res://scenes/settings_modal.tscn").instantiate()
+			p_settings.name = "SettingsModal"
+			p_settings.z_index = 50
+			add_child(p_settings)
+		settings_modal = p_settings
+		if p_settings.has_method("open"):
 			p_settings.open()
 
 func _on_exit_pressed() -> void:

@@ -484,6 +484,50 @@ theme_override_fonts/font = ExtResource("6_font_bold")
 theme_override_font_sizes/font_size = 13
 text = "60 FPS (Lancar)"
 
+[node name="RowTextSize" type="HBoxContainer" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LblTextSize" type="Label" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem/RowTextSize"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.180392, 0.168627, 1)
+theme_override_fonts/font = ExtResource("6_font_bold")
+theme_override_font_sizes/font_size = 14
+text = "Ukuran Teks"
+
+[node name="TextHBox" type="HBoxContainer" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem/RowTextSize"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BtnTextSmall" type="Button" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem/RowTextSize/TextHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("6_font_bold")
+theme_override_font_sizes/font_size = 13
+text = "Kecil"
+
+[node name="BtnTextNormal" type="Button" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem/RowTextSize/TextHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(106, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("6_font_bold")
+theme_override_font_sizes/font_size = 13
+text = "Normal"
+
+[node name="BtnTextLarge" type="Button" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem/RowTextSize/TextHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_fonts/font = ExtResource("6_font_bold")
+theme_override_font_sizes/font_size = 13
+text = "Besar"
+
 [node name="InfoCard" type="PanelContainer" parent="CenterBox/ModalCard/VBox/ScrollContainer/ContentVBox/SecSystem"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_info_card")

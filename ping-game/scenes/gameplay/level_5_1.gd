@@ -271,15 +271,24 @@ func _setup_header_ui() -> void:
 func _update_hearts_ui() -> void:
 	HeartsStyle.refresh(hearts_rects, hearts)
 
+var pause_modal_node: Control = null
+var pause_prev_active: bool = false
+
 func _on_back_pressed() -> void:
-	_play_synth_sequence([350.0], 0.08)
-	get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+	_on_pause_pressed()
 
 func _on_pause_pressed() -> void:
 	_play_synth_sequence([500.0], 0.08)
-	var pause_modal = pause_modal_scene.instantiate()
-	pause_modal.z_index = 300
-	add_child(pause_modal)
+	if pause_modal_node and is_instance_valid(pause_modal_node) and pause_modal_node.visible:
+		return
+	pause_prev_active = is_game_active
+	is_game_active = false
+	if pause_modal_node == null or not is_instance_valid(pause_modal_node):
+		pause_modal_node = pause_modal_scene.instantiate()
+		pause_modal_node.z_index = 300
+		add_child(pause_modal_node)
+		pause_modal_node.resume_requested.connect(func(): is_game_active = pause_prev_active)
+	pause_modal_node.open()
 
 func _process_timer(delta: float) -> void:
 	timer_seconds -= delta
@@ -491,7 +500,7 @@ func _input(event: InputEvent) -> void:
 
 func _update_joystick(pos: Vector2) -> void:
 	var diff = pos - joystick_center
-	var max_r = 50.0
+	var max_r = 50.0 * SettingsManager.get_joystick_scale()
 	if diff.length() > max_r:
 		diff = diff.normalized() * max_r
 	joystick_vector = diff / max_r
@@ -1010,8 +1019,6 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 5.1", "text": "Susun ketujuh kartu lapisan OSI dari Lapisan 1 (Physical) sampai Lapisan 7 (Application)." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Rak Menara OSI", "text": "Dekati rak ini lalu klik untuk membuka tugas. Di pop up, tekan Klik Susun dan atur kartu dari Lapisan 1 di bawah sampai Lapisan 7 di atas.", "target": rack_hotspot, "pointer": "both" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

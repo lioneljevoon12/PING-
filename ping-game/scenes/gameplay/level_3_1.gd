@@ -1648,10 +1648,8 @@ func _start_after_tutorial() -> void:
 func _tutorial_steps() -> Array:
 	return [
 		{ "title": "Misi Level 3.1", "text": "Periksa PC yang bermasalah: pisahkan NET ID (alamat jaringan) dan HOST ID (alamat perangkat) dari sebuah alamat IP." },
-		TutorialOverlay.step_move(self),
 		{ "title": "1. Papan Materi", "text": "Klik papan ini untuk membaca materi. Contoh: 192.168.1.10/24 berarti NET ID 192.168.1 dan HOST ID 10.", "target": whiteboard_node, "pointer": "both" },
 		{ "title": "2. PC Bermasalah", "text": "PC bertanda merah bermasalah. Klik PC ini untuk membuka tugas pemeriksaan NET ID dan HOST ID.", "target": pc2_desk, "pointer": "both" },
 		{ "title": "3. Meja Teknisi", "text": "Meja utama juga bisa diklik untuk membuka tugas yang sama.", "target": meja_teknisi, "pointer": "hand" },
-		TutorialOverlay.step_hearts(self),
 		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
 	]

@@ -2,7 +2,7 @@ extends Control
 
 var sm: Node:
 	get:
-		return get_node_or_null("/root/sm")
+		return get_node_or_null("/root/SettingsManager")
 
 # Textures
 const TEX_SOUND_ON = preload("res://art/ui-ux/icons/icon_sound.svg")
@@ -32,6 +32,10 @@ const TEX_SOUND_OFF = preload("res://art/ui-ux/icons/icon_sound_off.svg")
 # System
 @onready var btn_fps_30: Button = %BtnFps30
 @onready var btn_fps_60: Button = %BtnFps60
+
+@onready var btn_text_small: Button = %BtnTextSmall
+@onready var btn_text_normal: Button = %BtnTextNormal
+@onready var btn_text_large: Button = %BtnTextLarge
 
 var is_animating: bool = false
 
@@ -101,6 +105,11 @@ func _connect_signals() -> void:
 	# Haptic Toggle
 	btn_haptic_toggle.pressed.connect(_on_haptic_toggled)
 	
+	# Ukuran teks
+	btn_text_small.pressed.connect(func(): _set_text_size("small"))
+	btn_text_normal.pressed.connect(func(): _set_text_size("normal"))
+	btn_text_large.pressed.connect(func(): _set_text_size("large"))
+	
 	# FPS Buttons
 	btn_fps_30.pressed.connect(func(): _set_fps(30))
 	btn_fps_60.pressed.connect(func(): _set_fps(60))
@@ -165,6 +174,9 @@ func _load_ui_values() -> void:
 	
 	# FPS
 	_update_fps_ui(sm.fps_limit)
+	
+	# Ukuran teks
+	_update_text_ui(sm.text_size)
 
 func _on_bgm_slider_changed(val: float) -> void:
 	bgm_value_label.text = "%d%%" % int(val)
@@ -228,6 +240,17 @@ func _on_haptic_toggled() -> void:
 func _update_haptic_ui(enabled: bool) -> void:
 	btn_haptic_toggle.text = "AKTIF" if enabled else "NONAKTIF"
 	_style_button(btn_haptic_toggle, enabled)
+
+func _set_text_size(size_str: String) -> void:
+	if sm:
+		sm.set_text_size(size_str)
+		sm.play_sfx(659.25, 0.05)
+	_update_text_ui(size_str)
+
+func _update_text_ui(selected_size: String) -> void:
+	_style_button(btn_text_small, selected_size == "small")
+	_style_button(btn_text_normal, selected_size == "normal")
+	_style_button(btn_text_large, selected_size == "large")
 
 func _set_fps(fps: int) -> void:
 	if sm:

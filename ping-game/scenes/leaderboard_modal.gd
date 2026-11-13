@@ -98,15 +98,15 @@ func _ready() -> void:
 func _update_header_title() -> void:
 	var title_lbl = get_node_or_null("%TitleLabel")
 	if title_lbl and title_lbl is Label:
-		title_lbl.text = "⭐ PERINGKAT & REKAP BINTANG LEVEL"
+		title_lbl.text = "⭐ REKAP PERFORMA LEVELMU"
 		
 	var pod_title = get_node_or_null("CardWrapper/MainVBox/ContentSplitHBox/LeftPodiumVBox/PodiumTitle")
 	if pod_title and pod_title is Label:
-		pod_title.text = "📊 STATISTIK TEKNISI"
+		pod_title.text = "📊 RINGKASAN PERFORMA"
 		
 	var list_title = get_node_or_null("CardWrapper/MainVBox/ContentSplitHBox/RightListVBox/ListTitle")
 	if list_title and list_title is Label:
-		list_title.text = "📋 BINTANG TERTINGGI PER LEVEL (OFFLINE)"
+		list_title.text = "📋 CAPAIAN BINTANG TIAP LEVEL"
 
 func _build_close_button() -> void:
 	for c in close_btn_slot.get_children():
@@ -308,9 +308,9 @@ func _render_leaderboard() -> void:
 	breakdown_grid.add_theme_constant_override("separation", 5)
 	
 	var rank_items = [
-		{ "badge": "🥇 Peringkat 1 (Sempurna)", "sub": "3 Bintang ⭐⭐⭐", "count": stats["rank1_perfect"], "bg": Color("#fef9c3"), "border": Color("#ca8a04"), "col": Color("#854d0e") },
-		{ "badge": "🥈 Peringkat 2 (Baik)", "sub": "2 Bintang ⭐⭐", "count": stats["rank2_good"], "bg": Color("#f1f5f9"), "border": Color("#94a3b8"), "col": Color("#334155") },
-		{ "badge": "🥉 Peringkat 3 (Cukup)", "sub": "1 Bintang ⭐", "count": stats["rank3_passed"], "bg": Color("#ffedd5"), "border": Color("#ea580c"), "col": Color("#9a3412") },
+		{ "badge": "🥇 Sempurna", "sub": "3 Bintang ⭐⭐⭐", "count": stats["rank1_perfect"], "bg": Color("#fef9c3"), "border": Color("#ca8a04"), "col": Color("#854d0e") },
+		{ "badge": "🥈 Baik", "sub": "2 Bintang ⭐⭐", "count": stats["rank2_good"], "bg": Color("#f1f5f9"), "border": Color("#94a3b8"), "col": Color("#334155") },
+		{ "badge": "🥉 Cukup", "sub": "1 Bintang ⭐", "count": stats["rank3_passed"], "bg": Color("#ffedd5"), "border": Color("#ea580c"), "col": Color("#9a3412") },
 		{ "badge": "🔒 Terkunci / Belum", "sub": "Selesaikan level sebelumnya", "count": stats["locked"] + stats["unlocked_unplayed"], "bg": Color("#f8fafc"), "border": Color("#cbd5e1"), "col": Color("#64748b") }
 	]
 	
@@ -529,13 +529,13 @@ func _create_level_rank_card(stage_num: int, lvl: Dictionary, is_unlocked: bool,
 		rank_badge.text = "🔒 TERKUNCI"
 		rank_badge.add_theme_color_override("font_color", Color("#94a3b8"))
 	elif stars >= 3:
-		rank_badge.text = "🥇 PERINGKAT 1"
+		rank_badge.text = "🥇 SEMPURNA"
 		rank_badge.add_theme_color_override("font_color", Color("#ca8a04"))
 	elif stars == 2:
-		rank_badge.text = "🥈 PERINGKAT 2"
+		rank_badge.text = "🥈 BAIK"
 		rank_badge.add_theme_color_override("font_color", Color("#475569"))
 	elif stars == 1:
-		rank_badge.text = "🥉 PERINGKAT 3"
+		rank_badge.text = "🥉 CUKUP"
 		rank_badge.add_theme_color_override("font_color", Color("#ea580c"))
 	else:
 		rank_badge.text = "⏳ BELUM DIKERJAKAN"
@@ -584,7 +584,7 @@ func _render_player_sticky_row(player_stars: int, max_stars: int) -> void:
 	hb.add_child(save_icon)
 	
 	var save_lbl = Label.new()
-	save_lbl.text = "Data peringkat dan perolehan bintang tersimpan otomatis secara Offline (Lokal) di perangkat ini."
+	save_lbl.text = "Ini catatan performamu sendiri: bintang terbaik tiap level, tersimpan otomatis di perangkat ini."
 	save_lbl.add_theme_font_override("font", font_bold)
 	save_lbl.add_theme_font_size_override("font_size", 12)
 	save_lbl.add_theme_color_override("font_color", Color("#7c2d12"))

@@ -4,8 +4,8 @@
 [ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Black.ttf" id="2_font_black"]
 [ext_resource type="FontFile" path="res://art/assets/PING! Assets/Fonts/Nunito-Bold.ttf" id="3_font_bold"]
 [ext_resource type="Texture2D" path="res://art/ui-ux/dashboard/bg_dashboard.png" id="4_bg"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_icon_bukupanduan.png" id="5_book"]
-[ext_resource type="Texture2D" path="res://art/ui-ux/icons/figma_icon_modelatihan.png" id="6_latihan"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_book_new.png" id="5_book"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/icons/icon_practice_new.png" id="6_latihan"]
 [ext_resource type="PackedScene" path="res://scenes/guidebook.tscn" id="7_guidebook"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back"]

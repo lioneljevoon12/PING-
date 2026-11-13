@@ -618,6 +618,8 @@ func _build_tutorial_modal() -> void:
 	var card = PanelContainer.new()
 	card.custom_minimum_size = Vector2(880, 520)
 	card.set_anchors_preset(Control.PRESET_CENTER)
+	card.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	card.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var sb_c = StyleBoxFlat.new()
 	sb_c.bg_color = Color("#fffdf9")
 	sb_c.border_color = Color("#4a2e2b")
@@ -759,6 +761,8 @@ func _build_completion_modal() -> void:
 	var card = PanelContainer.new()
 	card.custom_minimum_size = Vector2(620, 460)
 	card.set_anchors_preset(Control.PRESET_CENTER)
+	card.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	card.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var sb_c = StyleBoxFlat.new()
 	sb_c.bg_color = Color("#fffdf9")
 	sb_c.border_color = Color("#10b981")
@@ -935,7 +939,7 @@ func _handle_joystick_input(event: InputEvent) -> void:
 func _update_joystick(touch_pos: Vector2) -> void:
 	var center = joystick_base.size / 2.0
 	var offset = touch_pos - center
-	var max_dist = 50.0
+	var max_dist = 50.0 * SettingsManager.get_joystick_scale()
 	if offset.length() > max_dist:
 		offset = offset.normalized() * max_dist
 	joystick_nub.position = center + offset - joystick_nub.size / 2.0
