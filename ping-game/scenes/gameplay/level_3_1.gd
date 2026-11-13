@@ -137,9 +137,14 @@ var verify_button: Button
 var dragging_card_id: String = ""
 var drag_touch_id: int = -1
 var drag_offset: Vector2 = Vector2.ZERO
+var drag_origin_pos: Vector2 = Vector2.ZERO
+var drag_origin_scale: Vector2 = Vector2.ONE
+var drag_press_global: Vector2 = Vector2.ZERO
+var drag_moved: bool = false
 var drag_start_pos: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	_setup_floor_carpet()
 	_load_character_frames()
 	_setup_character()
@@ -240,12 +245,17 @@ func _setup_character() -> void:
 	
 	char_sprite = TextureRect.new()
 	char_sprite.name = "CharSprite"
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	char_sprite.custom_minimum_size = Vector2(300, 165)
+	char_sprite.size = Vector2(300, 165)
+	char_sprite.position = Vector2(-80, -37)
 	char_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	character_node.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	char_pos = character_node.position
 
@@ -285,9 +295,6 @@ func _setup_stations() -> void:
 	meja_teknisi.add_child(meja_placed_host)
 	
 	# Pill label on Meja: "MEJA TEKNISI UTAMA"
-	var meja_pill = _create_pill("MEJA TEKNISI UTAMA", Color("#593e38"), Color("#fef3c7"), Color("#d97706"))
-	meja_pill.position = Vector2(150, 182)
-	meja_teknisi.add_child(meja_pill)
 	
 	# Click button for Meja Teknisi
 	var meja_btn = Button.new()
@@ -400,38 +407,39 @@ func _draw_pc2_alert_circle() -> void:
 func _setup_cables() -> void:
 	cables_container.draw.connect(_draw_cables)
 
+func _prect(n: Control) -> Rect2:
+	return Rect2(n.position, n.size * n.scale)
+
 func _draw_cables() -> void:
 	var green_c = Color("#22c55e")
 	var red_c = Color("#ef4444")
+	var rk = _prect(left_rack)
+	var mj = _prect(meja_teknisi)
+	var r1 = _prect(pc1_desk)
+	var r2 = _prect(pc2_desk)
 	
 	# Line 1: Rak Jaringan ke Meja Teknisi (Solid Green)
-	var pts_meja = PackedVector2Array([
-		Vector2(290, 390),
-		Vector2(560, 390),
-		Vector2(560, 360),
-		Vector2(860, 360)
-	])
+	var m_sy = rk.position.y + rk.size.y * 0.35
+	var m_ey = mj.position.y + mj.size.y * 0.40
+	var m_mx = (rk.end.x + mj.position.x) * 0.5
+	var pts_meja = PackedVector2Array([Vector2(rk.end.x, m_sy), Vector2(m_mx, m_sy), Vector2(m_mx, m_ey), Vector2(mj.position.x, m_ey)])
 	# Dark border for cable
 	cables_container.draw_polyline(pts_meja, Color(0.1, 0.1, 0.1, 0.6), 10.0, true)
 	cables_container.draw_polyline(pts_meja, green_c, 6.0, true)
 	
 	# Line 2: Rak Jaringan ke PC 1 (Solid Green)
-	var pts_pc1 = PackedVector2Array([
-		Vector2(240, 560),
-		Vector2(240, 620),
-		Vector2(460, 620)
-	])
+	var c1_x = rk.position.x + rk.size.x * 0.73
+	var c1_y = r1.position.y + r1.size.y * 0.78
+	var pts_pc1 = PackedVector2Array([Vector2(c1_x, rk.end.y - 24.0), Vector2(c1_x, c1_y), Vector2(r1.position.x, c1_y)])
 	cables_container.draw_polyline(pts_pc1, Color(0.1, 0.1, 0.1, 0.6), 10.0, true)
 	cables_container.draw_polyline(pts_pc1, green_c, 6.0, true)
 	
 	# Line 3: Meja Teknisi ke PC 2
 	# In GAGAL: Red dashed/striped
 	# In SUKSES: Solid Green
-	var pts_pc2 = PackedVector2Array([
-		Vector2(1100, 470),
-		Vector2(1100, 620),
-		Vector2(1210, 620)
-	])
+	var c2_x = mj.position.x + mj.size.x * 0.5
+	var c2_y = r2.position.y + r2.size.y * 0.78
+	var pts_pc2 = PackedVector2Array([Vector2(c2_x, mj.end.y - 8.0), Vector2(c2_x, c2_y), Vector2(r2.position.x, c2_y)])
 	if is_completed:
 		cables_container.draw_polyline(pts_pc2, Color(0.1, 0.1, 0.1, 0.6), 10.0, true)
 		cables_container.draw_polyline(pts_pc2, green_c, 6.0, true)
@@ -518,6 +526,7 @@ func _setup_header_ui() -> void:
 		h_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		hearts_container.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		HeartsStyle.schedule_normalize(hearts_rects)
 	hearts_panel.add_child(hearts_container)
 	left_box.add_child(hearts_panel)
 	
@@ -727,7 +736,7 @@ func _on_mulai_pressed() -> void:
 	tw.finished.connect(func():
 		intro_modal.visible = false
 		is_modal_open = false
-		is_game_active = true
+		_start_after_tutorial()
 	)
 
 func _setup_task_modal() -> void:
@@ -805,6 +814,7 @@ func _setup_task_modal() -> void:
 	dnet_bg.texture = tex_drop_netid
 	dnet_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dropzone_net_node.add_child(dnet_bg)
+	slot_cover_net = _make_slot_cover(dropzone_net_node, Rect2(22, 60, 366, 84), Color("#ffffff"))
 	
 	var dnet_click = Button.new()
 	dnet_click.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -828,6 +838,7 @@ func _setup_task_modal() -> void:
 	dhost_bg.texture = tex_drop_hostid
 	dhost_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dropzone_host_node.add_child(dhost_bg)
+	slot_cover_host = _make_slot_cover(dropzone_host_node, Rect2(22, 60, 366, 84), Color("#ffffff"))
 	
 	var dhost_click = Button.new()
 	dhost_click.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -880,6 +891,38 @@ func _setup_task_modal() -> void:
 	verify_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	verify_button.pressed.connect(_on_verify_pressed)
 	win_container.add_child(verify_button)
+
+	# Geser konten ke bawah agar tidak menimpa header jendela
+	for ch in win_container.get_children():
+		if ch == win_bg or ch == close_btn:
+			continue
+		ch.position.y += 16.0
+	for cid in card_nodes:
+		card_nodes[cid]["initial_pos"].y += 16.0
+
+
+# Penutup opak di atas teks petunjuk bawaan tekstur dropzone agar tidak tertimpa kartu
+func _make_slot_cover(parent: Control, rect: Rect2, col: Color) -> Panel:
+	var p = Panel.new()
+	p.position = rect.position
+	p.size = rect.size
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = col
+	sb.set_corner_radius_all(12)
+	p.add_theme_stylebox_override("panel", sb)
+	p.visible = false
+	parent.add_child(p)
+	return p
+
+var slot_cover_net: Panel
+var slot_cover_host: Panel
+
+func _refresh_slot_covers() -> void:
+	if slot_cover_net:
+		slot_cover_net.visible = (slot_netid != "")
+	if slot_cover_host:
+		slot_cover_host.visible = (slot_hostid != "")
 
 func _create_draggable_card(id: String, tex: Texture2D, initial_pos: Vector2, parent: Control) -> void:
 	var card_root = Control.new()
@@ -938,11 +981,11 @@ func _on_card_gui_input(id: String, event: InputEvent) -> void:
 		if st.pressed:
 			if drag_touch_id == -1:
 				drag_touch_id = st.index
-				_start_card_drag(id, st.position)
+				_start_card_drag(id, _card_event_global(id, st.position))
 		else:
 			if drag_touch_id == st.index:
 				drag_touch_id = -1
-				_end_card_drag(id, st.position)
+				_end_card_drag(id, _card_event_global(id, st.position))
 	elif event is InputEventMouseMotion:
 		var mm = event as InputEventMouseMotion
 		if dragging_card_id == id:
@@ -950,25 +993,41 @@ func _on_card_gui_input(id: String, event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		var sd = event as InputEventScreenDrag
 		if dragging_card_id == id and drag_touch_id == sd.index:
-			_update_card_drag(id, sd.position)
+			_update_card_drag(id, _card_event_global(id, sd.position))
+
+func _card_to_parent_local(node: Control, global_pos: Vector2) -> Vector2:
+	var par = node.get_parent() as Control
+	if par == null:
+		return global_pos
+	return par.get_global_transform().affine_inverse() * global_pos
+
+# Posisi event sentuh pada gui_input bersifat lokal terhadap kartu -> ubah ke koordinat global
+func _card_event_global(id: String, local_pos: Vector2) -> Vector2:
+	var node = card_nodes[id]["root"] as Control
+	return node.get_global_transform() * local_pos
 
 func _start_card_drag(id: String, global_pos: Vector2) -> void:
+	if dragging_card_id != "":
+		return
 	dragging_card_id = id
 	var node = card_nodes[id]["root"] as Control
-	drag_start_pos = node.position
-	drag_offset = node.global_position - global_pos
+	drag_origin_pos = node.position
+	drag_origin_scale = node.scale
+	drag_press_global = global_pos
+	drag_moved = false
+	drag_offset = node.position - _card_to_parent_local(node, global_pos)
 	node.z_index = 50
-	node.scale = Vector2(1.08, 1.08)
+	node.scale = Vector2(1.06, 1.06)
 	_play_synth_sequence([440.0], 0.05)
-	
-	# Also toggle tap selection
-	_toggle_card_selection(id)
 
 func _update_card_drag(id: String, global_pos: Vector2) -> void:
+	if dragging_card_id != id:
+		return
 	var node = card_nodes[id]["root"] as Control
-	var win_container = task_modal.get_node("WinContainer") as Control
-	var local_pos = win_container.get_local_mouse_position() + drag_offset
-	node.position = local_pos
+	if not drag_moved and global_pos.distance_to(drag_press_global) > 8.0:
+		drag_moved = true
+	if drag_moved:
+		node.position = _card_to_parent_local(node, global_pos) + drag_offset
 
 func _end_card_drag(id: String, global_pos: Vector2) -> void:
 	if dragging_card_id != id:
@@ -976,6 +1035,16 @@ func _end_card_drag(id: String, global_pos: Vector2) -> void:
 	dragging_card_id = ""
 	var node = card_nodes[id]["root"] as Control
 	node.z_index = 10
+	if not drag_moved:
+		# Ketukan biasa (tanpa geser): kartu tetap di tempatnya, hanya pilih / batal pilih
+		node.position = drag_origin_pos
+		node.scale = drag_origin_scale
+		_toggle_card_selection(id)
+		return
+	# Geser sungguhan: seleksi ketuk dibersihkan agar tidak "menempel"
+	if selected_card_id != "" and selected_card_id in card_nodes:
+		card_nodes[selected_card_id]["highlight"].visible = false
+	selected_card_id = ""
 	node.scale = Vector2(1.0, 1.0)
 	
 	var drop_rect_net = Rect2(dropzone_net_node.position, dropzone_net_node.size)
@@ -1031,13 +1100,14 @@ func _place_card_in_slot(id: String, slot: String) -> void:
 	# Target position inside drop zone (centered at dropzone bottom half)
 	var target_pos = Vector2.ZERO
 	if slot == "netid":
-		target_pos = dropzone_net_node.position + Vector2((dropzone_net_node.size.x - 260) / 2.0, 85)
+		target_pos = dropzone_net_node.position + Vector2((dropzone_net_node.size.x - 260) / 2.0, 66)
 	else:
-		target_pos = dropzone_host_node.position + Vector2((dropzone_host_node.size.x - 260) / 2.0, 85)
+		target_pos = dropzone_host_node.position + Vector2((dropzone_host_node.size.x - 260) / 2.0, 66)
 		
 	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(card_nodes[id]["root"], "position", target_pos, 0.2)
 	_play_synth_sequence([587.33, 880.0], 0.06)
+	_refresh_slot_covers()
 
 func _return_card_to_tray(id: String) -> void:
 	if slot_netid == id:
@@ -1050,6 +1120,7 @@ func _return_card_to_tray(id: String) -> void:
 	var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(card_nodes[id]["root"], "position", card_nodes[id]["initial_pos"], 0.22)
 	_play_synth_sequence([440.0, 330.0], 0.05)
+	_refresh_slot_covers()
 
 func _on_verify_pressed() -> void:
 	if slot_netid == "" or slot_hostid == "":
@@ -1205,11 +1276,7 @@ func _game_over(custom_reason: String = "") -> void:
 	)
 
 func _update_hearts_ui() -> void:
-	for i in range(3):
-		if i < hearts:
-			hearts_rects[i].modulate = Color(1, 1, 1, 1)
-		else:
-			hearts_rects[i].modulate = Color(0.3, 0.3, 0.3, 0.4)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _open_task_modal() -> void:
 	if is_modal_open:
@@ -1426,13 +1493,13 @@ func _handle_movement(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 		walk_frame_index = 0.0
 
 func _check_station_proximity() -> void:
 	var char_center = character_node.position + character_node.size / 2.0
-	var meja_center = meja_teknisi.position + meja_teknisi.size / 2.0
-	var pc2_center = pc2_desk.position + pc2_desk.size / 2.0
+	var meja_center = _prect(meja_teknisi).get_center()
+	var pc2_center = _prect(pc2_desk).get_center()
 	
 	var dist_meja = char_center.distance_to(meja_center)
 	var dist_pc2 = char_center.distance_to(pc2_center)
@@ -1447,8 +1514,10 @@ func _check_station_proximity() -> void:
 	else:
 		pc2_prompt_pill.visible = false
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not is_game_active:
+		return
+	if task_modal and task_modal.visible:
 		return
 		
 	# Mobile Joystick Input Processing
@@ -1557,3 +1626,32 @@ func _play_synth_sequence(freqs: Array, step_time: float) -> void:
 			var env = 1.0 - (float(i) / float(n_frames)) * 0.5
 			var s = sin(TAU * f * t) * 0.22 * env
 			playback.push_frame(Vector2(s, s))
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 3.1", "text": "Periksa PC yang bermasalah: pisahkan NET ID (alamat jaringan) dan HOST ID (alamat perangkat) dari sebuah alamat IP." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Papan Materi", "text": "Klik papan ini untuk membaca materi. Contoh: 192.168.1.10/24 berarti NET ID 192.168.1 dan HOST ID 10.", "target": whiteboard_node, "pointer": "both" },
+		{ "title": "2. PC Bermasalah", "text": "PC bertanda merah bermasalah. Klik PC ini untuk membuka tugas pemeriksaan NET ID dan HOST ID.", "target": pc2_desk, "pointer": "both" },
+		{ "title": "3. Meja Teknisi", "text": "Meja utama juga bisa diklik untuk membuka tugas yang sama.", "target": meja_teknisi, "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

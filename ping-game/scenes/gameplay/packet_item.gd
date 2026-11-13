@@ -186,34 +186,37 @@ func animate_shake_error() -> void:
 	await tw.finished
 	is_locked = false
 
+var tracking: bool = false
+
 func _gui_input(event: InputEvent) -> void:
 	if is_locked:
 		return
-		
-	# Mouse Button input
+
+	# Mouse
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				_start_drag_tracking(event.global_position)
 			else:
 				_end_drag_tracking(event.global_position)
-				
-	# Mouse Motion input
 	elif event is InputEventMouseMotion:
 		_process_motion(event.global_position)
-		
-	# Touch input (Mobile)
+
+	# Sentuh (HP). Posisi event sentuh pada _gui_input bersifat LOKAL terhadap kartu,
+	# jadi harus diubah ke koordinat global agar tidak bentrok dengan event mouse hasil emulasi.
 	elif event is InputEventScreenTouch:
+		var gp = get_global_transform() * event.position
 		if event.pressed:
-			_start_drag_tracking(event.position)
+			_start_drag_tracking(gp)
 		else:
-			_end_drag_tracking(event.position)
-			
-	# Screen Drag input (Mobile)
+			_end_drag_tracking(gp)
 	elif event is InputEventScreenDrag:
-		_process_motion(event.position)
+		_process_motion(get_global_transform() * event.position)
 
 func _start_drag_tracking(click_pos: Vector2) -> void:
+	if tracking:
+		return
+	tracking = true
 	drag_start_mouse_pos = click_pos
 	drag_offset = click_pos - global_position
 	has_moved = false
@@ -221,13 +224,15 @@ func _start_drag_tracking(click_pos: Vector2) -> void:
 	save_home_position()
 
 func _process_motion(current_pos: Vector2) -> void:
+	if not tracking:
+		return
 	if not has_moved and current_pos.distance_to(drag_start_mouse_pos) > 10.0:
 		has_moved = true
 		is_dragging = true
 		z_index = 100
 		_apply_style(style_dragging)
 		drag_started.emit(self)
-		
+
 	if is_dragging:
 		var target_pos = current_pos - drag_offset
 		var vp_sz = get_viewport_rect().size
@@ -236,6 +241,9 @@ func _process_motion(current_pos: Vector2) -> void:
 		global_position = target_pos
 
 func _end_drag_tracking(release_pos: Vector2) -> void:
+	if not tracking:
+		return
+	tracking = false
 	if is_dragging:
 		is_dragging = false
 		drag_ended.emit(self, release_pos)

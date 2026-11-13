@@ -152,6 +152,7 @@ var topo_envelope_icon: TextureRect = null
 var flying_envelopes: Array[TextureRect] = []
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	_load_dynamic_assets()
 	_setup_character()
 	_build_room_decorations()
@@ -249,7 +250,7 @@ func _handle_movement(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 		walk_frame_index = 0.0
 
 func _is_room_collision(pos: Vector2) -> bool:
@@ -336,8 +337,8 @@ func _load_dynamic_assets() -> void:
 	tex_panel = _safe_load_texture("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/straight.png")
 	tex_cable = _safe_load_texture("res://art/assets/scattered/kabel_utp-removebg-preview.png")
 	
-	for i in range(1, 9):
-		var p = "res://art/assets/PING! Assets/Sprite animation/router/%d.png" % i
+	for i in range(1, 33):
+		var p = "res://art/assets/PING! Assets/Sprite animation/router walk/%d.png" % i
 		var tex = _safe_load_texture(p)
 		if tex:
 			walk_frames.append(tex)
@@ -351,11 +352,16 @@ func _setup_character() -> void:
 	
 	char_sprite = TextureRect.new()
 	char_sprite.name = "CharSprite"
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	char_sprite.custom_minimum_size = Vector2(320, 176)
+	char_sprite.size = Vector2(320, 176)
+	char_sprite.position = Vector2(-50, -28)
 	character_node.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	char_pos = character_node.position
 
@@ -632,6 +638,7 @@ func _build_header_ui() -> void:
 		hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
 		h_box.add_child(hr)
 		hearts_rects.append(hr)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var bl = Label.new()
 		bl.text = "✕"
@@ -1076,7 +1083,7 @@ func _close_intro_modal() -> void:
 	await tw.finished
 	intro_modal.visible = false
 	is_modal_open = false
-	is_game_active = true
+	_start_after_tutorial()
 	_play_chime_sound()
 
 # --- POP UP 2.3 (3-TAHAP INTERACTIVE MODAL) ---
@@ -1453,7 +1460,7 @@ func _render_success_view() -> void:
 	next_btn.custom_minimum_size = Vector2(180, 36)
 	_style_action_btn(next_btn, Color("#a7f3d0"), Color("#059669"), Color("#065f46"))
 	next_btn.pressed.connect(func():
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_4.tscn")
 	)
 	btn_row.add_child(next_btn)
 	
@@ -2091,21 +2098,7 @@ func _handle_penalty(err_msg: String) -> void:
 		_trigger_game_over("Nyawa teknisi habis! Pelajari kembali mekanisme Broadcast ARP-Request.")
 
 func _update_hearts_display(is_damage: bool = false) -> void:
-	if not hearts_container:
-		return
-	for i in range(hearts_rects.size()):
-		var hr = hearts_rects[i]
-		var bl = broken_labels[i]
-		if i < hearts:
-			hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-			bl.visible = false
-		else:
-			hr.modulate = Color(0.4, 0.4, 0.4, 0.5)
-			bl.visible = true
-			if is_damage and i == hearts:
-				var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-				bl.scale = Vector2(1.5, 1.5)
-				tw.tween_property(bl, "scale", Vector2.ONE, 0.25)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _shake_screen() -> void:
 	var tw = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -2432,3 +2425,33 @@ static func _safe_load_texture(path: String) -> Texture2D:
 		if img and not img.is_empty():
 			return ImageTexture.create_from_image(img)
 	return null
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 2.3", "text": "PC 1 ingin mengirim data ke 192.168.1.50 tapi belum tahu MAC Address-nya. Bantu kirim ARP-Request lewat broadcast!" },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. PC Pengirim", "text": "PC 1 sudah tahu IP tujuan, tapi belum tahu MAC Address-nya.", "target": pc1_desk, "pointer": "hand" },
+		{ "title": "2. Kawal ARP-Request", "text": "Dekati perangkat di tengah lalu klik tombol Kawal agar paket ARP-Request disiarkan (broadcast) ke seluruh jaringan LAN.", "target": center_desk, "pointer": "both" },
+		{ "title": "3. PC Penerima", "text": "Semua PC menerima broadcast, tapi hanya pemilik IP 192.168.1.50 (bertanda bintang) yang akan membalas.", "target": (func(): return TutorialOverlay.union_of([pc2_desk, pc3_desk, pc4_desk])), "pointer": "arrow" },
+		{ "title": "4. Papan Referensi", "text": "Papan ini berisi ringkasan kelas alamat IPv4 dan cara kerja ARP. Lihat bila lupa.", "target": whiteboard_node, "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

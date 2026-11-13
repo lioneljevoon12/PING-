@@ -150,6 +150,7 @@ var rj45_pin_badges: Array[PanelContainer] = []
 var tray_card_nodes: Array[PanelContainer] = []
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	settings_modal = preload("res://scenes/settings_modal.tscn").instantiate()
 	add_child(settings_modal)
 	_load_walk_frames()
@@ -280,7 +281,7 @@ func _handle_character_movement(delta: float) -> void:
 			_play_footstep()
 	else:
 		walk_anim_time = 0.0
-		char_sprite.texture = tex_char_idle
+		char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 		char_sprite.flip_h = not char_facing_right
 
 func _is_room_collision(pos: Vector2, center_x: float) -> bool:
@@ -472,10 +473,14 @@ func _build_character() -> void:
 	char_sprite.name = "CharSprite"
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.custom_minimum_size = Vector2(256, 144)
-	char_sprite.size = Vector2(256, 144)
-	char_sprite.texture = tex_char_idle
+	char_sprite.custom_minimum_size = Vector2(340, 191)
+	char_sprite.size = Vector2(340, 191)
+	char_sprite.position = Vector2(-42, -24)
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	character_mascot.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 
 func _build_header_ui() -> void:
 	header_ui = Control.new()
@@ -542,6 +547,7 @@ func _build_header_ui() -> void:
 		h_rect.modulate = Color(1.0, 0.28, 0.4, 1.0)
 		slot.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var b_lbl = Label.new()
 		b_lbl.text = "✕"
@@ -673,32 +679,7 @@ func _build_header_ui() -> void:
 	header_ui.add_child(pause_btn)
 
 func _update_hearts_display(is_damage_event: bool = false) -> void:
-	for idx in range(hearts_rects.size()):
-		var hr = hearts_rects[idx]
-		var bl = broken_labels[idx] if idx < broken_labels.size() else null
-		if hr:
-			if idx < hearts:
-				hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-				hr.scale = Vector2.ONE
-				if bl: bl.visible = false
-			else:
-				if is_damage_event and idx == hearts:
-					hr.modulate = Color(1.0, 0.1, 0.1, 1.0)
-					var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-					tw.tween_property(hr, "scale", Vector2(1.25, 1.25), 0.1)
-					tw.tween_property(hr, "scale", Vector2(0.85, 0.85), 0.15)
-					tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 0.0
-						var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-						tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
-				else:
-					hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
-					hr.scale = Vector2(0.85, 0.85)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 1.0
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _build_mobile_controls() -> void:
 	joystick_zone = Control.new()
@@ -895,7 +876,7 @@ func _build_intro_modal() -> void:
 
 func _start_gameplay() -> void:
 	intro_modal.visible = false
-	is_game_active = true
+	_start_after_tutorial()
 	_play_sweep(523.25, 783.99, 0.1, 0.2)
 	show_toast("Dekati Meja Kerja dan tekan 'Urutkan Kabel' untuk merakit kabel!")
 
@@ -1276,11 +1257,11 @@ func _build_crimping_modal() -> void:
 			elif ev is InputEventScreenTouch:
 				var st = ev as InputEventScreenTouch
 				if st.pressed and pin_slots[slot_idx] != null:
-					_start_wire_drag(pin_slots[slot_idx], slot_idx, st.position)
+					_start_wire_drag(pin_slots[slot_idx], slot_idx, ch_ctrl.get_global_transform() * st.position)
 				elif not st.pressed:
-					_end_wire_drag(st.position)
+					_end_wire_drag(ch_ctrl.get_global_transform() * st.position)
 			elif ev is InputEventScreenDrag:
-				_process_wire_drag((ev as InputEventScreenDrag).position)
+				_process_wire_drag(ch_ctrl.get_global_transform() * (ev as InputEventScreenDrag).position)
 		)
 	
 	var housing_rect = TextureRect.new()
@@ -1576,11 +1557,11 @@ func _populate_tray_wires(shuffle_list: bool = true) -> void:
 			elif ev is InputEventScreenTouch:
 				var st = ev as InputEventScreenTouch
 				if st.pressed:
-					_start_wire_drag(wire_data, -1, st.position)
+					_start_wire_drag(wire_data, -1, wire_card.get_global_transform() * st.position)
 				else:
-					_end_wire_drag(st.position)
+					_end_wire_drag(wire_card.get_global_transform() * st.position)
 			elif ev is InputEventScreenDrag:
-				_process_wire_drag((ev as InputEventScreenDrag).position)
+				_process_wire_drag(wire_card.get_global_transform() * (ev as InputEventScreenDrag).position)
 		)
 		_setup_hover_scale(wire_card, 1.08)
 		grid_wires_container.add_child(wire_card)
@@ -1613,6 +1594,8 @@ func _update_drag_ghost_visual(wire: Dictionary) -> void:
 	drag_ghost.add_child(tr)
 
 func _start_wire_drag(wire: Dictionary, from_slot: int, global_pos: Vector2) -> void:
+	if not dragged_wire.is_empty():
+		return # sudah ada sentuhan/klik yang sedang berjalan (event mouse + sentuh ganda)
 	dragged_wire = wire
 	drag_from_slot_idx = from_slot
 	drag_start_global = global_pos
@@ -2015,3 +1998,34 @@ func _play_footstep() -> void:
 			var env = 1.0 - (float(i) / float(num_samples))
 			var noise = (randf() * 2.0 - 1.0) * env * 0.08
 			pb.push_frame(Vector2(noise, noise))
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 1.2", "text": "Rakit kabel UTP dengan urutan pin warna standar TIA/EIA 568A atau 568B sebelum waktu habis." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Meja Kerja", "text": "Dekati meja ini lalu tekan Urutkan Kabel untuk membuka panel perakitan pin warna.", "target": cable_table_node, "pointer": "both" },
+		{ "title": "2. Tombol AKSI", "text": "Tombol ini melakukan aksi pada objek terdekat, misalnya membuka perakitan di meja atau menyimpan kabel ke rak.", "target": action_btn_node, "pointer": "hand" },
+		{ "title": "3. Panduan Pin", "text": "Lupa urutan warna pin 568A/568B? Buka Panduan Pin di sini kapan saja.", "target": header_ui.get_node_or_null("GuidebookTopBtn"), "pointer": "hand" },
+		{ "title": "4. Rak Cross", "text": "Kabel Cross (urutan pin kedua ujung berbeda) disimpan di rak sebelah kiri ini.", "target": left_rack_node, "pointer": "hand" },
+		{ "title": "5. Rak Straight", "text": "Kabel Straight (urutan pin sama di kedua ujung) disimpan di rak sebelah kanan ini.", "target": right_rack_node, "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

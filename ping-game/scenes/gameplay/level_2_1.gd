@@ -160,6 +160,7 @@ func _ready() -> void:
 	_build_win_gameover_modals()
 	_build_toast_ui()
 	
+	help_btn = TutorialOverlay.make_help_button(header_ui, Vector2(0, 20), _on_help_pressed)
 	_reposition_responsive()
 	get_viewport().size_changed.connect(_reposition_responsive)
 	
@@ -247,7 +248,7 @@ func _process(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 			
 	_update_proximity_prompts()
 
@@ -551,11 +552,16 @@ func _build_character() -> void:
 	character_node.size = Vector2(220, 120)
 	character_node.pivot_offset = Vector2(110, 60)
 	char_sprite = TextureRect.new()
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	char_sprite.custom_minimum_size = Vector2(320, 176)
+	char_sprite.size = Vector2(320, 176)
+	char_sprite.position = Vector2(-50, -28)
 	character_node.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	char_pos = character_node.position
 
@@ -700,6 +706,7 @@ func _build_header_ui() -> void:
 		h_rect.pivot_offset = Vector2(17, 15)
 		slot.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var b_lbl = Label.new()
 		b_lbl.text = "✕"
@@ -994,6 +1001,10 @@ func _on_packet_drag_started(item: Control) -> void:
 	_play_tone(659.25, 0.08, 0.15)
 
 func _on_packet_drag_ended(item: Control, global_drop_pos: Vector2) -> void:
+	# Seret selesai: pilihan "ketuk" dibersihkan agar tidak menempel pada kartu
+	item.set_selected(false)
+	if selected_packet == item:
+		selected_packet = null
 	var item_center = item.global_position + item.size / 2.0
 	
 	var candidate_bins: Array[Control] = []
@@ -1093,40 +1104,7 @@ func _shake_screen() -> void:
 	tw.tween_property(self, "position", Vector2.ZERO, 0.05)
 
 func _update_hearts_display(is_damage_event: bool = false) -> void:
-	if not hearts_container:
-		return
-		
-	for i in range(hearts_rects.size()):
-		var hr = hearts_rects[i]
-		var bl = broken_labels[i]
-		
-		if i < hearts:
-			hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-			hr.scale = Vector2.ONE
-			bl.visible = false
-		else:
-			# Heart hilang / pecah
-			if is_damage_event and i == hearts:
-				# Animasi pecah / hilang yang jelas
-				hr.modulate = Color(1.0, 0.2, 0.2, 1.0)
-				var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-				tw.tween_property(hr, "scale", Vector2(1.3, 1.3), 0.1)
-				tw.tween_property(hr, "scale", Vector2(0.8, 0.8), 0.15)
-				tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
-				bl.visible = true
-				bl.modulate.a = 0.0
-				var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-				tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
-			else:
-				hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
-				hr.scale = Vector2(0.8, 0.8)
-				bl.visible = true
-				bl.modulate.a = 1.0
-				
-	if is_damage_event and hearts_panel:
-		var tw_panel = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tw_panel.tween_property(hearts_panel, "modulate", Color(1.0, 0.5, 0.5, 1.0), 0.08)
-		tw_panel.tween_property(hearts_panel, "modulate", Color.WHITE, 0.25)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 # --- INTRO MODAL BUILDER (Figma Image 1) ---
 func _build_intro_modal() -> void:
@@ -1344,9 +1322,54 @@ func _open_intro_modal() -> void:
 func _on_intro_start_pressed() -> void:
 	_play_tone(523.25, 0.1, 0.2)
 	intro_modal.visible = false
-	is_game_active = true
 	_populate_packet_cards()
-	_open_sorting_modal()
+	# Panduan bermain: bagian ruangan -> buka mesin sortir -> bagian mesin sortir -> mulai
+	TutorialOverlay.start(self, _tutorial_room_steps(), func():
+		_open_sorting_modal()
+		TutorialOverlay.start(self, _tutorial_sort_steps(), func():
+			is_game_active = true
+		)
+	)
+
+# --- PANDUAN BERMAIN (hint pop up dengan tangan/panah) ---
+func _union_rect(nodes: Array) -> Rect2:
+	var r = Rect2()
+	var first = true
+	for n in nodes:
+		if n is Control and (n as Control).is_visible_in_tree():
+			var gr = (n as Control).get_global_rect()
+			r = gr if first else r.merge(gr)
+			first = false
+	return r
+
+func _tutorial_room_steps() -> Array:
+	var dpad = mobile_controls_root.get_node_or_null("DpadBase") if mobile_controls_root else null
+	return [
+		{ "title": "Selamat datang, Teknisi!", "text": "Tugasmu: sortir paket alamat IPv4 ke Kelas A, B, atau C sebelum waktu habis. Yuk lihat caranya!" },
+		{ "title": "1. Berjalan", "text": "Geser joystick ini dengan mouse/jari, atau tekan tombol W A S D / panah di keyboard untuk menggerakkan karakter.", "target": dpad, "pointer": "hand" },
+		{ "title": "2. Meja Sortir", "text": "Dekati meja ini, lalu klik tombol Sortir (atau tekan Spasi) untuk membuka mesin sortir paket.", "target": center_desk, "pointer": "both" },
+		{ "title": "3. Papan Contekan", "text": "Papan di atas berisi rentang oktet pertama tiap kelas. Dekati dan klik papan kapan saja kamu lupa.", "target": whiteboard_node, "pointer": "hand" },
+		{ "title": "4. Pad Kelas", "text": "Tiga pad di lantai ini mewakili Kelas A, B, dan C. Paket yang benar akan menyala hijau di sini.", "target": func(): return _union_rect([bin_a_pad, bin_b_pad, bin_c_pad]), "pointer": "arrow" },
+	]
+
+func _tutorial_sort_steps() -> Array:
+	var hearts_panel = header_ui.get_node_or_null("HeartsPanel") if header_ui else null
+	return [
+		{ "title": "5. Antrean Paket", "text": "Ini paket IPv4 yang harus disortir. Lihat angka PERTAMA pada alamatnya (oktet pertama), lalu klik paketnya.", "target": sorting_queue_container.get_parent(), "pointer": "hand" },
+		{ "title": "6. Masukkan ke Kelas", "text": "Seret paket ke kelas yang tepat, atau klik paket lalu klik kelasnya.\nKelas A: 1–126  |  Kelas B: 128–191  |  Kelas C: 192–223.", "target": func(): return _union_rect(sorting_bins_dict.values()), "pointer": "both" },
+		{ "title": "7. Nyawa", "text": "Salah memilih kelas mengurangi 1 nyawa (hati). Nyawa habis = misi gagal, jadi teliti ya!", "target": hearts_panel, "pointer": "hand" },
+		{ "title": "Siap?", "text": "Sortir semua paket sebelum waktu habis. Butuh bantuan lagi? Tekan tombol ? di pojok kanan atas." },
+	]
+
+var help_btn: Button
+
+func _on_help_pressed() -> void:
+	if get_tree().paused:
+		return
+	if sorting_modal.visible:
+		TutorialOverlay.start(self, _tutorial_sort_steps(), Callable(), true)
+	else:
+		TutorialOverlay.start(self, _tutorial_room_steps(), Callable(), true)
 
 # --- WHITEBOARD / CHEAT SHEET MODAL ---
 func _build_whiteboard_modal() -> void:
@@ -1573,6 +1596,8 @@ func show_toast(msg: String, duration: float = 2.5) -> void:
 func _reposition_responsive() -> void:
 	var vp_sz = get_viewport_rect().size
 	var center_x = vp_sz.x / 2.0
+	if help_btn:
+		help_btn.position = Vector2(vp_sz.x - 300.0, 20.0)
 	
 	door_arch.position = Vector2(center_x - 160.0, 45.0)
 	potted_plant.position = Vector2(center_x + 180.0, 75.0)

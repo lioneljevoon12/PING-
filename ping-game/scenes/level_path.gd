@@ -6,7 +6,7 @@ extends Control
 @onready var potted_plant: TextureButton = %PottedPlant
 @onready var path_line: Line2D = %PathLine
 @onready var desks_container: Control = %DesksContainer
-@onready var desk_nodes: Array[Control] = [%Desk1, %Desk2, %Desk3, %Desk4]
+@onready var desk_nodes: Array[Control] = [%Desk1, %Desk2, %Desk3, %Desk4, %Desk5]
 @onready var character_mascot: TextureRect = %CharacterMascot
 
 @onready var back_btn: TextureButton = %BackButton
@@ -121,9 +121,17 @@ var stages_info: Dictionary = {
 			{
 				"num": 3,
 				"tag": "2.3",
-				"name": "Protokol ARP: Request & Reply",
-				"desc": "Mengawal langsung perjalanan amplop bersayap (ARP-Request) dan menuntun balasan MAC-Address (ARP-Reply) ke perangkat tujuan.",
-				"target": "Kawal ARP-Request dan tuntun balasan ARP-Reply",
+				"name": "Protokol ARP: Request (Broadcast)",
+				"desc": "Mengawal langsung perjalanan amplop bersayap (ARP-Request) yang dibroadcast untuk mencari MAC Address pemilik IP tujuan.",
+				"target": "Kawal ARP-Request hingga ditemukan pemilik IP 192.168.1.50",
+				"char_offset": Vector2(-85, 20)
+			},
+			{
+				"num": 4,
+				"tag": "2.4",
+				"name": "Balasan MAC Address (ARP-Reply) & Tabel ARP",
+				"desc": "Tuntun balasan MAC-Address (ARP-Reply) dari pemilik IP ke PC pengirim, simpan di Tabel ARP, lalu uji pengiriman Unicast.",
+				"target": "Simpan MAC ke Tabel ARP dan ubah jalur menjadi hijau (UP)",
 				"char_offset": Vector2(-85, 20)
 			}
 		]
@@ -174,23 +182,23 @@ var stages_info: Dictionary = {
 		"levels": [
 			{
 				"num": 1,
-				"name": "Topologi Jaringan (Star vs Mesh)",
-				"desc": "Bandingkan kelebihan topologi Star dengan switch pusat versus redundant Mesh topology tahan kendala.",
-				"target": "Rancang topologi tahan toleransi kegagalan link",
+				"name": "Jangkauan Wilayah: PAN, LAN, MAN & WAN",
+				"desc": "Periksa papan klasifikasi jaringan dan kelompokkan setiap kartu situasi (Personal, Gedung, Kota, hingga Antarnegara) ke kategori wilayah yang tepat.",
+				"target": "Cocokkan kartu situasi ke kategori PAN, LAN, MAN, WAN",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
-				"name": "VLAN & Switch Port Security",
-				"desc": "Pisahkan traffic jaringan per departemen secara logis menggunakan 802.1Q Virtual LAN.",
-				"target": "Atur Access Port dan Trunk Port pada switch",
+				"name": "Memperbaiki Pusat Topologi Star",
+				"desc": "Switch Pusat (SW-01) mengalami gangguan dan jalur kabel ke PC kantor terputus! Aktifkan kembali switch dan sambungkan seluruh kabel.",
+				"target": "Hubungkan seluruh kabel PC ke Switch Pusat",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
-				"name": "Backbone Fiber Optik & SFP",
-				"desc": "Gunakan kabel serat optik untuk transmisi data kecepatan gigabit antar gedung kampus.",
-				"target": "Pasang modul transceiver SFP dan verifikasi link",
+				"name": "Memperbaiki Topologi Ring dan Mesh",
+				"desc": "Perbaiki segmen kabel melingkar pada Topologi Ring dan sambungkan rute redundan persilangan pada Topologi Mesh!",
+				"target": "Selesaikan jalur Topologi Ring dan Mesh",
 				"char_offset": Vector2(-85, 20)
 			}
 		]
@@ -203,22 +211,36 @@ var stages_info: Dictionary = {
 			{
 				"num": 1,
 				"name": "Model 7 Lapisan OSI Layer",
-				"desc": "Petakan protokol dari Physical, Data Link, Network, Transport, Session, Presentation, hingga Application.",
-				"target": "Cocokkan protokol dengan lapisan yang tepat",
+				"desc": "Susun 7 kartu OSI Layer dari Physical, Data Link, Network, Transport, Session, Presentation, hingga Application.",
+				"target": "Seluruh 7 panel lapisan OSI menyala hijau secara berurutan",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 2,
-				"name": "Protokol TCP vs UDP",
-				"desc": "Pahami perbedaan handshaking 3 arah (SYN-ACK) TCP dengan transmisi cepat UDP tanpa koneksi.",
-				"target": "Pilih protokol yang sesuai untuk Web, Video, dan DNS",
+				"name": "Data Encapsulation & Decapsulation",
+				"desc": "Kemas data di Client dari Data, Segment, Packet, Frame hingga Bits, lalu bongkar kembali di Server.",
+				"target": "Susun alur Encapsulation (Bagian A) dan Decapsulation (Bagian B)",
 				"char_offset": Vector2(-85, 20)
 			},
 			{
 				"num": 3,
-				"name": "Troubleshooting & Analisis Paket",
-				"desc": "Inspeksi paket header, temukan paket korup, dan selesaikan tantangan akhir master teknisi PING!",
-				"target": "Dapatkan sertifikasi Teknisi Jaringan Handal!",
+				"name": "Protokol Transport: TCP vs UDP",
+				"desc": "Analisis 6 situasi komunikasi lalu arahkan ke Jalur TCP (andal, urut, ACK) atau Jalur UDP (ringan, cepat).",
+				"target": "Arahkan seluruh 6 situasi ke jalur protokol yang sesuai",
+				"char_offset": Vector2(-85, 20)
+			},
+			{
+				"num": 4,
+				"name": "Mencocokkan Layanan Server dengan Nomor Port",
+				"desc": "Hubungkan kabel patch HTTP, HTTPS, DNS, SSH, dan FTP ke soket nomor port standarnya.",
+				"target": "Kelima layanan Server aktif pada nomor port yang benar",
+				"char_offset": Vector2(-85, 20)
+			},
+			{
+				"num": 5,
+				"name": "TCP Three-Way Handshake",
+				"desc": "Selesaikan jabat tangan tiga arah SYN, SYN/ACK, ACK secara berurutan untuk menyambungkan Client ke Server.",
+				"target": "Koneksi Client ke Server berhasil dibangun",
 				"char_offset": Vector2(-85, 20)
 			}
 		]
@@ -240,6 +262,10 @@ func _ready() -> void:
 		character_mascot.texture = walk_frames[0]
 	else:
 		character_mascot.texture = tex_router
+		
+	var pd = get_node_or_null("/root/PlayerData")
+	if pd and pd.has_method("apply_to_character"):
+		pd.apply_to_character(character_mascot)
 	
 	_build_header_ui()
 	_build_desks()
@@ -277,6 +303,14 @@ func _ready() -> void:
 		await get_tree().create_timer(0.3).timeout
 		var img = get_viewport().get_texture().get_image()
 		img.save_png("art/stage2_render.png")
+		get_tree().quit()
+
+	if "--screenshot-stage5" in all_args:
+		await get_tree().process_frame
+		load_stage(5)
+		await get_tree().create_timer(0.4).timeout
+		var img = get_viewport().get_texture().get_image()
+		img.save_png("art/stage5_render.png")
 		get_tree().quit()
 
 	if "--screenshot-stage3" in all_args:
@@ -613,6 +647,8 @@ func _start_selected_level() -> void:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_2.tscn")
 	elif current_stage == 2 and selected_level_index == 2:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_3.tscn")
+	elif current_stage == 2 and selected_level_index == 3:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_4.tscn")
 	elif current_stage == 3 and selected_level_index == 0:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_1.tscn")
 	elif current_stage == 3 and selected_level_index == 1:
@@ -621,6 +657,22 @@ func _start_selected_level() -> void:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_3.tscn")
 	elif current_stage == 3 and selected_level_index == 3:
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_3_4.tscn")
+	elif current_stage == 4 and selected_level_index == 0:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_4_1.tscn")
+	elif current_stage == 4 and selected_level_index == 1:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_4_2.tscn")
+	elif current_stage == 4 and selected_level_index == 2:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_4_3.tscn")
+	elif current_stage == 5 and selected_level_index == 0:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_5_1.tscn")
+	elif current_stage == 5 and selected_level_index == 1:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_5_2.tscn")
+	elif current_stage == 5 and selected_level_index == 2:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_5_3.tscn")
+	elif current_stage == 5 and selected_level_index == 3:
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_5_4.tscn")
+	elif current_stage == 5 and selected_level_index == 4 and ResourceLoader.exists("res://scenes/gameplay/level_5_5.tscn"):
+		get_tree().change_scene_to_file("res://scenes/gameplay/level_5_5.tscn")
 	else:
 		show_toast("Memulai Stage %d Level %d.%d: Menyiapkan simulasi jaringan..." % [current_stage, current_stage, selected_level_index + 1])
 
@@ -1183,7 +1235,14 @@ func _reposition_responsive() -> void:
 		
 	# Reposition Desks spread across the center
 	var num_lvls = stages_info[current_stage]["levels"].size() if current_stage in stages_info else 3
-	if num_lvls == 4:
+	if num_lvls == 5:
+		# 5 Desks untuk Stage 5
+		var pos5 = [Vector2(center_x - 640.0, 470.0), Vector2(center_x - 340.0, 470.0), Vector2(center_x - 40.0, 470.0), Vector2(center_x + 300.0, 330.0), Vector2(center_x + 540.0, 150.0)]
+		for k in range(5):
+			if desk_nodes.size() > k and desk_nodes[k]:
+				desk_nodes[k].position = pos5[k]
+				desk_nodes[k].size = Vector2(180.0, 126.0)
+	elif num_lvls == 4:
 		# 4 Desks for Stage 3!
 		if desk_nodes.size() > 0 and desk_nodes[0]:
 			desk_nodes[0].position = Vector2(center_x - 580.0, 460.0)
@@ -1197,6 +1256,8 @@ func _reposition_responsive() -> void:
 		if desk_nodes.size() > 3 and desk_nodes[3]:
 			desk_nodes[3].position = Vector2(center_x + 460.0, 220.0)
 			desk_nodes[3].size = Vector2(180.0, 126.0)
+		if desk_nodes.size() > 4 and desk_nodes[4]:
+			desk_nodes[4].visible = false
 	else:
 		# 3 Desks for Stage 1, 2, 4, 5
 		if desk_nodes.size() > 0 and desk_nodes[0]:
@@ -1210,6 +1271,8 @@ func _reposition_responsive() -> void:
 			desk_nodes[2].size = Vector2(180.0, 126.0)
 		if desk_nodes.size() > 3 and desk_nodes[3]:
 			desk_nodes[3].visible = false
+		if desk_nodes.size() > 4 and desk_nodes[4]:
+			desk_nodes[4].visible = false
 		
 	# Path line hidden as per user request: "gak usah dikasih garis garis gitu"
 	if path_line:

@@ -139,8 +139,8 @@ func _process(delta: float) -> void:
 
 func _load_walk_frames() -> void:
 	walk_frames.clear()
-	for i in range(1, 10):
-		var p = "res://art/assets/PING! Assets/Sprite animation/router/%d.png" % i
+	for i in range(1, 33):
+		var p = "res://art/assets/PING! Assets/Sprite animation/router walk/%d.png" % i
 		if ResourceLoader.exists(p):
 			var tex = load(p)
 			if tex is Texture2D:
@@ -325,7 +325,9 @@ func _build_character() -> void:
 	mascot_sprite.texture = tex_router_idle
 	mascot_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mascot_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	mascot_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	mascot_sprite.custom_minimum_size = Vector2(320, 176)
+	mascot_sprite.size = Vector2(320, 176)
+	mascot_sprite.position = Vector2(-50, -28)
 	if PlayerData:
 		mascot_sprite.modulate = PlayerData.get_active_skin_color()
 	character_mascot.add_child(mascot_sprite)

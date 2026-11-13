@@ -1,5 +1,9 @@
 extends Control
 
+var sm: Node:
+	get:
+		return get_node_or_null("/root/sm")
+
 # Textures
 const TEX_SOUND_ON = preload("res://art/ui-ux/icons/icon_sound.svg")
 const TEX_SOUND_OFF = preload("res://art/ui-ux/icons/icon_sound_off.svg")
@@ -128,9 +132,9 @@ func close() -> void:
 		return
 	is_animating = true
 	
-	if SettingsManager:
-		SettingsManager.play_sfx(523.25, 0.07) # Closing beep
-		SettingsManager.save_settings()
+	if sm:
+		sm.play_sfx(523.25, 0.07) # Closing beep
+		sm.save_settings()
 	
 	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_property(self, "modulate:a", 0.0, 0.16)
@@ -140,70 +144,70 @@ func close() -> void:
 	is_animating = false
 
 func _load_ui_values() -> void:
-	if not SettingsManager:
+	if not sm:
 		return
 		
 	# BGM
-	bgm_slider.value = SettingsManager.bgm_volume * 100.0
+	bgm_slider.value = sm.bgm_volume * 100.0
 	bgm_value_label.text = "%d%%" % int(bgm_slider.value)
-	_update_mute_btn(bgm_mute_button, SettingsManager.bgm_muted)
+	_update_mute_btn(bgm_mute_button, sm.bgm_muted)
 	
 	# SFX
-	sfx_slider.value = SettingsManager.sfx_volume * 100.0
+	sfx_slider.value = sm.sfx_volume * 100.0
 	sfx_value_label.text = "%d%%" % int(sfx_slider.value)
-	_update_mute_btn(sfx_mute_button, SettingsManager.sfx_muted)
+	_update_mute_btn(sfx_mute_button, sm.sfx_muted)
 	
 	# Joystick Size
-	_update_joystick_ui(SettingsManager.joystick_size)
+	_update_joystick_ui(sm.joystick_size)
 	
 	# Haptic
-	_update_haptic_ui(SettingsManager.haptic_enabled)
+	_update_haptic_ui(sm.haptic_enabled)
 	
 	# FPS
-	_update_fps_ui(SettingsManager.fps_limit)
+	_update_fps_ui(sm.fps_limit)
 
 func _on_bgm_slider_changed(val: float) -> void:
 	bgm_value_label.text = "%d%%" % int(val)
-	if SettingsManager:
-		SettingsManager.set_bgm_volume(val / 100.0)
-		if SettingsManager.bgm_muted and val > 0:
-			SettingsManager.set_bgm_muted(false)
+	if sm:
+		sm.set_bgm_volume(val / 100.0)
+		if sm.bgm_muted and val > 0:
+			sm.set_bgm_muted(false)
 			_update_mute_btn(bgm_mute_button, false)
 
 func _on_bgm_mute_toggled() -> void:
-	if not SettingsManager:
+	if not sm:
 		return
-	var new_muted = not SettingsManager.bgm_muted
-	SettingsManager.set_bgm_muted(new_muted)
+	var new_muted = not sm.bgm_muted
+	sm.set_bgm_muted(new_muted)
 	_update_mute_btn(bgm_mute_button, new_muted)
 
 func _on_sfx_slider_changed(val: float) -> void:
 	sfx_value_label.text = "%d%%" % int(val)
-	if SettingsManager:
-		SettingsManager.set_sfx_volume(val / 100.0)
-		if SettingsManager.sfx_muted and val > 0:
-			SettingsManager.set_sfx_muted(false)
+	if sm:
+		sm.set_sfx_volume(val / 100.0)
+		if sm.sfx_muted and val > 0:
+			sm.set_sfx_muted(false)
 			_update_mute_btn(sfx_mute_button, false)
 		# Play test beep so player hears difference
-		SettingsManager.play_sfx(784.0, 0.05, 0.3)
+		sm.play_sfx(784.0, 0.05, 0.3)
 
 func _on_sfx_mute_toggled() -> void:
-	if not SettingsManager:
+	if not sm:
 		return
-	var new_muted = not SettingsManager.sfx_muted
-	SettingsManager.set_sfx_muted(new_muted)
+	var new_muted = not sm.sfx_muted
+	sm.set_sfx_muted(new_muted)
 	_update_mute_btn(sfx_mute_button, new_muted)
 	if not new_muted:
-		SettingsManager.play_sfx(659.25, 0.06)
+		sm.play_sfx(659.25, 0.06)
 
 func _update_mute_btn(btn: Button, is_muted: bool) -> void:
 	btn.icon = TEX_SOUND_OFF if is_muted else TEX_SOUND_ON
 	btn.modulate = Color(1.0, 1.0, 1.0, 0.5) if is_muted else Color(1.0, 1.0, 1.0, 1.0)
 
 func _set_joystick_size(size_str: String) -> void:
-	if SettingsManager:
-		SettingsManager.set_joystick_size(size_str)
-		SettingsManager.play_sfx(659.25, 0.05)
+	if sm:
+		sm.set_joystick_size(size_str)
+		sm.play_sfx(659.25, 0.05)
 	_update_joystick_ui(size_str)
 
 func _update_joystick_ui(selected_size: String) -> void:
@@ -212,13 +216,13 @@ func _update_joystick_ui(selected_size: String) -> void:
 	_style_button(btn_joy_large, selected_size == "large")
 
 func _on_haptic_toggled() -> void:
-	if not SettingsManager:
+	if not sm:
 		return
-	var new_state = not SettingsManager.haptic_enabled
-	SettingsManager.set_haptic_enabled(new_state)
-	SettingsManager.play_sfx(659.25, 0.05)
+	var new_state = not sm.haptic_enabled
+	sm.set_haptic_enabled(new_state)
+	sm.play_sfx(659.25, 0.05)
 	if new_state:
-		SettingsManager.vibrate(50)
+		sm.vibrate(50)
 	_update_haptic_ui(new_state)
 
 func _update_haptic_ui(enabled: bool) -> void:
@@ -226,9 +230,9 @@ func _update_haptic_ui(enabled: bool) -> void:
 	_style_button(btn_haptic_toggle, enabled)
 
 func _set_fps(fps: int) -> void:
-	if SettingsManager:
-		SettingsManager.set_fps_limit(fps)
-		SettingsManager.play_sfx(659.25, 0.05)
+	if sm:
+		sm.set_fps_limit(fps)
+		sm.play_sfx(659.25, 0.05)
 	_update_fps_ui(fps)
 
 func _update_fps_ui(selected_fps: int) -> void:

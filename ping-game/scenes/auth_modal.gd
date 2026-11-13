@@ -106,7 +106,9 @@ func _on_tab_signup_clicked() -> void:
 
 func _on_google_play_pressed() -> void:
 	var user = "Google_Player"
-	PlayerData.login(user)
+	var pd = get_node_or_null("/root/PlayerData")
+	if pd and pd.has_method("login"):
+		pd.login(user)
 	auth_successful.emit(user)
 	close_modal()
 
@@ -115,7 +117,9 @@ func _on_submit_pressed() -> void:
 	if user == "":
 		user = "Teknisi"
 		
-	PlayerData.login(user)
+	var pd = get_node_or_null("/root/PlayerData")
+	if pd and pd.has_method("login"):
+		pd.login(user)
 	auth_successful.emit(user)
 	close_modal()
 

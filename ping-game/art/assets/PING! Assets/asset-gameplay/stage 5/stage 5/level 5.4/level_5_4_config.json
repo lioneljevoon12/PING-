@@ -1,0 +1,36 @@
+{
+  "level": "5.4",
+  "title": "Port Assignment",
+  "ports": [
+    {
+      "svc": "HTTP",
+      "port": "80",
+      "desc": "Layanan Web Standar",
+      "color": "#FFB5A7"
+    },
+    {
+      "svc": "HTTPS",
+      "port": "443",
+      "desc": "Layanan Web Aman (SSL/TLS)",
+      "color": "#A8E6CF"
+    },
+    {
+      "svc": "DNS",
+      "port": "53",
+      "desc": "Penerjemah Nama Domain ke IP",
+      "color": "#A2D2FF"
+    },
+    {
+      "svc": "SSH",
+      "port": "22",
+      "desc": "Akses Remote Terminal Aman",
+      "color": "#FFF3B0"
+    },
+    {
+      "svc": "FTP",
+      "port": "21",
+      "desc": "Layanan Transfer File Server",
+      "color": "#E2CBF7"
+    }
+  ]
+}

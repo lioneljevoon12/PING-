@@ -76,8 +76,9 @@ func _ready() -> void:
 
 func _update_stars_display() -> void:
 	if stars_label:
-		var total = PlayerData.get_total_stars()
-		var max_s = PlayerData.get_max_stars()
+		var pd = get_node_or_null("/root/PlayerData")
+		var total = pd.get_total_stars() if pd else 0
+		var max_s = pd.get_max_stars() if pd else 48
 		# Format matches Figma Home: "12 / 57"
 		stars_label.text = "BINTANG\n%d / %d" % [total, max_s]
 

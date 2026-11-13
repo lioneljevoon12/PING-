@@ -141,8 +141,13 @@ var verify_button: Button
 var dragging_card_id: String = ""
 var drag_touch_id: int = -1
 var drag_offset: Vector2 = Vector2.ZERO
+var drag_origin_pos: Vector2 = Vector2.ZERO
+var drag_origin_scale: Vector2 = Vector2.ONE
+var drag_press_global: Vector2 = Vector2.ZERO
+var drag_moved: bool = false
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	_setup_floor_carpet()
 	_load_character_frames()
 	_setup_character()
@@ -200,12 +205,17 @@ func _setup_character() -> void:
 	
 	char_sprite = TextureRect.new()
 	char_sprite.name = "CharSprite"
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	char_sprite.custom_minimum_size = Vector2(300, 165)
+	char_sprite.size = Vector2(300, 165)
+	char_sprite.position = Vector2(-80, -37)
 	char_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	character_node.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	char_pos = character_node.position
 
@@ -228,12 +238,18 @@ func _setup_workstation() -> void:
 	
 	# Monitor status text overlay on workstation screen
 	workstation_status_label = Label.new()
-	workstation_status_label.text = "4 CIDR MISMATCH!"
-	workstation_status_label.position = Vector2(110, 88)
-	workstation_status_label.size = Vector2(145, 20)
+	workstation_status_label.text = ""
+	workstation_status_label.visible = false
+	workstation_status_label.position = Vector2(128, 98)
+	workstation_status_label.size = Vector2(108, 26)
+	workstation_status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var sb_ws = StyleBoxFlat.new()
+	sb_ws.bg_color = Color("#1e293b")
+	sb_ws.set_corner_radius_all(6)
+	workstation_status_label.add_theme_stylebox_override("normal", sb_ws)
 	workstation_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	workstation_status_label.add_theme_font_override("font", font_extrabold)
-	workstation_status_label.add_theme_font_size_override("font_size", 10)
+	workstation_status_label.add_theme_font_size_override("font_size", 8)
 	workstation_status_label.add_theme_color_override("font_color", Color("#f87171"))
 	workstation_node.add_child(workstation_status_label)
 
@@ -373,16 +389,23 @@ func _setup_whiteboard_overlay() -> void:
 	
 	# Create 4 tags overlayed on whiteboard showing empty slots [ / ?? ] initially
 	var slot_positions = [
-		Vector2(185, 38), # PC-01 slot
-		Vector2(185, 88), # PC-02 slot
-		Vector2(420, 38), # PC-03 slot
-		Vector2(420, 88)  # PC-04 slot
+		Vector2(128, 43), # PC-01 slot
+		Vector2(128, 90), # PC-02 slot
+		Vector2(300, 43), # PC-03 slot
+		Vector2(300, 90)  # PC-04 slot
 	]
 	for i in range(4):
 		var lbl = Label.new()
-		lbl.text = "/ ??"
-		lbl.size = Vector2(40, 24)
+		lbl.text = ""
+		lbl.visible = false
+		lbl.size = Vector2(50, 37)
 		lbl.position = slot_positions[i]
+		var sb_tag = StyleBoxFlat.new()
+		sb_tag.bg_color = Color("#ecfdf5")
+		sb_tag.border_color = Color("#22c55e")
+		sb_tag.set_border_width_all(2)
+		sb_tag.set_corner_radius_all(8)
+		lbl.add_theme_stylebox_override("normal", sb_tag)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.add_theme_font_override("font", font_black)
@@ -394,32 +417,32 @@ func _setup_whiteboard_overlay() -> void:
 func _setup_cables() -> void:
 	cables_container.draw.connect(_draw_cables)
 
+func _prect(n: Control) -> Rect2:
+	return Rect2(n.position, n.size * n.scale)
+
 func _draw_cables() -> void:
 	var blue_c = Color("#38bdf8")
 	var green_c = Color("#22c55e")
 	var red_c = Color("#ef4444")
+	var ws = _prect(workstation_node)
+	var d1 = _prect(desk1_container)
+	var d2 = _prect(desk2_container)
+	var rk = _prect(rack_node)
 	
 	# Blue Line from Workstation across to Rack Subnet
-	var pts_workstation = PackedVector2Array([
-		Vector2(240, 310),
-		Vector2(240, 260),
-		Vector2(1100, 260),
-		Vector2(1100, 390),
-		Vector2(1200, 390)
-	])
+	var w_x = ws.position.x + ws.size.x * 0.51
+	var w_j = rk.position.x - 50.0
+	var w_ey = rk.position.y + rk.size.y * 0.34
+	var pts_workstation = PackedVector2Array([Vector2(w_x, ws.position.y + ws.size.y * 0.1), Vector2(w_x, 262.0), Vector2(w_j, 262.0), Vector2(w_j, w_ey), Vector2(rk.position.x, w_ey)])
 	cables_container.draw_polyline(pts_workstation, Color(0.1, 0.1, 0.1, 0.5), 9.0, true)
 	cables_container.draw_polyline(pts_workstation, blue_c, 5.0, true)
 	
 	# Line from Desk 1 to Rack Subnet
-	var pts_d1 = PackedVector2Array([
-		Vector2(1080, 420),
-		Vector2(1200, 420)
-	])
+	var d1_y = d1.position.y + d1.size.y * 0.80
+	var pts_d1 = PackedVector2Array([Vector2(d1.end.x - 62.0, d1_y), Vector2(rk.position.x, d1_y)])
 	# Line from Desk 2 to Rack Subnet
-	var pts_d2 = PackedVector2Array([
-		Vector2(1080, 600),
-		Vector2(1200, 600)
-	])
+	var d2_y = d2.position.y + d2.size.y * 0.80
+	var pts_d2 = PackedVector2Array([Vector2(d2.end.x - 62.0, d2_y), Vector2(rk.position.x, d2_y)])
 	
 	if is_completed:
 		cables_container.draw_polyline(pts_d1, Color(0.1, 0.1, 0.1, 0.5), 9.0, true)
@@ -499,6 +522,7 @@ func _setup_header_ui() -> void:
 		h_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		hearts_container.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		HeartsStyle.schedule_normalize(hearts_rects)
 	hearts_panel.add_child(hearts_container)
 	left_box.add_child(hearts_panel)
 	
@@ -702,7 +726,7 @@ func _on_mulai_pressed() -> void:
 	tw.finished.connect(func():
 		intro_modal.visible = false
 		is_modal_open = false
-		is_game_active = true
+		_start_after_tutorial()
 	)
 
 func _setup_task_modal() -> void:
@@ -784,9 +808,10 @@ func _setup_task_modal() -> void:
 		row_root.add_child(row_bg)
 		
 		# Dropzone / click target for this row (right half)
+		row_covers[row_idx] = _make_slot_cover(row_root, Rect2(371, 11, 174, 52), Color("#f3f7ff"))
 		var drop_btn = Button.new()
-		drop_btn.size = Vector2(210, 58)
-		drop_btn.position = Vector2(365, 9)
+		drop_btn.size = Vector2(210, 68)
+		drop_btn.position = Vector2(342, 4)
 		drop_btn.flat = true
 		drop_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		drop_btn.pressed.connect(func(): _on_row_dropzone_tapped(row_idx))
@@ -794,7 +819,7 @@ func _setup_task_modal() -> void:
 		
 		row_nodes[row_idx] = {
 			"root": row_root,
-			"drop_pos": row_root.position + drop_btn.position + Vector2(10, 4),
+			"drop_pos": row_root.position + Vector2(458, 37) - Vector2(110, 26),
 			"drop_rect": Rect2(row_root.position + drop_btn.position, drop_btn.size)
 		}
 	
@@ -842,6 +867,39 @@ func _setup_task_modal() -> void:
 	verify_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	verify_button.pressed.connect(_on_verify_pressed)
 	win_container.add_child(verify_button)
+
+	# Geser konten ke bawah agar tidak menimpa header jendela
+	for ch in win_container.get_children():
+		if ch == win_bg or ch == close_btn:
+			continue
+		ch.position.y += 16.0
+	for cid in card_nodes:
+		card_nodes[cid]["initial_pos"].y += 16.0
+	for rid in row_nodes:
+		row_nodes[rid]["drop_pos"].y += 16.0
+		var rr = row_nodes[rid]["drop_rect"] as Rect2
+		rr.position.y += 16.0
+		row_nodes[rid]["drop_rect"] = rr
+
+# Penutup opak di atas teks petunjuk bawaan tekstur dropzone agar tidak tertimpa kartu
+func _make_slot_cover(parent: Control, rect: Rect2, col: Color) -> Panel:
+	var p = Panel.new()
+	p.position = rect.position
+	p.size = rect.size
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb = StyleBoxFlat.new()
+	sb.bg_color = col
+	sb.set_corner_radius_all(12)
+	p.add_theme_stylebox_override("panel", sb)
+	p.visible = false
+	parent.add_child(p)
+	return p
+
+var row_covers: Dictionary = {}
+
+func _refresh_row_covers() -> void:
+	for r in row_covers.keys():
+		(row_covers[r] as Control).visible = (slot_assignment.get(r, "") != "")
 
 func _create_draggable_cidr_card(id: String, tex: Texture2D, initial_pos: Vector2, parent: Control) -> void:
 	var card_root = Control.new()
@@ -898,11 +956,11 @@ func _on_card_gui_input(id: String, event: InputEvent) -> void:
 		if st.pressed:
 			if drag_touch_id == -1:
 				drag_touch_id = st.index
-				_start_card_drag(id, st.position)
+				_start_card_drag(id, _card_event_global(id, st.position))
 		else:
 			if drag_touch_id == st.index:
 				drag_touch_id = -1
-				_end_card_drag(id, st.position)
+				_end_card_drag(id, _card_event_global(id, st.position))
 	elif event is InputEventMouseMotion:
 		var mm = event as InputEventMouseMotion
 		if dragging_card_id == id:
@@ -910,22 +968,41 @@ func _on_card_gui_input(id: String, event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		var sd = event as InputEventScreenDrag
 		if dragging_card_id == id and drag_touch_id == sd.index:
-			_update_card_drag(id, sd.position)
+			_update_card_drag(id, _card_event_global(id, sd.position))
+
+func _card_to_parent_local(node: Control, global_pos: Vector2) -> Vector2:
+	var par = node.get_parent() as Control
+	if par == null:
+		return global_pos
+	return par.get_global_transform().affine_inverse() * global_pos
+
+# Posisi event sentuh pada gui_input bersifat lokal terhadap kartu -> ubah ke koordinat global
+func _card_event_global(id: String, local_pos: Vector2) -> Vector2:
+	var node = card_nodes[id]["root"] as Control
+	return node.get_global_transform() * local_pos
 
 func _start_card_drag(id: String, global_pos: Vector2) -> void:
+	if dragging_card_id != "":
+		return
 	dragging_card_id = id
 	var node = card_nodes[id]["root"] as Control
-	drag_offset = node.global_position - global_pos
+	drag_origin_pos = node.position
+	drag_origin_scale = node.scale
+	drag_press_global = global_pos
+	drag_moved = false
+	drag_offset = node.position - _card_to_parent_local(node, global_pos)
 	node.z_index = 50
 	node.scale = Vector2(1.06, 1.06)
 	_play_synth_sequence([440.0], 0.05)
-	_toggle_card_selection(id)
 
 func _update_card_drag(id: String, global_pos: Vector2) -> void:
+	if dragging_card_id != id:
+		return
 	var node = card_nodes[id]["root"] as Control
-	var win_container = task_modal.get_node("WinContainer") as Control
-	var local_pos = win_container.get_local_mouse_position() + drag_offset
-	node.position = local_pos
+	if not drag_moved and global_pos.distance_to(drag_press_global) > 8.0:
+		drag_moved = true
+	if drag_moved:
+		node.position = _card_to_parent_local(node, global_pos) + drag_offset
 
 func _end_card_drag(id: String, global_pos: Vector2) -> void:
 	if dragging_card_id != id:
@@ -933,6 +1010,16 @@ func _end_card_drag(id: String, global_pos: Vector2) -> void:
 	dragging_card_id = ""
 	var node = card_nodes[id]["root"] as Control
 	node.z_index = 10
+	if not drag_moved:
+		# Ketukan biasa (tanpa geser): kartu tetap di tempatnya, hanya pilih / batal pilih
+		node.position = drag_origin_pos
+		node.scale = drag_origin_scale
+		_toggle_card_selection(id)
+		return
+	# Geser sungguhan: seleksi ketuk dibersihkan agar tidak "menempel"
+	if selected_card_id != "" and selected_card_id in card_nodes:
+		card_nodes[selected_card_id]["highlight"].visible = false
+	selected_card_id = ""
 	node.scale = Vector2(1.0, 1.0)
 	
 	var card_center = node.position + node.size / 2.0
@@ -984,7 +1071,9 @@ func _place_card_in_row(card_id: String, row_idx: int) -> void:
 	var target_pos = row_nodes[row_idx]["drop_pos"] as Vector2
 	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(card_nodes[card_id]["root"], "position", target_pos, 0.2)
+	tw.parallel().tween_property(card_nodes[card_id]["root"], "scale", Vector2(0.74, 0.74), 0.2)
 	_play_synth_sequence([587.33, 880.0], 0.06)
+	_refresh_row_covers()
 
 func _return_card_to_tray(card_id: String) -> void:
 	for r in range(1, 5):
@@ -995,7 +1084,9 @@ func _return_card_to_tray(card_id: String) -> void:
 	
 	var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(card_nodes[card_id]["root"], "position", card_nodes[card_id]["initial_pos"], 0.22)
+	tw.parallel().tween_property(card_nodes[card_id]["root"], "scale", Vector2.ONE, 0.22)
 	_play_synth_sequence([440.0, 330.0], 0.05)
+	_refresh_row_covers()
 
 func _on_verify_pressed() -> void:
 	for r in range(1, 5):
@@ -1058,11 +1149,13 @@ func _apply_room_success_state() -> void:
 	for i in range(1, 5):
 		if i in wb_placed_tags:
 			wb_placed_tags[i].text = valid_cidrs[i]
-			wb_placed_tags[i].add_theme_color_override("font_color", Color("#22c55e"))
+			wb_placed_tags[i].visible = true
+			wb_placed_tags[i].add_theme_color_override("font_color", Color("#15803d"))
 	alert_badge_wb.visible = false
 	
 	# 2. Update Workstation monitor to "ALL 4 SUBNETS VALID!"
 	if workstation_status_label:
+		workstation_status_label.visible = true
 		workstation_status_label.text = "ALL 4 SUBNETS VALID!"
 		workstation_status_label.add_theme_color_override("font_color", Color("#4ade80"))
 		
@@ -1170,11 +1263,7 @@ func _game_over(custom_reason: String = "") -> void:
 	)
 
 func _update_hearts_ui() -> void:
-	for i in range(3):
-		if i < hearts:
-			hearts_rects[i].modulate = Color(1, 1, 1, 1)
-		else:
-			hearts_rects[i].modulate = Color(0.3, 0.3, 0.3, 0.4)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _open_task_modal() -> void:
 	if is_modal_open:
@@ -1303,11 +1392,13 @@ func _handle_movement(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 		walk_frame_index = 0.0
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not is_game_active:
+		return
+	if task_modal and task_modal.visible:
 		return
 		
 	if event is InputEventScreenTouch:
@@ -1432,3 +1523,32 @@ func _play_synth_sequence(freqs: Array, step_time: float) -> void:
 			var env = 1.0 - (float(i) / float(n_frames)) * 0.5
 			var s = sin(TAU * f * t) * 0.22 * env
 			playback.push_frame(Vector2(s, s))
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 3.2", "text": "Cocokkan Subnet Mask dengan notasi CIDR yang benar (/24, /25, /26, /27) untuk tiap PC." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Papan Konfigurasi", "text": "Klik papan ini (atau tombol Cocokkan CIDR) untuk membuka tugas. Di pop up, seret kartu CIDR ke slot subnet mask yang cocok.", "target": whiteboard_container, "pointer": "both" },
+		{ "title": "2. Meja PC", "text": "Tiap PC punya subnet mask sendiri. Klik meja untuk membuka tugasnya juga.", "target": (func(): return TutorialOverlay.union_of([desk1_container, desk2_container])), "pointer": "arrow" },
+		{ "title": "3. Rak Subnet & Switch", "text": "Saat semua cocok, jalur kabel ke rak ini menyala hijau dan jaringan tersambung.", "target": rack_node, "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

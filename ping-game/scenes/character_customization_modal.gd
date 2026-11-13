@@ -151,16 +151,32 @@ func _update_live_preview() -> void:
 	if PlayerData and temp_skin in PlayerData.SKIN_CONFIG:
 		skin_color = PlayerData.SKIN_CONFIG[temp_skin]["color"]
 		skin_desc = PlayerData.SKIN_CONFIG[temp_skin]["desc"]
-	preview_mascot.modulate = skin_color
+	preview_mascot.self_modulate = skin_color
 	preview_desc_label.text = skin_desc
 	
-	# 2. Accessory icon
-	var acc_icon = ""
+	# 2. Accessory texture overlay
+	var acc_overlay = preview_mascot.get_node_or_null("PreviewAccOverlay") as TextureRect
+	if not acc_overlay:
+		acc_overlay = TextureRect.new()
+		acc_overlay.name = "PreviewAccOverlay"
+		acc_overlay.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		acc_overlay.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		acc_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		acc_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+		preview_mascot.add_child(acc_overlay)
+		
+	var acc_path = ""
 	if PlayerData and temp_accessory in PlayerData.ACCESSORY_CONFIG:
-		acc_icon = PlayerData.ACCESSORY_CONFIG[temp_accessory]["icon"]
-	if acc_icon == "❌":
-		acc_icon = ""
-	preview_accessory_label.text = acc_icon
+		acc_path = PlayerData.ACCESSORY_CONFIG[temp_accessory].get("texture_path", "")
+		
+	if acc_path != "" and ResourceLoader.exists(acc_path):
+		acc_overlay.texture = load(acc_path)
+		acc_overlay.visible = true
+	else:
+		acc_overlay.visible = false
+		
+	if preview_accessory_label:
+		preview_accessory_label.text = ""
 	
 	# 3. Title label
 	preview_title_label.text = temp_title
@@ -273,10 +289,19 @@ func _render_accessory_options() -> void:
 		hb.add_theme_constant_override("separation", 12)
 		btn.add_child(hb)
 		
-		var icon_lbl = Label.new()
-		icon_lbl.text = data["icon"]
-		icon_lbl.add_theme_font_size_override("font_size", 24)
-		hb.add_child(icon_lbl)
+		var p = data.get("texture_path", "")
+		if p != "" and ResourceLoader.exists(p):
+			var icon_tex = TextureRect.new()
+			icon_tex.texture = load(p)
+			icon_tex.custom_minimum_size = Vector2(36, 36)
+			icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			hb.add_child(icon_tex)
+		else:
+			var icon_lbl = Label.new()
+			icon_lbl.text = data["icon"]
+			icon_lbl.add_theme_font_size_override("font_size", 24)
+			hb.add_child(icon_lbl)
 		
 		var vb = VBoxContainer.new()
 		vb.alignment = BoxContainer.ALIGNMENT_CENTER

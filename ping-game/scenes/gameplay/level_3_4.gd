@@ -212,6 +212,7 @@ var drag_touch_id: int = -1
 var drag_offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	_setup_floor_carpet()
 	_load_character_frames()
 	_setup_character()
@@ -248,26 +249,19 @@ func _setup_character() -> void:
 	char_sprite = TextureRect.new()
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.custom_minimum_size = Vector2(90, 80)
-	char_sprite.size = Vector2(90, 80)
-	char_sprite.position = Vector2(15, 15)
-	char_sprite.pivot_offset = Vector2(45, 40)
+	char_sprite.custom_minimum_size = Vector2(250, 138)
+	char_sprite.size = Vector2(250, 138)
+	char_sprite.position = Vector2(-65, -18)
+	char_sprite.pivot_offset = Vector2(125, 69)
+	char_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if walk_frames.size() > 0:
 		char_sprite.texture = walk_frames[0]
 	else:
 		char_sprite.texture = tex_char_idle
 	character_node.add_child(char_sprite)
-	
-	var spawn_label = Label.new()
-	spawn_label.text = "SPAWN"
-	spawn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	spawn_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	spawn_label.add_theme_font_override("font", font_extrabold)
-	spawn_label.add_theme_font_size_override("font_size", 10)
-	spawn_label.add_theme_color_override("font_color", Color("#94a3b8"))
-	spawn_label.position = Vector2(25, -5)
-	character_node.add_child(spawn_label)
-	
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	char_pos = character_node.position
 
 func _setup_wall_monitors() -> void:
@@ -315,27 +309,6 @@ func _setup_main_technician_desk() -> void:
 	desk_tex.texture = tex_main_desk
 	desk_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	main_technician_desk.add_child(desk_tex)
-	
-	# "MEJA TEKNISI ROUTING" label badge underneath
-	var desk_lbl_panel = PanelContainer.new()
-	desk_lbl_panel.size = Vector2(170, 24)
-	desk_lbl_panel.position = Vector2((main_technician_desk.size.x - 170) / 2.0, main_technician_desk.size.y - 12)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#ffffff")
-	sb.border_color = Color("#4a2e2b")
-	sb.set_border_width_all(2)
-	sb.set_corner_radius_all(10)
-	desk_lbl_panel.add_theme_stylebox_override("panel", sb)
-	main_technician_desk.add_child(desk_lbl_panel)
-	
-	var lbl = Label.new()
-	lbl.text = "MEJA TEKNISI ROUTING"
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.add_theme_font_override("font", font_extrabold)
-	lbl.add_theme_font_size_override("font_size", 10)
-	lbl.add_theme_color_override("font_color", Color("#4a2e2b"))
-	desk_lbl_panel.add_child(lbl)
 	
 	# Clickable overlay button on the desk
 	var desk_btn = Button.new()
@@ -580,34 +553,29 @@ func _setup_cables() -> void:
 
 func _draw_cables() -> void:
 	# Cable 1: PC-01 to Switch
-	var p1_out = pc1_desk.position + Vector2(pc1_desk.size.x, pc1_desk.size.y * 0.5)
-	var sw_in1 = switch_station.position + Vector2(0, switch_station.size.y * 0.4)
+	var p1_out = pc1_desk.position + Vector2((pc1_desk.size * pc1_desk.scale).x, (pc1_desk.size * pc1_desk.scale).y * 0.5)
+	var sw_in1 = switch_station.position + Vector2(0, (switch_station.size * switch_station.scale).y * 0.4)
 	cables_container.draw_line(p1_out, Vector2(sw_in1.x - 15, p1_out.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(sw_in1.x - 15, p1_out.y), Vector2(sw_in1.x - 15, sw_in1.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(sw_in1.x - 15, sw_in1.y), sw_in1, Color("#4ade80"), 4.0)
 	
 	# Cable 2: PC-02 to Switch
-	var p2_out = pc2_desk.position + Vector2(pc2_desk.size.x, pc2_desk.size.y * 0.5)
-	var sw_in2 = switch_station.position + Vector2(0, switch_station.size.y * 0.7)
+	var p2_out = pc2_desk.position + Vector2((pc2_desk.size * pc2_desk.scale).x, (pc2_desk.size * pc2_desk.scale).y * 0.5)
+	var sw_in2 = switch_station.position + Vector2(0, (switch_station.size * switch_station.scale).y * 0.7)
 	cables_container.draw_line(p2_out, Vector2(sw_in2.x - 15, p2_out.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(sw_in2.x - 15, p2_out.y), Vector2(sw_in2.x - 15, sw_in2.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(sw_in2.x - 15, sw_in2.y), sw_in2, Color("#4ade80"), 4.0)
 	
 	# Cable 3: Switch to R-01
-	var sw_out = switch_station.position + Vector2(switch_station.size.x, switch_station.size.y * 0.5)
-	var r1_in = router1_station.position + Vector2(0, router1_station.size.y * 0.5)
+	var sw_out = switch_station.position + Vector2((switch_station.size * switch_station.scale).x, (switch_station.size * switch_station.scale).y * 0.5)
+	var r1_in = router1_station.position + Vector2(0, (router1_station.size * router1_station.scale).y * 0.5)
 	cables_container.draw_line(sw_out, Vector2(r1_in.x - 25, sw_out.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(r1_in.x - 25, sw_out.y), Vector2(r1_in.x - 25, r1_in.y), Color("#4ade80"), 4.0)
 	cables_container.draw_line(Vector2(r1_in.x - 25, r1_in.y), r1_in, Color("#4ade80"), 4.0)
 	
-	# Cable 4: Cable from R-01 to Technician Desk
-	var desk_bot = main_technician_desk.position + Vector2(main_technician_desk.size.x * 0.2, main_technician_desk.size.y)
-	var r1_top = router1_station.position + Vector2(router1_station.size.x * 0.5, 0)
-	cables_container.draw_line(desk_bot, r1_top, Color("#94a3b8"), 3.0)
-	
 	# Cable 5: R-01 to R-02
-	var r1_out = router1_station.position + Vector2(router1_station.size.x, router1_station.size.y * 0.55)
-	var r2_in = router2_station.position + Vector2(0, router2_station.size.y * 0.55)
+	var r1_out = router1_station.position + Vector2((router1_station.size * router1_station.scale).x, (router1_station.size * router1_station.scale).y * 0.55)
+	var r2_in = router2_station.position + Vector2(0, (router2_station.size * router2_station.scale).y * 0.55)
 	if is_completed:
 		cables_container.draw_line(r1_out, r2_in, Color("#22c55e"), 6.0)
 	else:
@@ -615,8 +583,8 @@ func _draw_cables() -> void:
 		_draw_dashed_line(r1_out, r2_in, Color("#ef4444"), Color("#fee2e2"), 6.0, 10.0)
 		
 	# Cable 6: R-02 to Server Zone
-	var r2_out = router2_station.position + Vector2(router2_station.size.x, router2_station.size.y * 0.5)
-	var srv_in = server_zone.position + Vector2(0, server_zone.size.y * 0.5)
+	var r2_out = router2_station.position + Vector2((router2_station.size * router2_station.scale).x, (router2_station.size * router2_station.scale).y * 0.5)
+	var srv_in = server_zone.position + Vector2(0, (server_zone.size * server_zone.scale).y * 0.5)
 	var cable_srv_col = Color("#22c55e") if is_completed else Color("#67e8f9")
 	cables_container.draw_line(r2_out, Vector2(r2_out.x + 30, r2_out.y), cable_srv_col, 5.0)
 	cables_container.draw_line(Vector2(r2_out.x + 30, r2_out.y), Vector2(r2_out.x + 30, srv_in.y), cable_srv_col, 5.0)
@@ -701,6 +669,7 @@ func _build_header_ui() -> void:
 		h.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		hearts_container.add_child(h)
 		hearts_rects.append(h)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 	# Level 3.4 Badge
 	var lvl_badge = PanelContainer.new()
@@ -875,7 +844,7 @@ func _on_mulai_pressed() -> void:
 	tw.finished.connect(func():
 		intro_modal.visible = false
 		is_modal_open = false
-		is_game_active = true
+		_start_after_tutorial()
 	)
 
 func _setup_task_modal() -> void:
@@ -1081,7 +1050,21 @@ func _setup_task_modal() -> void:
 	verify_button.pressed.connect(_on_verify_pressed)
 	win_container.add_child(verify_button)
 
+var modal_shifted: bool = false
+
+func _shift_task_modal_content() -> void:
+	var win_container = task_modal.get_node("WinContainer") as Control
+	for ch in win_container.get_children():
+		if ch.position.y < 40.0:
+			continue
+		ch.position.y += 16.0
+	for cid in card_nodes:
+		card_nodes[cid]["orig_pos"].y += 16.0
+
 func _open_task_modal() -> void:
+	if not modal_shifted:
+		modal_shifted = true
+		_shift_task_modal_content()
 	if is_completed:
 		show_toast("✅ Routing Table R-01 sudah sempurna dan rute aktif!")
 		return
@@ -1106,44 +1089,88 @@ func _close_task_modal() -> void:
 			is_game_active = true
 	)
 
+var drag_moved: bool = false
+var drag_press_global: Vector2 = Vector2.ZERO
+var drag_origin_pos: Vector2 = Vector2.ZERO
+var card_tweens: Dictionary = {}
+
+func _card_parent_local(c_node: Control, global_pos: Vector2) -> Vector2:
+	var par = c_node.get_parent() as Control
+	if par == null:
+		return global_pos
+	return par.get_global_transform().affine_inverse() * global_pos
+
 func _on_card_input(card_id: String, event: InputEvent) -> void:
+	var c_node = card_nodes[card_id]["ctrl"] as Control
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				dragging_card_id = card_id
-				drag_offset = event.position
-				card_nodes[card_id]["ctrl"].z_index = 50
-				# If already in a slot, tapping it removes it back to tray!
-				if card_nodes[card_id]["in_slot"] != "":
-					_remove_card_from_slot(card_id)
-				else:
-					_select_card(card_id)
-			else:
-				if dragging_card_id == card_id:
-					_handle_card_drop(card_id)
-					dragging_card_id = ""
-					card_nodes[card_id]["ctrl"].z_index = 0
+		if event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if event.pressed:
+			_card_press(card_id, event.global_position)
+		else:
+			_card_release(card_id)
 	elif event is InputEventScreenTouch:
 		if event.pressed:
-			drag_touch_id = event.index
-			dragging_card_id = card_id
-			card_nodes[card_id]["ctrl"].z_index = 50
-			if card_nodes[card_id]["in_slot"] != "":
-				_remove_card_from_slot(card_id)
-			else:
-				_select_card(card_id)
+			if drag_touch_id == -1:
+				drag_touch_id = event.index
+			_card_press(card_id, c_node.get_global_transform() * event.position)
 		else:
-			if drag_touch_id == event.index and dragging_card_id == card_id:
-				_handle_card_drop(card_id)
-				dragging_card_id = ""
+			if drag_touch_id == event.index:
 				drag_touch_id = -1
-				card_nodes[card_id]["ctrl"].z_index = 0
-	elif event is InputEventMouseMotion and dragging_card_id == card_id:
-		var c_node = card_nodes[card_id]["ctrl"]
-		c_node.global_position = get_global_mouse_position() - drag_offset
-	elif event is InputEventScreenDrag and dragging_card_id == card_id and event.index == drag_touch_id:
-		var c_node = card_nodes[card_id]["ctrl"]
-		c_node.global_position = event.position - drag_offset
+				_card_release(card_id)
+	elif event is InputEventMouseMotion:
+		if dragging_card_id == card_id:
+			_card_motion(card_id, event.global_position)
+	elif event is InputEventScreenDrag:
+		if dragging_card_id == card_id and event.index == drag_touch_id:
+			_card_motion(card_id, c_node.get_global_transform() * event.position)
+
+func _card_press(card_id: String, global_pos: Vector2) -> void:
+	if dragging_card_id != "":
+		return
+	var c_node = card_nodes[card_id]["ctrl"] as Control
+	dragging_card_id = card_id
+	drag_moved = false
+	drag_press_global = global_pos
+	drag_origin_pos = c_node.position
+	drag_offset = c_node.position - _card_parent_local(c_node, global_pos)
+	c_node.z_index = 50
+
+func _card_motion(card_id: String, global_pos: Vector2) -> void:
+	var c_node = card_nodes[card_id]["ctrl"] as Control
+	if not drag_moved and global_pos.distance_to(drag_press_global) > 8.0:
+		drag_moved = true
+		if card_tweens.has(card_id) and card_tweens[card_id] != null and card_tweens[card_id].is_valid():
+			card_tweens[card_id].kill()
+		# Kartu yang diseret keluar dari slot: kosongkan slotnya (tanpa animasi)
+		if card_nodes[card_id]["in_slot"] != "":
+			for sk in slot_assignment.keys():
+				if slot_assignment[sk] == card_id:
+					slot_assignment[sk] = ""
+			card_nodes[card_id]["in_slot"] = ""
+		_play_synth_sequence([440.0], 0.05)
+	if drag_moved:
+		c_node.position = _card_parent_local(c_node, global_pos) + drag_offset
+
+func _card_release(card_id: String) -> void:
+	if dragging_card_id != card_id:
+		return
+	dragging_card_id = ""
+	var c_node = card_nodes[card_id]["ctrl"] as Control
+	c_node.z_index = 0
+	if not drag_moved:
+		# Ketukan biasa: kartu di slot dikembalikan ke tray, kartu di tray dipilih / batal dipilih
+		c_node.position = drag_origin_pos
+		if card_nodes[card_id]["in_slot"] != "":
+			_remove_card_from_slot(card_id)
+		else:
+			_select_card(card_id)
+		return
+	# Geser sungguhan: seleksi ketuk dibersihkan agar tidak "menempel"
+	if selected_card_id != "":
+		selected_card_id = ""
+		_update_card_styles()
+	_handle_card_drop(card_id)
 
 func _select_card(card_id: String) -> void:
 	if selected_card_id == card_id:
@@ -1236,8 +1263,11 @@ func _remove_card_from_slot(card_id: String) -> void:
 
 func _animate_card_to(card_id: String, target_pos: Vector2) -> void:
 	var c_node = card_nodes[card_id]["ctrl"]
+	if card_tweens.has(card_id) and card_tweens[card_id] != null and card_tweens[card_id].is_valid():
+		card_tweens[card_id].kill()
 	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(c_node, "position", target_pos, 0.22)
+	card_tweens[card_id] = tw
 
 func _on_verify_pressed() -> void:
 	# Check if all 4 slots are filled
@@ -1286,11 +1316,7 @@ func _on_routing_error(msg: String) -> void:
 		_game_over()
 
 func _update_hearts_ui() -> void:
-	for i in range(3):
-		if i < hearts:
-			hearts_rects[i].modulate = Color(1, 1, 1, 1)
-		else:
-			hearts_rects[i].modulate = Color(0.3, 0.3, 0.3, 0.4)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _shake_node(n: Control) -> void:
 	var orig_x = n.position.x
@@ -1538,19 +1564,25 @@ func _process(delta: float) -> void:
 		_process_movement(delta)
 
 func _process_movement(delta: float) -> void:
-	input_dir = Vector2.ZERO
+	var move_dir = Vector2.ZERO
 	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
-		input_dir.x += 1.0
+		move_dir.x += 1.0
 	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
-		input_dir.x -= 1.0
+		move_dir.x -= 1.0
 	if Input.is_action_pressed("ui_down") or Input.is_key_pressed(KEY_S):
-		input_dir.y += 1.0
+		move_dir.y += 1.0
 	if Input.is_action_pressed("ui_up") or Input.is_key_pressed(KEY_W):
-		input_dir.y -= 1.0
-		
-	if input_dir.length_squared() > 0.0:
-		input_dir = input_dir.normalized()
-		char_pos += input_dir * MOVE_SPEED * delta
+		move_dir.y -= 1.0
+	if move_dir.length_squared() == 0.0 and input_dir.length_squared() > 0.01:
+		move_dir = input_dir
+
+	if move_dir.length_squared() > 0.0:
+		move_dir = move_dir.normalized()
+		char_pos += move_dir * MOVE_SPEED * delta
+		if move_dir.x < -0.1:
+			char_sprite.flip_h = true
+		elif move_dir.x > 0.1:
+			char_sprite.flip_h = false
 		
 		# Clamp to room boundaries
 		char_pos.x = clamp(char_pos.x, 70.0, 1430.0)
@@ -1600,18 +1632,27 @@ func _build_mobile_controls() -> void:
 	
 	dpad_center = dpad_area.global_position + Vector2(80, 80)
 	
-	dpad_area.gui_input.connect(func(ev: InputEvent):
-		if ev is InputEventScreenTouch:
-			if ev.pressed:
-				dpad_touch_id = ev.index
-				_update_dpad(ev.position)
-			elif ev.index == dpad_touch_id:
-				dpad_touch_id = -1
-				input_dir = Vector2.ZERO
-				dpad_knob_sprite.position = Vector2(50, 50)
-		elif ev is InputEventScreenDrag and ev.index == dpad_touch_id:
-			_update_dpad(ev.position)
-	)
+	dpad_area_node = dpad_area
+
+var dpad_area_node: Control
+
+func _input(event: InputEvent) -> void:
+	if not is_game_active or not dpad_area_node:
+		return
+	if task_modal and task_modal.visible:
+		return
+	if event is InputEventScreenTouch:
+		var local_p = event.position - dpad_area_node.global_position
+		if event.pressed:
+			if dpad_touch_id == -1 and Rect2(Vector2(-20, -20), Vector2(200, 200)).has_point(local_p):
+				dpad_touch_id = event.index
+				_update_dpad(local_p)
+		elif event.index == dpad_touch_id:
+			dpad_touch_id = -1
+			input_dir = Vector2.ZERO
+			dpad_knob_sprite.position = Vector2(50, 50)
+	elif event is InputEventScreenDrag and event.index == dpad_touch_id:
+		_update_dpad(event.position - dpad_area_node.global_position)
 
 func _update_dpad(local_pos: Vector2) -> void:
 	var center = Vector2(80, 80)
@@ -1711,3 +1752,33 @@ func _check_screenshot_args() -> void:
 			if img:
 				img.save_png("art/34_room_sukses_render.png")
 		get_tree().quit()
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 3.4", "text": "Perbaiki tabel routing supaya paket dari PC bisa melewati Switch dan Router sampai ke Server Utama." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Tabel Routing", "text": "Monitor ini menampilkan tabel routing. Baris merah berarti rute hilang atau salah. Klik untuk membuka tugas.", "target": wall_rt_monitor, "pointer": "both" },
+		{ "title": "2. Router R1", "text": "Router yang routing-nya bermasalah ditandai merah. Klik router untuk memperbaikinya.", "target": router1_station, "pointer": "both" },
+		{ "title": "3. Meja Teknisi Routing", "text": "Klik meja ini atau tombol Perbaiki Routing untuk membuka pop up tugas.", "target": main_technician_desk, "pointer": "hand" },
+		{ "title": "4. Server Utama", "text": "Tujuan akhirnya: paket harus sampai ke server ini, jadi semua rute harus tersambung.", "target": server_zone, "pointer": "arrow" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

@@ -144,6 +144,7 @@ var dpad_radius: float = 55.0
 var cable_points: Dictionary = {}
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	settings_modal = preload("res://scenes/settings_modal.tscn").instantiate()
 	add_child(settings_modal)
 	
@@ -303,7 +304,7 @@ func _process(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 			
 	_update_proximity_prompts()
 
@@ -686,11 +687,15 @@ func _get_bezier_point(start: Vector2, finish: Vector2, ctrl_offset: Vector2, t:
 # --- CHARACTER SETUP ---
 func _build_character() -> void:
 	char_sprite = TextureRect.new()
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.size = Vector2(256, 144)
+	char_sprite.size = Vector2(340, 191)
+	char_sprite.position = Vector2(-42, -24)
 	character_mascot.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	var screen_w = get_viewport_rect().size.x
 	char_pos = Vector2(screen_w / 2.0 - 128.0, 270.0)
@@ -853,6 +858,7 @@ func _build_header_ui() -> void:
 		h.modulate = Color(1.0, 0.28, 0.4, 1.0)
 		slot.add_child(h)
 		hearts_rects.append(h)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var b_lbl = Label.new()
 		b_lbl.text = "✕"
@@ -976,32 +982,7 @@ func _update_timer_display() -> void:
 		timer_label.add_theme_color_override("font_color", Color("#1e293b"))
 
 func _update_hearts_display(is_damage_event: bool = false) -> void:
-	for idx in range(hearts_rects.size()):
-		var hr = hearts_rects[idx]
-		var bl = broken_labels[idx] if idx < broken_labels.size() else null
-		if hr:
-			if idx < hearts:
-				hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-				hr.scale = Vector2.ONE
-				if bl: bl.visible = false
-			else:
-				if is_damage_event and idx == hearts:
-					hr.modulate = Color(1.0, 0.1, 0.1, 1.0)
-					var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-					tw.tween_property(hr, "scale", Vector2(1.25, 1.25), 0.1)
-					tw.tween_property(hr, "scale", Vector2(0.85, 0.85), 0.15)
-					tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 0.0
-						var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-						tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
-				else:
-					hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
-					hr.scale = Vector2(0.85, 0.85)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 1.0
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _deduct_heart() -> void:
 	if hearts > 0:
@@ -1125,7 +1106,7 @@ func _build_intro_modal() -> void:
 func _start_gameplay() -> void:
 	_play_sweep(440.0, 880.0, 0.15, 0.25)
 	intro_modal.visible = false
-	is_game_active = true
+	_start_after_tutorial()
 	show_toast("Misi Dimulai: Dekati Rak di sebelah kiri untuk mengambil perangkat!", 3.5)
 
 # --- TABLE INTERACTION & STATE HANDLING ---
@@ -2093,7 +2074,7 @@ func _reposition_responsive() -> void:
 		if hearts_p:
 			hearts_p.position = Vector2(110, 26)
 		if lvl_p:
-			lvl_p.position = Vector2(270, 26)
+			lvl_p.position = Vector2(292, 26)
 		if timer_p:
 			timer_p.position = Vector2(screen_w - 240, 26)
 		if pause_b:
@@ -2184,3 +2165,33 @@ func _play_footstep() -> void:
 			var env = 1.0 - (float(i) / float(num_samples))
 			var noise = (randf() * 2.0 - 1.0) * env * 0.08
 			pb.push_frame(Vector2(noise, noise))
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 1.3", "text": "Hubungkan 4 komputer dengan perangkat yang tepat (Hub atau Switch), lalu kirim amplop data." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Rak Perangkat", "text": "Dekati rak di sebelah kiri untuk mengambil perangkat Hub atau Switch.", "target": left_rack_node, "pointer": "both" },
+		{ "title": "2. Meja Tengah", "text": "Taruh perangkat di meja ini. Hub menyiarkan data ke semua PC sehingga amplop bisa bertabrakan, sedangkan Switch mengirim hanya ke tujuan.", "target": cable_table_node, "pointer": "both" },
+		{ "title": "3. Empat PC", "text": "Semua PC harus terhubung ke perangkat. Setelah itu kirim amplop data ke tujuannya.", "target": (func(): return TutorialOverlay.union_of([pc1_node, pc2_node, pc3_node, pc4_node])), "pointer": "arrow" },
+		{ "title": "4. Tombol AKSI", "text": "Tekan saat dekat rak, meja, atau PC untuk mengambil, menaruh, atau menghubungkan.", "target": Rect2(1409, 555, 110, 110), "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

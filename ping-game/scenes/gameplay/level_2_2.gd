@@ -117,6 +117,7 @@ var packets_sorted_count: int = 0
 var traffic_deck: Array[Dictionary] = []
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	_load_dynamic_assets()
 	_setup_character()
 	_build_room_decorations()
@@ -219,7 +220,7 @@ func _handle_movement(delta: float) -> void:
 			_play_footstep()
 	else:
 		if char_sprite:
-			char_sprite.texture = tex_char_idle
+			char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 		walk_frame_index = 0.0
 
 func _is_room_collision(pos: Vector2) -> bool:
@@ -299,8 +300,8 @@ func _load_dynamic_assets() -> void:
 	tex_router_obj = _safe_load_texture("res://art/assets/PING! Assets/asset-gameplay/stage2/router objects 1.png")
 	
 	# Load Walk frames router jika ada
-	for i in range(1, 9):
-		var p = "res://art/assets/PING! Assets/Sprite animation/router/%d.png" % i
+	for i in range(1, 33):
+		var p = "res://art/assets/PING! Assets/Sprite animation/router walk/%d.png" % i
 		var tex = _safe_load_texture(p)
 		if tex:
 			walk_frames.append(tex)
@@ -314,11 +315,16 @@ func _setup_character() -> void:
 	
 	char_sprite = TextureRect.new()
 	char_sprite.name = "CharSprite"
-	char_sprite.texture = tex_char_idle
+	char_sprite.texture = (walk_frames[0] if walk_frames.size() > 0 else tex_char_idle)
 	char_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	char_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	char_sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+	char_sprite.custom_minimum_size = Vector2(320, 176)
+	char_sprite.size = Vector2(320, 176)
+	char_sprite.position = Vector2(-50, -28)
 	character_node.add_child(char_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(char_sprite)
 	
 	char_pos = character_node.position
 
@@ -800,6 +806,7 @@ func _build_header_ui() -> void:
 		hr.pivot_offset = Vector2(15, 13)
 		h_box.add_child(hr)
 		hearts_rects.append(hr)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var bl = Label.new()
 		bl.text = "✕"
@@ -1208,7 +1215,7 @@ func _close_intro_modal() -> void:
 	await tw.finished
 	intro_modal.visible = false
 	is_modal_open = false
-	is_game_active = true
+	_start_after_tutorial()
 	_play_chime_sound()
 
 # --- FILTER MODAL (FIGMA IMAGE 3) ---
@@ -1485,38 +1492,7 @@ func _shake_screen() -> void:
 	tw.tween_property(self, "position", Vector2.ZERO, 0.05)
 
 func _update_hearts_display(is_damage_event: bool = false) -> void:
-	if not hearts_container:
-		return
-		
-	for i in range(hearts_rects.size()):
-		var hr = hearts_rects[i]
-		var bl = broken_labels[i]
-		
-		if i < hearts:
-			hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-			hr.scale = Vector2.ONE
-			bl.visible = false
-		else:
-			if is_damage_event and i == hearts:
-				hr.modulate = Color(1.0, 0.2, 0.2, 1.0)
-				var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-				tw.tween_property(hr, "scale", Vector2(1.3, 1.3), 0.1)
-				tw.tween_property(hr, "scale", Vector2(0.8, 0.8), 0.15)
-				tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
-				bl.visible = true
-				bl.modulate.a = 0.0
-				var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-				tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
-			else:
-				hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
-				hr.scale = Vector2(0.8, 0.8)
-				bl.visible = true
-				bl.modulate.a = 1.0
-				
-	if is_damage_event and hearts_panel:
-		var tw_panel = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tw_panel.tween_property(hearts_panel, "modulate", Color(1.0, 0.5, 0.5, 1.0), 0.08)
-		tw_panel.tween_property(hearts_panel, "modulate", Color.WHITE, 0.25)
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 # --- WHITEBOARD MODAL (EDUKASI FIREWALL) ---
 func _open_whiteboard_modal() -> void:
@@ -1842,3 +1818,32 @@ static func _safe_load_texture(path: String) -> Texture2D:
 		if img and not img.is_empty():
 			return ImageTexture.create_from_image(img)
 	return null
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 2.2", "text": "Saring trafik yang meminta akses ke server internal: izinkan IP Privat, blokir IP Publik." },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Aturan Firewall", "text": "Baca aturannya dulu. ALLOW untuk IP Privat (10.x, 172.16 - 172.31, 192.168.x) dan BLOCK untuk IP Publik.", "target": whiteboard_node, "pointer": "hand" },
+		{ "title": "2. Konsol Filter", "text": "Dekati meja tengah ini lalu klik tombol Filter (atau tekan Spasi) untuk membuka konsol penyaring.", "target": center_desk, "pointer": "both" },
+		{ "title": "3. Zona Hasil", "text": "Di konsol, tempatkan tiap alamat IP ke zona yang benar: IP Privat ke LAN Aman (kiri), IP Publik ke Karantina (kanan).", "target": (func(): return TutorialOverlay.union_of([left_pad, right_pad])), "pointer": "arrow" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

@@ -120,6 +120,7 @@ var pinout_hint_panel: PanelContainer
 var pinout_hint_lbl: Label
 
 func _ready() -> void:
+	call_deferred("_setup_help_button")
 	settings_modal = preload("res://scenes/settings_modal.tscn").instantiate()
 	add_child(settings_modal)
 	_load_walk_frames()
@@ -524,34 +525,7 @@ func _add_cable_to_rack_display(rack_type: String, tex: Texture2D) -> void:
 			break
 
 func _update_hearts_display(is_damage_event: bool = false) -> void:
-	if not hearts_container:
-		return
-	for idx in range(hearts_rects.size()):
-		var hr = hearts_rects[idx]
-		var bl = broken_labels[idx] if idx < broken_labels.size() else null
-		if hr:
-			if idx < hearts:
-				hr.modulate = Color(1.0, 0.28, 0.4, 1.0)
-				hr.scale = Vector2.ONE
-				if bl: bl.visible = false
-			else:
-				if is_damage_event and idx == hearts:
-					hr.modulate = Color(1.0, 0.1, 0.1, 1.0)
-					var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-					tw.tween_property(hr, "scale", Vector2(1.25, 1.25), 0.1)
-					tw.tween_property(hr, "scale", Vector2(0.85, 0.85), 0.15)
-					tw.tween_property(hr, "modulate", Color(0.25, 0.2, 0.22, 0.35), 0.2)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 0.0
-						var tw_b = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-						tw_b.tween_property(bl, "modulate:a", 1.0, 0.15)
-				else:
-					hr.modulate = Color(0.25, 0.2, 0.22, 0.35)
-					hr.scale = Vector2(0.85, 0.85)
-					if bl:
-						bl.visible = true
-						bl.modulate.a = 1.0
+	HeartsStyle.refresh(hearts_rects, hearts)
 
 func _update_timer_display() -> void:
 	var total_sec = int(time_remaining)
@@ -564,7 +538,7 @@ func _update_timer_display() -> void:
 		timer_label.add_theme_color_override("font_color", Color("#4a2e2b"))
 
 func _start_gameplay() -> void:
-	is_game_active = true
+	_start_after_tutorial()
 	intro_modal.visible = false
 	_play_sweep(440.0, 880.0, 0.15, 0.18)
 	show_toast("Misi dimulai! Analisis kabel di meja dan kelompokkan ke rak yang sesuai.")
@@ -817,12 +791,16 @@ func _build_character_mascot() -> void:
 	character_mascot.pivot_offset = Vector2(128, 72)
 	
 	mascot_sprite = TextureRect.new()
-	mascot_sprite.size = Vector2(256, 144)
+	mascot_sprite.size = Vector2(340, 191)
+	mascot_sprite.position = Vector2(-42, -24)
 	mascot_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mascot_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	mascot_sprite.pivot_offset = Vector2(128, 72)
+	mascot_sprite.pivot_offset = Vector2(170, 95)
 	mascot_sprite.texture = walk_frames[0] if walk_frames.size() > 0 else tex_router_idle
 	character_mascot.add_child(mascot_sprite)
+	var _pd = get_node_or_null("/root/PlayerData")
+	if _pd and _pd.has_method("apply_to_character"):
+		_pd.apply_to_character(mascot_sprite)
 	
 	# Floating Carried Cable Icon
 	carried_icon = TextureRect.new()
@@ -915,6 +893,7 @@ func _build_header_ui() -> void:
 		h_rect.modulate = Color(1.0, 0.28, 0.4, 1.0)
 		slot.add_child(h_rect)
 		hearts_rects.append(h_rect)
+		HeartsStyle.schedule_normalize(hearts_rects)
 		
 		var b_lbl = Label.new()
 		b_lbl.text = "✕"
@@ -1666,3 +1645,32 @@ func _play_notes(notes: Array[float], note_duration: float, volume: float = 0.2)
 	stream.data = data
 	audio_player.stream = stream
 	audio_player.play()
+
+
+# ==============================================================================
+# PANDUAN BERMAIN (hint pop up dengan tangan/panah) - bisa dibuka lagi lewat tombol "?"
+# ==============================================================================
+var help_btn: Button
+
+func _setup_help_button() -> void:
+	if header_ui and timer_label:
+		help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
+
+func _on_help_pressed() -> void:
+	if TutorialOverlay.can_open_help(self):
+		TutorialOverlay.start(self, _tutorial_steps(), Callable(), true)
+
+# Dipanggil saat intro selesai: tampilkan panduan dulu, permainan baru aktif setelahnya
+func _start_after_tutorial() -> void:
+	TutorialOverlay.start(self, _tutorial_steps(), func(): is_game_active = true)
+
+func _tutorial_steps() -> Array:
+	return [
+		{ "title": "Misi Level 1.1", "text": "Periksa kabel di meja kerja: mana yang Straight dan mana yang Cross, lalu masukkan ke rak yang sesuai. Yuk lihat caranya!" },
+		TutorialOverlay.step_move(self),
+		{ "title": "1. Meja Kerja Kabel", "text": "Dekati meja ini. Klik Lihat untuk memeriksa urutan pin warna kabel, lalu klik Ambil untuk membawa kabelnya. Straight = urutan pin sama di kedua ujung, Cross = urutan berbeda.", "target": cable_table_node, "pointer": "both" },
+		{ "title": "2. Rak Cross", "text": "Bawa kabel Cross ke rak di sebelah kiri ini, lalu klik tombol simpan yang muncul.", "target": left_rack_node, "pointer": "hand" },
+		{ "title": "3. Rak Straight", "text": "Kabel Straight disimpan di rak sebelah kanan ini. Salah rak akan mengurangi nyawa.", "target": right_rack_node, "pointer": "hand" },
+		TutorialOverlay.step_hearts(self),
+		{ "title": "Siap?", "text": "Selesaikan misi sebelum waktu habis. Lupa caranya? Tekan tombol ? (kuning) di dekat pewaktu kapan saja untuk melihat panduan ini lagi." }
+	]

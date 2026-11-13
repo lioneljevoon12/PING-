@@ -1,0 +1,372 @@
+[gd_scene load_steps=13 format=3 uid="uid://d4e5f6a7b8c91"]
+
+[ext_resource type="Script" path="res://scenes/gameplay/level_2_4.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/bg_stage2.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/rak-kabel.png" id="3_rack"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage1/1.3/meja-panjang.png" id="4_table_long"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage1/1.3/meja-pc.png" id="5_table_pc"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage2/operator_pc_2_1.png" id="6_pc"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/star_gold.png" id="7_star"]
+[ext_resource type="Texture2D" path="res://art/ui-ux/levelpath/crisp_door.png" id="8_door"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/Map/pot-bunga.png" id="9_plant"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/generals/frame-jam.png" id="10_clock"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage2/switch-icons.png" id="11_switch"]
+[ext_resource type="Texture2D" path="res://art/assets/PING! Assets/asset-gameplay/stage2/router objects 1.png" id="12_router"]
+
+[node name="Level2_4" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+
+[node name="FootstepPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+volume_db = -8.0
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DoorArch" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 600.0
+offset_top = 45.0
+offset_right = 920.0
+offset_bottom = 245.0
+texture = ExtResource("8_door")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PottedPlant" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 940.0
+offset_top = 75.0
+offset_right = 1040.0
+offset_bottom = 245.0
+texture = ExtResource("9_plant")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WallClock" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 115.0
+offset_right = 1110.0
+offset_bottom = 165.0
+texture = ExtResource("10_clock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LeftRackCabinet" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 40.0
+offset_top = 210.0
+offset_right = 260.0
+offset_bottom = 570.0
+texture = ExtResource("3_rack")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WhiteboardNode" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 320.0
+offset_top = 80.0
+offset_right = 520.0
+offset_bottom = 190.0
+
+[node name="CablesContainer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PC1Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 280.0
+offset_top = 460.0
+offset_right = 440.0
+offset_bottom = 580.0
+
+[node name="PC1TableTex" type="TextureRect" parent="PC1Desk"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_table_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC1Monitor" type="TextureRect" parent="PC1Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = -45.0
+offset_right = 125.0
+offset_bottom = 45.0
+texture = ExtResource("6_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC1Pill" type="PanelContainer" parent="PC1Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 75.0
+offset_right = 150.0
+offset_bottom = 100.0
+
+[node name="PC1Label" type="Label" parent="PC1Desk/PC1Pill"]
+layout_mode = 2
+text = "PC 1: 192.168.1.10"
+horizontal_alignment = 1
+
+[node name="PC1Bubble" type="PanelContainer" parent="PC1Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -25.0
+offset_top = -92.0
+offset_right = 185.0
+offset_bottom = -50.0
+
+[node name="PC1BubbleLabel" type="Label" parent="PC1Desk/PC1Bubble"]
+layout_mode = 2
+text = "🔵 JALUR STANDBY\nTabel ARP PC 1 kosong"
+horizontal_alignment = 1
+
+[node name="CenterDesk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 540.0
+offset_top = 480.0
+offset_right = 780.0
+offset_bottom = 590.0
+
+[node name="DeskTableTex" type="TextureRect" parent="CenterDesk"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_table_long")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CenterSwitch" type="TextureRect" parent="CenterDesk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 10.0
+offset_right = 110.0
+offset_bottom = 65.0
+texture = ExtResource("11_switch")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CenterRouter" type="TextureRect" parent="CenterDesk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 135.0
+offset_top = 8.0
+offset_right = 215.0
+offset_bottom = 68.0
+texture = ExtResource("12_router")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="KawalBtn" type="Button" parent="CenterDesk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 65.0
+offset_top = 72.0
+offset_right = 175.0
+offset_bottom = 100.0
+text = "Kawal"
+
+[node name="KawalAlertPill" type="PanelContainer" parent="CenterDesk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 30.0
+offset_top = -34.0
+offset_right = 210.0
+offset_bottom = -4.0
+
+[node name="KawalAlertLabel" type="Label" parent="CenterDesk/KawalAlertPill"]
+layout_mode = 2
+text = "! Kawal ARP-Reply"
+horizontal_alignment = 1
+
+[node name="PC2Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 310.0
+offset_right = 1220.0
+offset_bottom = 420.0
+
+[node name="PC2TableTex" type="TextureRect" parent="PC2Desk"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_table_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC2Monitor" type="TextureRect" parent="PC2Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = -45.0
+offset_right = 125.0
+offset_bottom = 45.0
+texture = ExtResource("6_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC2Pill" type="PanelContainer" parent="PC2Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 70.0
+offset_right = 150.0
+offset_bottom = 95.0
+
+[node name="PC2Label" type="Label" parent="PC2Desk/PC2Pill"]
+layout_mode = 2
+text = "PC 2: 192.168.1.12"
+horizontal_alignment = 1
+
+[node name="PC3Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 470.0
+offset_right = 1220.0
+offset_bottom = 580.0
+
+[node name="PC3TableTex" type="TextureRect" parent="PC3Desk"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_table_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC3Monitor" type="TextureRect" parent="PC3Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = -45.0
+offset_right = 125.0
+offset_bottom = 45.0
+texture = ExtResource("6_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC3Pill" type="PanelContainer" parent="PC3Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 70.0
+offset_right = 150.0
+offset_bottom = 95.0
+
+[node name="PC3Label" type="Label" parent="PC3Desk/PC3Pill"]
+layout_mode = 2
+text = "PC 3: 192.168.1.50"
+horizontal_alignment = 1
+
+[node name="PC3StarBadge" type="TextureRect" parent="PC3Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 135.0
+offset_top = -25.0
+offset_right = 165.0
+offset_bottom = 5.0
+texture = ExtResource("7_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC4Desk" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 630.0
+offset_right = 1220.0
+offset_bottom = 740.0
+
+[node name="PC4TableTex" type="TextureRect" parent="PC4Desk"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_table_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC4Monitor" type="TextureRect" parent="PC4Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = -45.0
+offset_right = 125.0
+offset_bottom = 45.0
+texture = ExtResource("6_pc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PC4Pill" type="PanelContainer" parent="PC4Desk"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 70.0
+offset_right = 150.0
+offset_bottom = 95.0
+
+[node name="PC4Label" type="Label" parent="PC4Desk/PC4Pill"]
+layout_mode = 2
+text = "PC 4: 192.168.1.88"
+horizontal_alignment = 1
+
+[node name="CharacterNode" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 460.0
+offset_top = 340.0
+offset_right = 680.0
+offset_bottom = 460.0
+pivot_offset = Vector2(110, 60)

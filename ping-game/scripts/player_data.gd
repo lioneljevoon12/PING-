@@ -6,7 +6,7 @@ signal customization_changed
 var current_username: String = "Teknisi"
 var is_logged_in: bool = false
 var current_stage: int = 1
-var unlocked_stage: int = 5
+var unlocked_stage: int = 1
 
 # Customization state (Dummy / Persistent)
 var current_skin: String = "classic"
@@ -23,11 +23,36 @@ const SKIN_CONFIG: Dictionary = {
 }
 
 const ACCESSORY_CONFIG: Dictionary = {
-	"none": { "name": "Tanpa Aksesoris", "icon": "❌" },
-	"helmet": { "name": "Helm Proyek", "icon": "👷" },
-	"visor": { "name": "Kacamata AR Cyber", "icon": "🥽" },
-	"headset": { "name": "Headset Admin", "icon": "🎧" },
-	"grad_cap": { "name": "Topi Sarjana", "icon": "🎓" }
+	"none": {
+		"name": "Tanpa Aksesoris",
+		"icon": "❌",
+		"texture_path": ""
+	},
+	"helmet": {
+		"name": "Helm Proyek",
+		"icon": "👷",
+		"texture_path": "res://art/assets/PING! Assets/accessories/helm proyek.png"
+	},
+	"visor": {
+		"name": "Kacamata",
+		"icon": "👓",
+		"texture_path": "res://art/assets/PING! Assets/accessories/kacamata.png"
+	},
+	"headset": {
+		"name": "Headset Admin",
+		"icon": "🎧",
+		"texture_path": "res://art/assets/PING! Assets/accessories/headset.png"
+	},
+	"grad_cap": {
+		"name": "Topi Sarjana",
+		"icon": "🎓",
+		"texture_path": "res://art/assets/PING! Assets/accessories/topi sarjana.png"
+	},
+	"ribbon": {
+		"name": "Pita Manis",
+		"icon": "🎀",
+		"texture_path": "res://art/assets/PING! Assets/accessories/pita.png"
+	}
 }
 
 const TITLE_OPTIONS: Array[String] = [
@@ -44,10 +69,10 @@ const SAVE_PATH: String = "user://player_progress.json"
 # Progression: Stage 1.1 Unlocked initially, others locked
 var stage_progress: Dictionary = {
 	1: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0 } },
-	2: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0 } },
+	2: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0, 4: 0 } },
 	3: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0, 4: 0 } },
 	4: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0 } },
-	5: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0 } },
+	5: { "unlocked_level": 1, "stars": { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } },
 }
 
 func _ready() -> void:
@@ -57,11 +82,21 @@ func _ready() -> void:
 
 # --- UNLOCK & PROGRESSION SYSTEM ---
 
-# Variabel konfigurasi mode testing: semua stage & level terbuka untuk mempermudah testing
+# Mode testing dimatikan agar kunci stage/level aktif dari sangat awal sesuai request user
 var test_mode_all_unlocked: bool = true
+
+# Jumlah level per stage (Stage 2 & 3 = 4 level, Stage 5 = 5 level, lainnya = 3 level)
+func get_stage_level_count(stage_num: int) -> int:
+	if stage_num == 3 or stage_num == 2:
+		return 4
+	if stage_num == 5:
+		return 5
+	return 3
 
 func is_stage_unlocked(stage_num: int) -> bool:
 	if test_mode_all_unlocked:
+		return true
+	if stage_num == 1:
 		return true
 	return stage_num <= unlocked_stage
 
@@ -76,7 +111,7 @@ func is_level_unlocked(stage_num: int, level_num: int) -> bool:
 
 func get_stage_unlocked_level(stage_num: int) -> int:
 	if test_mode_all_unlocked:
-		return 4 if stage_num == 3 else 3
+		return get_stage_level_count(stage_num)
 	if stage_num in stage_progress:
 		return int(stage_progress[stage_num].get("unlocked_level", 1))
 	return 1
@@ -88,19 +123,23 @@ func get_level_stars(stage_num: int, level_num: int) -> int:
 
 func set_level_stars(stage_num: int, level_num: int, stars: int) -> void:
 	if stage_num not in stage_progress:
-		stage_progress[stage_num] = { "unlocked_level": 1, "stars": {} }
+		var max_lvls = get_stage_level_count(stage_num)
+		var s_dict: Dictionary = {}
+		for l in range(1, max_lvls + 1):
+			s_dict[l] = 0
+		stage_progress[stage_num] = { "unlocked_level": 1, "stars": s_dict }
 		
 	var prev_stars = int(stage_progress[stage_num]["stars"].get(level_num, 0))
 	stage_progress[stage_num]["stars"][level_num] = max(prev_stars, stars)
 	
-	var max_stage_level = 4 if stage_num == 3 else 3
+	var max_stage_level = get_stage_level_count(stage_num)
 	if stars > 0:
 		if level_num < max_stage_level:
 			var next_lvl = level_num + 1
 			var cur_unlocked = int(stage_progress[stage_num].get("unlocked_level", 1))
 			stage_progress[stage_num]["unlocked_level"] = max(cur_unlocked, next_lvl)
 		elif level_num == max_stage_level:
-			# Tamat stage ini -> Buka stage berikutnya!
+			# Tamat stage ini -> Buka stage berikutnya dari sangat awal!
 			unlocked_stage = max(unlocked_stage, stage_num + 1)
 			if (stage_num + 1) in stage_progress:
 				var next_stage_lvl = int(stage_progress[stage_num + 1].get("unlocked_level", 1))
@@ -132,7 +171,52 @@ func get_total_stars() -> int:
 	return total
 
 func get_max_stars() -> int:
-	return 48 # (4 Stage x 3 Level + 1 Stage x 4 Level) x 3 Bintang = 48 Bintang
+	var total_levels = 0
+	for s_num in range(1, 6):
+		total_levels += get_stage_level_count(s_num)
+	return total_levels * 3 # 19 level x 3 Bintang = 57 Bintang
+
+func get_star_rank_stats() -> Dictionary:
+	var stats = {
+		"rank1_perfect": 0, # 3 stars
+		"rank2_good": 0,    # 2 stars
+		"rank3_passed": 0,  # 1 star
+		"unlocked_unplayed": 0, # 0 stars tapi unlocked
+		"locked": 0         # locked
+	}
+	for s_num in range(1, 6):
+		var max_lvl = get_stage_level_count(s_num)
+		var s_unlocked = is_stage_unlocked(s_num)
+		var unl_lvl = get_stage_unlocked_level(s_num)
+		for l in range(1, max_lvl + 1):
+			var stars = get_level_stars(s_num, l)
+			if stars >= 3:
+				stats["rank1_perfect"] += 1
+			elif stars == 2:
+				stats["rank2_good"] += 1
+			elif stars == 1:
+				stats["rank3_passed"] += 1
+			else:
+				if s_unlocked and l <= unl_lvl:
+					stats["unlocked_unplayed"] += 1
+				else:
+					stats["locked"] += 1
+	return stats
+
+func get_technician_rank_title() -> String:
+	var total = get_total_stars()
+	if total >= 45:
+		return "Master Network Architect"
+	elif total >= 35:
+		return "Firewall Guardian"
+	elif total >= 25:
+		return "Subnet Specialist"
+	elif total >= 15:
+		return "Packet Whisperer"
+	elif total >= 5:
+		return "Cable Craftsman"
+	else:
+		return "Junior Technician"
 
 # --- CUSTOMIZATION SYSTEM ---
 
@@ -147,6 +231,50 @@ func set_customization(skin: String, accessory: String, title_name: String) -> v
 	current_title = title_name
 	save_progress()
 	customization_changed.emit()
+
+func get_active_accessory_texture() -> Texture2D:
+	if current_accessory in ACCESSORY_CONFIG:
+		var p = ACCESSORY_CONFIG[current_accessory].get("texture_path", "")
+		if p != "" and ResourceLoader.exists(p):
+			return load(p)
+	return null
+
+func apply_to_character(char_sprite: Node) -> void:
+	if not char_sprite or not is_instance_valid(char_sprite):
+		return
+		
+	var skin_col = get_active_skin_color()
+	if "self_modulate" in char_sprite:
+		char_sprite.self_modulate = skin_col
+	elif "modulate" in char_sprite:
+		char_sprite.modulate = skin_col
+		
+	var acc_tex = get_active_accessory_texture()
+	var acc_node = char_sprite.get_node_or_null("AccessoryOverlay") as TextureRect
+	
+	if acc_tex:
+		if not acc_node:
+			acc_node = TextureRect.new()
+			acc_node.name = "AccessoryOverlay"
+			acc_node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			acc_node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			acc_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			acc_node.set_anchors_preset(Control.PRESET_FULL_RECT)
+			acc_node.anchor_left = 0.0
+			acc_node.anchor_top = 0.0
+			acc_node.anchor_right = 1.0
+			acc_node.anchor_bottom = 1.0
+			acc_node.offset_left = 0
+			acc_node.offset_top = 0
+			acc_node.offset_right = 0
+			acc_node.offset_bottom = 0
+			char_sprite.add_child(acc_node)
+			
+		acc_node.texture = acc_tex
+		acc_node.visible = true
+	else:
+		if acc_node:
+			acc_node.visible = false
 
 # --- SAVE & LOAD SYSTEM ---
 
@@ -209,7 +337,7 @@ func load_progress() -> void:
 func reset_progress_to_default() -> void:
 	unlocked_stage = 1
 	for s_num in range(1, 6):
-		var num_lvls = 4 if s_num == 3 else 3
+		var num_lvls = get_stage_level_count(s_num)
 		var stars_dict: Dictionary = {}
 		for l in range(1, num_lvls + 1):
 			stars_dict[l] = 0

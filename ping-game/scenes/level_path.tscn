@@ -111,6 +111,16 @@ offset_right = 1260.0
 offset_bottom = 300.0
 pivot_offset = Vector2(80, 60)
 
+[node name="Desk5" type="Control" parent="DesksContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 1100.0
+offset_top = 100.0
+offset_right = 1260.0
+offset_bottom = 220.0
+pivot_offset = Vector2(80, 60)
+
 [node name="CharacterMascot" type="TextureRect" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
