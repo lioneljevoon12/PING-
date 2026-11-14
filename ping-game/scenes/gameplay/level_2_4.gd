@@ -1221,9 +1221,9 @@ func _build_popup_2_3() -> void:
 	topo_hbox.add_child(branch_cables)
 	
 	topo_envelope_icon = TextureRect.new()
-	topo_envelope_icon.texture = tex_envelope
 	topo_envelope_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	topo_envelope_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	topo_envelope_icon.texture = tex_envelope
 	topo_envelope_icon.custom_minimum_size = Vector2(36, 26)
 	topo_envelope_icon.size = Vector2(36, 26)
 	topo_envelope_icon.position = Vector2(100, 42)
@@ -1962,11 +1962,13 @@ func _set_pc1_bubble(txt: String, col: Color) -> void:
 
 func _create_flying_envelope(start_pos: Vector2) -> TextureRect:
 	var tr = TextureRect.new()
-	tr.texture = tex_envelope
-	tr.custom_minimum_size = Vector2(36, 28)
-	tr.size = Vector2(36, 28)
+	# expand_mode HARUS diset sebelum texture & size, kalau tidak ukuran tertahan ukuran asli gambar (kebesaran)
 	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.texture = tex_envelope
+	tr.custom_minimum_size = Vector2(60, 42)
+	tr.size = Vector2(60, 42)
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tr.global_position = start_pos
 	tr.z_index = 80
 	add_child(tr)
