@@ -790,207 +790,7 @@ func _open_pause_modal() -> void:
 
 # --- INTRO MODAL (FIGMA IMAGE 1) ---
 func _build_intro_modal() -> void:
-	intro_modal = Control.new()
-	intro_modal.name = "IntroModal"
-	intro_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	intro_modal.z_index = 150
-	intro_modal.visible = false
-	add_child(intro_modal)
-	
-	var dim = ColorRect.new()
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.6)
-	intro_modal.add_child(dim)
-	
-	var intro_card = Control.new()
-	intro_card.size = Vector2(860, 540)
-	intro_card.pivot_offset = Vector2(430, 270)
-	intro_modal.add_child(intro_card)
-	
-	var bg_panel = PanelContainer.new()
-	bg_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#fefce8") # Warm notebook yellow
-	sb.border_color = Color("#38bdf8") # Sky blue border
-	sb.set_border_width_all(3.5)
-	sb.set_corner_radius_all(22)
-	sb.shadow_color = Color(0, 0, 0, 0.3)
-	sb.shadow_size = 14
-	sb.shadow_offset = Vector2(0, 6)
-	sb.set_content_margin_all(20)
-	bg_panel.add_theme_stylebox_override("panel", sb)
-	intro_card.add_child(bg_panel)
-	
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	bg_panel.add_child(vbox)
-	
-	# Notebook Hole top
-	var hole = Control.new()
-	hole.custom_minimum_size = Vector2(20, 14)
-	hole.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var hole_tr = Panel.new()
-	hole_tr.custom_minimum_size = Vector2(16, 16)
-	var sb_h = StyleBoxFlat.new()
-	sb_h.bg_color = Color("#fefce8")
-	sb_h.border_color = Color("#4a2e2b")
-	sb_h.set_border_width_all(2.5)
-	sb_h.set_corner_radius_all(8)
-	hole_tr.add_theme_stylebox_override("panel", sb_h)
-	hole.add_child(hole_tr)
-	vbox.add_child(hole)
-	
-	# Title
-	var title = Label.new()
-	title.text = "✉️ Level 2.3 – Mencari MAC Address dengan ARP-Request"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_override("font", font_black)
-	title.add_theme_font_size_override("font_size", 20)
-	title.add_theme_color_override("font_color", Color("#2d1810"))
-	vbox.add_child(title)
-	
-	# Konsep Box
-	var konsep_card = PanelContainer.new()
-	var sb_k = StyleBoxFlat.new()
-	sb_k.bg_color = Color("#ffffff")
-	sb_k.border_color = Color("#fed7aa")
-	sb_k.set_border_width_all(2)
-	sb_k.set_corner_radius_all(12)
-	sb_k.set_content_margin_all(10)
-	konsep_card.add_theme_stylebox_override("panel", sb_k)
-	vbox.add_child(konsep_card)
-	
-	var k_vbox = VBoxContainer.new()
-	k_vbox.add_theme_constant_override("separation", 4)
-	konsep_card.add_child(k_vbox)
-	
-	var k_head = HBoxContainer.new()
-	k_head.add_theme_constant_override("separation", 10)
-	k_vbox.add_child(k_head)
-	
-	var pill_tag = _create_mini_pill("KONSEP ARP-REQUEST", Color("#fed7aa"), Color("#ea580c"))
-	k_head.add_child(pill_tag)
-	
-	var k_t = Label.new()
-	k_t.text = "PC Pengirim sudah tahu IP tujuan, tapi belum tahu MAC Address-nya!"
-	k_t.add_theme_font_override("font", font_bold)
-	k_t.add_theme_font_size_override("font_size", 12)
-	k_t.add_theme_color_override("font_color", Color("#1e293b"))
-	k_head.add_child(k_t)
-	
-	var k_desc = Label.new()
-	k_desc.text = "• ARP-Request dipakai untuk mencari MAC Address berdasarkan IP Address pada jaringan lokal (LAN).\n• Karena MAC tujuan belum diketahui, paket dikirim secara Broadcast Ethernet ke jaringan lokal."
-	k_desc.add_theme_font_override("font", font_semibold)
-	k_desc.add_theme_font_size_override("font_size", 11)
-	k_desc.add_theme_color_override("font_color", Color("#475569"))
-	k_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	k_vbox.add_child(k_desc)
-	
-	# Visual Diagram Box (PC 1 -> Broadcast -> PC 3)
-	var diag_box = PanelContainer.new()
-	var sb_diag = StyleBoxFlat.new()
-	sb_diag.bg_color = Color("#ffffff")
-	sb_diag.border_color = Color("#cbd5e1")
-	sb_diag.set_border_width_all(1.5)
-	sb_diag.set_corner_radius_all(12)
-	sb_diag.set_content_margin_all(8)
-	diag_box.add_theme_stylebox_override("panel", sb_diag)
-	vbox.add_child(diag_box)
-	
-	var d_row = HBoxContainer.new()
-	d_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	d_row.add_theme_constant_override("separation", 14)
-	diag_box.add_child(d_row)
-	
-	var card_pc1 = _create_diagram_pc_box("PC 1 (PENGIRIM)", "IP: 192.168.1.10", "Tahu IP, Cari MAC Tujuan", Color("#eff6ff"), Color("#3b82f6"), Color("#1e40af"))
-	d_row.add_child(card_pc1)
-	
-	var mid_box = VBoxContainer.new()
-	mid_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	mid_box.add_theme_constant_override("separation", 4)
-	mid_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	d_row.add_child(mid_box)
-	
-	var env_label = Label.new()
-	env_label.text = "✉️ ~ ~ ~ ~ ~ ~ ~ ~"
-	env_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	env_label.add_theme_font_override("font", font_bold)
-	env_label.add_theme_color_override("font_color", Color("#0284c7"))
-	mid_box.add_child(env_label)
-	
-	var broad_pill = _create_mini_pill("Broadcast Ethernet: FF:FF:FF:FF:FF:FF", Color("#fef9c3"), Color("#854d0e"))
-	broad_pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	mid_box.add_child(broad_pill)
-	
-	var card_pc3 = _create_diagram_pc_box("★ PC 3 (IP TUJUAN)", "IP: 192.168.1.50", "Target yang Dicari", Color("#f0fdf4"), Color("#10b981"), Color("#065f46"))
-	d_row.add_child(card_pc3)
-	
-	# Two Columns: Langkah Bermain & Kondisi Selesai
-	var col_row = HBoxContainer.new()
-	col_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(col_row)
-	
-	var box_langkah = _create_intro_col_box(
-		"LANGKAH BERMAIN & KONTROL",
-		"1. Klik \"Kawal\" di Meja tengah ruangan.\n2. Tuntunlah ARP-Request.",
-		Color("#fffbeb"),
-		Color("#f59e0b")
-	)
-	box_langkah.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col_row.add_child(box_langkah)
-	
-	var box_kondisi = _create_intro_col_box(
-		"KONDISI MENYELESAIKAN MISI",
-		"• Ketiga simpul kabel mengarah lurus ke tengah dan amplop ARP-Request tiba di PC 3.\n✓ Target: IP 192.168.1.50 (Bukan .12 / .88)\n✓ Membuka akses ke misi Level 2.4 (ARP-Reply).",
-		Color("#f0fdf4"),
-		Color("#10b981")
-	)
-	box_kondisi.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col_row.add_child(box_kondisi)
-	
-	# Bottom Row: Avatar & Button MULAI
-	var bot_row = HBoxContainer.new()
-	bot_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	bot_row.add_theme_constant_override("separation", 20)
-	vbox.add_child(bot_row)
-	
-	var avatar_box = PanelContainer.new()
-	avatar_box.custom_minimum_size = Vector2(44, 44)
-	var sb_av = StyleBoxFlat.new()
-	sb_av.bg_color = Color("#ffffff")
-	sb_av.border_color = Color("#4a2e2b")
-	sb_av.set_border_width_all(2.5)
-	sb_av.set_corner_radius_all(22)
-	avatar_box.add_theme_stylebox_override("panel", sb_av)
-	bot_row.add_child(avatar_box)
-	
-	var av_tr = TextureRect.new()
-	av_tr.texture = tex_char_idle
-	av_tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	av_tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	avatar_box.add_child(av_tr)
-	
-	var mulai_btn = Button.new()
-	mulai_btn.text = "MULAI"
-	mulai_btn.custom_minimum_size = Vector2(220, 44)
-	mulai_btn.add_theme_font_override("font", font_black)
-	mulai_btn.add_theme_font_size_override("font_size", 16)
-	mulai_btn.add_theme_color_override("font_color", Color("#065f46"))
-	var sb_mulai = StyleBoxFlat.new()
-	sb_mulai.bg_color = Color("#6ee7b7")
-	sb_mulai.border_color = Color("#059669")
-	sb_mulai.set_border_width_all(2.5)
-	sb_mulai.set_corner_radius_all(14)
-	sb_mulai.shadow_color = Color(0.02, 0.59, 0.41, 0.3)
-	sb_mulai.shadow_size = 6
-	sb_mulai.shadow_offset = Vector2(0, 3)
-	mulai_btn.add_theme_stylebox_override("normal", sb_mulai)
-	mulai_btn.add_theme_stylebox_override("hover", sb_mulai)
-	mulai_btn.add_theme_stylebox_override("pressed", sb_mulai)
-	mulai_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	mulai_btn.pressed.connect(_close_intro_modal)
-	_setup_hover_scale(mulai_btn, 1.05)
-	bot_row.add_child(mulai_btn)
+	intro_modal = IntroCard.build(self, "Level 2.3 – Mencari MAC Address dengan ARP-Request", "PC Pengirim sudah tahu IP tujuan, tapi belum tahu MAC Address-nya! ARP-Request dikirim secara Broadcast ke jaringan lokal (LAN) untuk mencari MAC Address berdasarkan IP Address.", _close_intro_modal, 150, false)
 
 func _create_diagram_pc_box(title_txt: String, ip_txt: String, desc_txt: String, bg_col: Color, border_col: Color, text_col: Color) -> PanelContainer:
 	var pan = PanelContainer.new()
@@ -1062,7 +862,7 @@ func _create_intro_col_box(title_txt: String, body_txt: String, bg_col: Color, b
 func _open_intro_modal() -> void:
 	is_modal_open = true
 	intro_modal.visible = true
-	var card = intro_modal.get_child(1) as Control
+	var card = IntroCard.card_of(intro_modal)
 	card.position = (get_viewport_rect().size - card.size) / 2.0
 	card.scale = Vector2(0.8, 0.8)
 	card.modulate.a = 0.0
@@ -1073,7 +873,7 @@ func _open_intro_modal() -> void:
 	_play_chime_sound()
 
 func _close_intro_modal() -> void:
-	var card = intro_modal.get_child(1) as Control
+	var card = IntroCard.card_of(intro_modal)
 	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_property(card, "scale", Vector2(0.8, 0.8), 0.18)
 	tw.tween_property(card, "modulate:a", 0.0, 0.16)

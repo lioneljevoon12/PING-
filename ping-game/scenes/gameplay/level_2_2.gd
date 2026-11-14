@@ -942,193 +942,7 @@ func _position_header_elements() -> void:
 
 # --- INTRO MODAL (FIGMA IMAGE 9) ---
 func _build_intro_modal() -> void:
-	intro_modal = Control.new()
-	intro_modal.name = "IntroModal"
-	intro_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	intro_modal.z_index = 150
-	intro_modal.visible = false
-	add_child(intro_modal)
-	
-	var dim = ColorRect.new()
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.6)
-	intro_modal.add_child(dim)
-	
-	var intro_card = Control.new()
-	intro_card.size = Vector2(840, 530)
-	intro_card.pivot_offset = Vector2(420, 265)
-	intro_modal.add_child(intro_card)
-	
-	var bg_panel = PanelContainer.new()
-	bg_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#fefce8")
-	sb.border_color = Color("#38bdf8")
-	sb.set_border_width_all(3.5)
-	sb.set_corner_radius_all(22)
-	sb.shadow_color = Color(0, 0, 0, 0.3)
-	sb.shadow_size = 14
-	sb.shadow_offset = Vector2(0, 6)
-	sb.set_content_margin_all(22)
-	bg_panel.add_theme_stylebox_override("panel", sb)
-	intro_card.add_child(bg_panel)
-	
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	bg_panel.add_child(vbox)
-	
-	# Notebook Hole top
-	var hole = Control.new()
-	hole.custom_minimum_size = Vector2(20, 16)
-	hole.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var hole_tr = Panel.new()
-	hole_tr.custom_minimum_size = Vector2(16, 16)
-	var sb_h = StyleBoxFlat.new()
-	sb_h.bg_color = Color("#fffef7")
-	sb_h.border_color = Color("#4a2e2b")
-	sb_h.set_border_width_all(2.5)
-	sb_h.set_corner_radius_all(8)
-	hole_tr.add_theme_stylebox_override("panel", sb_h)
-	hole.add_child(hole_tr)
-	vbox.add_child(hole)
-	
-	# Title
-	var title = Label.new()
-	title.text = "🛡️ Level 2.2 – Aturan Firewall: IP Privat vs IP Publik"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_override("font", font_black)
-	title.add_theme_font_size_override("font_size", 21)
-	title.add_theme_color_override("font_color", Color("#2d1810"))
-	vbox.add_child(title)
-	
-	# Skenario Misi Card
-	var mission_card = PanelContainer.new()
-	var sb_m = StyleBoxFlat.new()
-	sb_m.bg_color = Color("#ffffff")
-	sb_m.border_color = Color("#fed7aa")
-	sb_m.set_border_width_all(2)
-	sb_m.set_corner_radius_all(14)
-	sb_m.set_content_margin_all(10)
-	mission_card.add_theme_stylebox_override("panel", sb_m)
-	vbox.add_child(mission_card)
-	
-	var m_vbox = VBoxContainer.new()
-	m_vbox.add_theme_constant_override("separation", 3)
-	mission_card.add_child(m_vbox)
-	
-	var m_head = HBoxContainer.new()
-	m_head.add_theme_constant_override("separation", 10)
-	m_vbox.add_child(m_head)
-	
-	var pill_tag = _create_mini_pill("SKENARIO MISI", Color("#fed7aa"), Color("#ea580c"))
-	m_head.add_child(pill_tag)
-	
-	var m_t = Label.new()
-	m_t.text = "Saring trafik yang meminta akses langsung ke Server Internal (LAN)!"
-	m_t.add_theme_font_override("font", font_bold)
-	m_t.add_theme_font_size_override("font_size", 12)
-	m_t.add_theme_color_override("font_color", Color("#1e293b"))
-	m_head.add_child(m_t)
-	
-	var m_desc = Label.new()
-	m_desc.text = "• Aturan Skenario: ALLOW (Izinkan) alamat IP Privat internal, dan BLOCK (Tolak) akses langsung dari IP Publik.\nℹ️ Catatan: Alamat IP Publik TIDAK selalu berbahaya (misal DNS 8.8.8.8/8.8.4.4), namun diblokir karena aturan server khusus lokal."
-	m_desc.add_theme_font_override("font", font_semibold)
-	m_desc.add_theme_font_size_override("font_size", 11)
-	m_desc.add_theme_color_override("font_color", Color("#475569"))
-	m_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	m_vbox.add_child(m_desc)
-	
-	# Reference Boxes (ALLOW vs BLOCK)
-	var ref_row = HBoxContainer.new()
-	ref_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(ref_row)
-	
-	var box_allow = _create_intro_ref_box(
-		"✓ ALLOW (IZINKAN – IP PRIVAT LAN)",
-		"• 10.0.0.0 – 10.255.255.255 (10.x.x.x)\n• 172.16.0.0 – 172.31.255.255\n• 192.168.0.0 – 192.168.255.255",
-		Color("#a7f3d0"),
-		Color("#059669"),
-		Color("#065f46")
-	)
-	box_allow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ref_row.add_child(box_allow)
-	
-	var box_block = _create_intro_ref_box(
-		"✕ BLOCK (TOLAK – IP PUBLIK WAN)",
-		"Alamat publik yang digunakan di jaringan internet luar (di luar 3 rentang IP Privat di samping).\nContoh: 203.0.113.45 • 8.8.4.4 • 185.199.108.15",
-		Color("#fecdd3"),
-		Color("#dc2626"),
-		Color("#991b1b")
-	)
-	box_block.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ref_row.add_child(box_block)
-	
-	# Instructions & Conditions row
-	var inst_row = HBoxContainer.new()
-	inst_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(inst_row)
-	
-	var inst_left = _create_intro_note_box(
-		"🕹️ LANGKAH BERMAIN & KONTROL",
-		"1. Klik \"Filter\" atau dekati meja PC Satpam.\n2. Pilih kartu trafik IP yang mengantre di atas.\n3. Drag / arahkan ke gerbang ALLOW atau gerbang BLOCK.",
-		Color("#ffffff"),
-		Color("#64748b")
-	)
-	inst_left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inst_row.add_child(inst_left)
-	
-	var inst_right = _create_intro_note_box(
-		"🏆 KONDISI MENYELESAIKAN MISI",
-		"• Seluruh paket trafik (6/6) berhasil dipisahkan sesuai aturan firewall skenario permainan.\n✓ IP Privat -> ALLOW | IP Publik -> BLOCK\n✓ Membuka akses ke misi Level 2.3 (ARP-Request).",
-		Color("#f0fdf4"),
-		Color("#10b981")
-	)
-	inst_right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inst_row.add_child(inst_right)
-	
-	# Bottom Row: Avatar Mascot + MULAI Button
-	var bot_row = HBoxContainer.new()
-	bot_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	bot_row.add_theme_constant_override("separation", 16)
-	vbox.add_child(bot_row)
-	
-	var avatar_box = PanelContainer.new()
-	avatar_box.custom_minimum_size = Vector2(44, 44)
-	var sb_av = StyleBoxFlat.new()
-	sb_av.bg_color = Color("#ffffff")
-	sb_av.border_color = Color("#4a2e2b")
-	sb_av.set_border_width_all(2.5)
-	sb_av.set_corner_radius_all(22)
-	avatar_box.add_theme_stylebox_override("panel", sb_av)
-	bot_row.add_child(avatar_box)
-	
-	var av_tr = TextureRect.new()
-	av_tr.texture = tex_char_idle
-	av_tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	av_tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	avatar_box.add_child(av_tr)
-	
-	var mulai_btn = Button.new()
-	mulai_btn.text = "MULAI"
-	mulai_btn.custom_minimum_size = Vector2(220, 46)
-	mulai_btn.add_theme_font_override("font", font_black)
-	mulai_btn.add_theme_font_size_override("font_size", 17)
-	mulai_btn.add_theme_color_override("font_color", Color("#065f46"))
-	var sb_mulai = StyleBoxFlat.new()
-	sb_mulai.bg_color = Color("#6ee7b7")
-	sb_mulai.border_color = Color("#059669")
-	sb_mulai.set_border_width_all(2.5)
-	sb_mulai.set_corner_radius_all(14)
-	sb_mulai.shadow_color = Color(0.02, 0.59, 0.41, 0.3)
-	sb_mulai.shadow_size = 6
-	sb_mulai.shadow_offset = Vector2(0, 3)
-	mulai_btn.add_theme_stylebox_override("normal", sb_mulai)
-	mulai_btn.add_theme_stylebox_override("hover", sb_mulai)
-	mulai_btn.add_theme_stylebox_override("pressed", sb_mulai)
-	mulai_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	mulai_btn.pressed.connect(_close_intro_modal)
-	_setup_hover_scale(mulai_btn, 1.05)
-	bot_row.add_child(mulai_btn)
+	intro_modal = IntroCard.build(self, "Level 2.2 – Aturan Firewall: IP Privat vs IP Publik", "Saring trafik yang meminta akses langsung ke Server Internal (LAN)! ALLOW (izinkan) alamat IP Privat internal, dan BLOCK (tolak) akses langsung dari IP Publik.", _close_intro_modal, 150, false)
 
 func _create_intro_ref_box(title: String, body: String, bg_col: Color, border_col: Color, text_col: Color) -> PanelContainer:
 	var pan = PanelContainer.new()
@@ -1194,7 +1008,7 @@ func _create_intro_note_box(title: String, body: String, bg_col: Color, border_c
 func _open_intro_modal() -> void:
 	is_modal_open = true
 	intro_modal.visible = true
-	var card = intro_modal.get_child(1) as Control
+	var card = IntroCard.card_of(intro_modal)
 	card.position = (get_viewport_rect().size - card.size) / 2.0
 	card.scale = Vector2(0.8, 0.8)
 	card.modulate.a = 0.0
@@ -1205,7 +1019,7 @@ func _open_intro_modal() -> void:
 	_play_chime_sound()
 
 func _close_intro_modal() -> void:
-	var card = intro_modal.get_child(1) as Control
+	var card = IntroCard.card_of(intro_modal)
 	var tw = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.tween_property(card, "scale", Vector2(0.8, 0.8), 0.18)
 	tw.tween_property(card, "modulate:a", 0.0, 0.16)

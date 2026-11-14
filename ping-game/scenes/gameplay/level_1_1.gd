@@ -379,7 +379,8 @@ func _update_interaction_prompts() -> void:
 	if table_prompts_container:
 		table_prompts_container.visible = false
 	_ensure_cable_prompts()
-	var near_table = dist_table < 220.0
+	var modal_open = (pinout_modal != null and pinout_modal.visible) or (guidebook_modal != null and guidebook_modal.visible) 		or (pause_modal != null and pause_modal.visible) or (intro_modal != null and intro_modal.visible) or not is_game_active
+	var near_table = dist_table < 220.0 and not modal_open
 	for i in range(cables_data.size()):
 		var box: Control = cable_prompt_boxes[i]
 		var show_box = false
@@ -443,7 +444,6 @@ func _ensure_cable_prompts() -> void:
 		var box = Control.new()
 		box.name = "CablePrompt%d" % i
 		box.size = Vector2(76, 52)
-		box.z_index = 20
 		box.visible = false
 		var idx = i
 		var b_lihat = _make_cable_pill("Lihat")
@@ -1390,78 +1390,9 @@ func _build_guidebook_modal() -> void:
 	add_child(guidebook_modal)
 
 func _build_intro_modal() -> void:
-	intro_modal = Control.new()
-	intro_modal.name = "IntroModal"
-	intro_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	intro_modal.visible = true
-	add_child(intro_modal)
-	
-	var backdrop = ColorRect.new()
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.color = Color(0, 0, 0, 0.65)
-	intro_modal.add_child(backdrop)
-	
-	var card = PanelContainer.new()
-	card.name = "IntroCard"
-	card.size = Vector2(620, 360)
-	card.pivot_offset = Vector2(310, 180)
-	intro_card = card
-	var vp_sz_i = get_viewport_rect().size
-	card.position = Vector2((vp_sz_i.x - card.size.x) / 2.0, (vp_sz_i.y - card.size.y) / 2.0)
-	
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#fffbeb") # Warm cream matching mockup
-	sb.border_color = Color("#4a2e2b")
-	sb.set_border_width_all(4)
-	sb.set_corner_radius_all(22)
-	sb.set_content_margin_all(24)
-	sb.shadow_color = Color(0, 0, 0, 0.35)
-	sb.shadow_size = 12
-	card.add_theme_stylebox_override("panel", sb)
-	intro_modal.add_child(card)
-	
-	var vb = VBoxContainer.new()
-	vb.add_theme_constant_override("separation", 14)
-	vb.alignment = BoxContainer.ALIGNMENT_CENTER
-	card.add_child(vb)
-	
-	var title = Label.new()
-	title.text = "Level 1.1: Membedakan Kabel Straight dan Cross"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_override("font", font_black)
-	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color("#4a2e2b"))
-	vb.add_child(title)
-	
-	var desc = Label.new()
-	desc.text = "Persiapan infrastruktur fisik dimulai!\n\nBedakan mana kabel Straight dan mana kabel Cross dengan memeriksa urutan pin warnanya, lalu kelompokkan ke dalam rak sesuai dengan namanya agar siap digunakan teknisi jaringan!"
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	desc.add_theme_font_override("font", font_semibold)
-	desc.add_theme_font_size_override("font_size", 14)
-	desc.add_theme_color_override("font_color", Color("#78350f"))
-	vb.add_child(desc)
-	
-	var btn_start = Button.new()
-	btn_start.text = "MULAI MISI"
-	btn_start.custom_minimum_size = Vector2(200, 48)
-	btn_start.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	btn_start.add_theme_font_override("font", font_black)
-	btn_start.add_theme_font_size_override("font_size", 16)
-	
-	var sb_start = StyleBoxFlat.new()
-	sb_start.bg_color = Color("#99f6e4") # Teal button matching mockup
-	sb_start.border_color = Color("#0f766e")
-	sb_start.set_border_width_all(3)
-	sb_start.set_corner_radius_all(14)
-	btn_start.add_theme_stylebox_override("normal", sb_start)
-	btn_start.add_theme_color_override("font_color", Color("#115e59"))
-	
-	btn_start.pressed.connect(_start_gameplay)
-	_setup_hover_scale(btn_start, 1.08)
-	vb.add_child(btn_start)
+	intro_modal = IntroCard.build(self, "Level 1.1: Membedakan Kabel Straight dan Cross", "Persiapan infrastruktur fisik dimulai! Bedakan mana kabel Straight dan mana kabel Cross dengan memeriksa urutan pin warnanya, lalu kelompokkan ke dalam rak sesuai dengan namanya agar siap digunakan teknisi jaringan!", _start_gameplay, 150, true)
+	set("intro_card", IntroCard.card_of(intro_modal))
 
-# --- ENDGAME & PAUSE MODALS ---
 func _build_endgame_modals() -> void:
 	game_dialog = preload("res://scenes/game_dialog.tscn").instantiate()
 	game_dialog.name = "GameDialog"

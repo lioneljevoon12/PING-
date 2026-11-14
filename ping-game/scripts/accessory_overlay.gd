@@ -10,10 +10,10 @@ extends Control
 
 # u, v = titik tengah aksesoris relatif terhadap kotak badan (0..1), w = lebar relatif terhadap lebar badan
 const PLACEMENT := {
-	"helmet": { "u": 0.50, "v": 0.27, "w": 0.42, "alpha": 1.0 },
-	"visor": { "u": 0.60, "v": 0.70, "w": 0.36, "alpha": 0.6 },
+	"helmet": { "u": 0.50, "v": 0.29, "w": 0.42, "alpha": 1.0 },
+	"visor": { "u": 0.60, "v": 0.66, "w": 0.40, "alpha": 0.65 },
 	"headset": { "u": 0.50, "v": 0.37, "w": 0.66, "alpha": 1.0 },
-	"grad_cap": { "u": 0.50, "v": 0.27, "w": 0.52, "alpha": 1.0 },
+	"grad_cap": { "u": 0.50, "v": 0.31, "w": 0.52, "alpha": 1.0 },
 	"ribbon": { "u": 0.27, "v": 0.42, "w": 0.20, "alpha": 1.0 },
 }
 

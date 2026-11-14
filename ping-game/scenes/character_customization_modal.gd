@@ -257,7 +257,7 @@ func _render_accessory_options() -> void:
 		var is_selected = (acc_id == temp_accessory)
 		
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(210, 56)
+		btn.custom_minimum_size = Vector2(210, 104)
 		btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		
 		var sb = StyleBoxFlat.new()
@@ -270,35 +270,27 @@ func _render_accessory_options() -> void:
 		btn.add_theme_stylebox_override("hover", sb)
 		btn.add_theme_stylebox_override("pressed", sb)
 		
-		var hb = HBoxContainer.new()
-		hb.add_theme_constant_override("separation", 12)
-		btn.add_child(hb)
-		
+		# Hanya gambar aksesoris (besar), tanpa tulisan
+		var cc = CenterContainer.new()
+		cc.set_anchors_preset(Control.PRESET_FULL_RECT)
+		cc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(cc)
 		var p = data.get("texture_path", "")
 		if p != "" and ResourceLoader.exists(p):
 			var icon_tex = TextureRect.new()
-			icon_tex.texture = load(p)
-			icon_tex.custom_minimum_size = Vector2(36, 36)
 			icon_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 			icon_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			hb.add_child(icon_tex)
+			icon_tex.texture = AccessoryOverlay._cropped_texture(p)
+			icon_tex.custom_minimum_size = Vector2(120, 84)
+			icon_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cc.add_child(icon_tex)
 		else:
 			var icon_lbl = Label.new()
-			icon_lbl.text = data["icon"]
-			icon_lbl.add_theme_font_size_override("font_size", 24)
-			hb.add_child(icon_lbl)
-		
-		var vb = VBoxContainer.new()
-		vb.alignment = BoxContainer.ALIGNMENT_CENTER
-		vb.add_theme_constant_override("separation", 2)
-		hb.add_child(vb)
-		
-		var l_title = Label.new()
-		l_title.text = data["name"]
-		l_title.add_theme_font_override("font", font_black)
-		l_title.add_theme_font_size_override("font_size", 13)
-		l_title.add_theme_color_override("font_color", Color("#1e293b"))
-		vb.add_child(l_title)
+			icon_lbl.text = "❌"
+			icon_lbl.add_theme_font_size_override("font_size", 46)
+			icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cc.add_child(icon_lbl)
+		btn.tooltip_text = str(data.get("name", ""))
 		
 		var aid = acc_id
 		btn.pressed.connect(func():

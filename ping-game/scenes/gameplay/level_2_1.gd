@@ -1106,123 +1106,7 @@ func _update_hearts_display(is_damage_event: bool = false) -> void:
 
 # --- INTRO MODAL BUILDER (Figma Image 1) ---
 func _build_intro_modal() -> void:
-	intro_modal = Control.new()
-	intro_modal.name = "IntroModal"
-	intro_modal.set_anchors_preset(Control.PRESET_FULL_RECT)
-	intro_modal.visible = false
-	add_child(intro_modal)
-	
-	var dim = ColorRect.new()
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.color = Color(0, 0, 0, 0.6)
-	intro_modal.add_child(dim)
-	
-	var intro_card = Control.new()
-	intro_card.size = Vector2(820, 520)
-	intro_card.pivot_offset = Vector2(410, 260)
-	intro_modal.add_child(intro_card)
-	
-	var bg_panel = PanelContainer.new()
-	bg_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = Color("#fffef7")
-	sb.border_color = Color("#4a2e2b")
-	sb.set_border_width_all(3.5)
-	sb.set_corner_radius_all(22)
-	sb.shadow_color = Color(0, 0, 0, 0.3)
-	sb.shadow_size = 14
-	sb.shadow_offset = Vector2(0, 6)
-	sb.set_content_margin_all(24)
-	bg_panel.add_theme_stylebox_override("panel", sb)
-	intro_card.add_child(bg_panel)
-	
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 12)
-	bg_panel.add_child(vbox)
-	
-	var title = Label.new()
-	title.text = "📦 Level 2.1 – Pengelompokan Kelas Alamat IPv4"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_override("font", font_black)
-	title.add_theme_font_size_override("font_size", 19)
-	title.add_theme_color_override("font_color", Color("#4a2e2b"))
-	vbox.add_child(title)
-	
-	var tujuan_panel = PanelContainer.new()
-	var sb_tujuan = StyleBoxFlat.new()
-	sb_tujuan.bg_color = Color("#ffffff")
-	sb_tujuan.border_color = Color("#cbd5e1")
-	sb_tujuan.set_border_width_all(1.5)
-	sb_tujuan.set_corner_radius_all(10)
-	sb_tujuan.set_content_margin_all(8)
-	tujuan_panel.add_theme_stylebox_override("panel", sb_tujuan)
-	vbox.add_child(tujuan_panel)
-	
-	var vb_tujuan = VBoxContainer.new()
-	vb_tujuan.add_theme_constant_override("separation", 4)
-	tujuan_panel.add_child(vb_tujuan)
-	
-	var hb_tujuan = HBoxContainer.new()
-	hb_tujuan.add_theme_constant_override("separation", 8)
-	vb_tujuan.add_child(hb_tujuan)
-	
-	var pill_tujuan = _create_mini_pill("TUJUAN", Color("#fecaca"), Color("#991b1b"))
-	hb_tujuan.add_child(pill_tujuan)
-	
-	var lbl_tujuan = Label.new()
-	lbl_tujuan.text = "Kelompokkan paket IPv4 yang masuk ke Kelas A, B, atau C!"
-	lbl_tujuan.add_theme_font_override("font", font_bold)
-	lbl_tujuan.add_theme_font_size_override("font_size", 13)
-	lbl_tujuan.add_theme_color_override("font_color", Color("#1e293b"))
-	hb_tujuan.add_child(lbl_tujuan)
-	
-	var lbl_subtujuan = Label.new()
-	lbl_subtujuan.text = "• Cara menentukan kelas: Cukup perhatikan ANGKA PERTAMA (oktet ke-1) sebelum tanda titik.\n📖 Catatan: Pembagian Kelas A, B, C adalah konsep classful IPv4 historis sebagai dasar pengalamatan."
-	lbl_subtujuan.add_theme_font_override("font", font_semibold)
-	lbl_subtujuan.add_theme_font_size_override("font_size", 11)
-	lbl_subtujuan.add_theme_color_override("font_color", Color("#64748b"))
-	vb_tujuan.add_child(lbl_subtujuan)
-	
-	var cards_row = HBoxContainer.new()
-	cards_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	cards_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(cards_row)
-	
-	cards_row.add_child(_create_intro_class_card("KELAS A", "Oktet 1: 1 - 126", "Contoh: 10.24.1.5", Color("#e6fffa"), Color("#319795")))
-	cards_row.add_child(_create_intro_class_card("KELAS B", "Oktet 1: 128 - 191", "Contoh: 172.16.0.4", Color("#ebf8ff"), Color("#3182ce")))
-	cards_row.add_child(_create_intro_class_card("KELAS C", "Oktet 1: 192 - 223", "Contoh: 192.168.1.10", Color("#f3e8ff"), Color("#805ad5")))
-	
-	var bottom_row = HBoxContainer.new()
-	bottom_row.add_theme_constant_override("separation", 12)
-	vbox.add_child(bottom_row)
-	
-	var c_ctrl = _create_info_box("🎮 LANGKAH BERMAIN & KONTROL", "1. Gunakan Joystick atau Tombol WASD/Panah untuk bergerak mendekati Meja Sortir.\n2. Klik 'Sortir' untuk membuka antrean paket.\n3. Drag kartu paket IPv4 ke keranjang kelas, ATAU klik kartu lalu klik keranjang.")
-	c_ctrl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bottom_row.add_child(c_ctrl)
-	
-	var c_cond = _create_info_box("⭐ KONDISI MENYELESAIKAN MISI", "• Seluruh 10 kartu paket IPv4 berhasil disortir.\n• Bintang 3: Nyawa penuh (3 HP) & sisa waktu banyak.\n• Bintang 2: Minimal 2 HP tersisa.")
-	c_cond.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bottom_row.add_child(c_cond)
-	
-	var btn_start = Button.new()
-	btn_start.text = "MULAI"
-	btn_start.custom_minimum_size = Vector2(220, 48)
-	btn_start.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	btn_start.add_theme_font_override("font", font_black)
-	btn_start.add_theme_font_size_override("font_size", 17)
-	var sb_btn = StyleBoxFlat.new()
-	sb_btn.bg_color = Color("#99f6e4")
-	sb_btn.border_color = Color("#0d9488")
-	sb_btn.set_border_width_all(2.5)
-	sb_btn.set_corner_radius_all(14)
-	btn_start.add_theme_stylebox_override("normal", sb_btn)
-	btn_start.add_theme_stylebox_override("hover", sb_btn)
-	btn_start.add_theme_stylebox_override("pressed", sb_btn)
-	btn_start.add_theme_color_override("font_color", Color("#0f766e"))
-	btn_start.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	btn_start.pressed.connect(_on_intro_start_pressed)
-	_setup_hover_scale(btn_start, 1.08)
-	vbox.add_child(btn_start)
+	intro_modal = IntroCard.build(self, "Level 2.1 – Pengelompokan Kelas Alamat IPv4", "Kelompokkan paket IPv4 yang masuk ke Kelas A, B, atau C! Cukup perhatikan ANGKA PERTAMA (oktet ke-1) sebelum tanda titik: Kelas A = 1–126, Kelas B = 128–191, Kelas C = 192–223.", _on_intro_start_pressed, 150, false)
 
 func _create_intro_class_card(cls_title: String, octet_str: String, example_str: String, bg_col: Color, border_col: Color) -> Control:
 	var panel = PanelContainer.new()
@@ -1314,7 +1198,7 @@ func _create_mini_pill(text: String, bg_col: Color, text_col: Color) -> PanelCon
 
 func _open_intro_modal() -> void:
 	intro_modal.visible = true
-	var card = intro_modal.get_child(1) as Control
+	var card = IntroCard.card_of(intro_modal)
 	_animate_modal_open(intro_modal, card)
 
 func _on_intro_start_pressed() -> void:
