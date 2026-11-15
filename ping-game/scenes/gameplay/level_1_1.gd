@@ -1003,7 +1003,7 @@ func _build_header_ui() -> void:
 	vb_lvl.add_child(sep_lvl)
 	
 	var lbl_lvl_num = Label.new()
-	lbl_lvl_num.text = "1"
+	lbl_lvl_num.text = "1.1"
 	lbl_lvl_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl_lvl_num.add_theme_font_override("font", font_black)
 	lbl_lvl_num.add_theme_font_size_override("font_size", 22)

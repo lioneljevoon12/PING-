@@ -1746,17 +1746,8 @@ func _on_pause_pressed() -> void:
 	pause_modal.open()
 
 func _on_back_pressed() -> void:
-	_play_synth_sequence([440.0, 392.0], 0.08)
-	if not game_dialog or not is_instance_valid(game_dialog):
-		_setup_game_dialog()
-	else:
-		game_dialog.z_index = 350
-		
-	game_dialog.show_confirmation(
-		"KELUAR LEVEL?",
-		"Apakah kamu yakin ingin kembali ke Peta Level? Progres saat ini belum tersimpan.",
-		func(): get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	)
+	# Sama seperti level lain: tombol kembali membuka menu "PERMAINAN DIJEDA"
+	_on_pause_pressed()
 
 func _update_hearts_ui() -> void:
 	HeartsStyle.refresh(hearts_rects, hearts)

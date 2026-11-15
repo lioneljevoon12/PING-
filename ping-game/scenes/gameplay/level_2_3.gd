@@ -2015,7 +2015,7 @@ func _reposition_responsive() -> void:
 		left_rack_cabinet.size = Vector2(260.0, 360.0)
 		
 	if pc1_desk:
-		pc1_desk.position = Vector2(clamp(center_x - 350.0, 180.0, 290.0), clamp(vp_sz.y * 0.58, 430.0, 480.0))
+		pc1_desk.position = Vector2(clamp(center_x - 350.0, 345.0, 400.0), clamp(vp_sz.y * 0.58, 430.0, 480.0))
 		
 	if center_desk:
 		var desk_w = 260.0

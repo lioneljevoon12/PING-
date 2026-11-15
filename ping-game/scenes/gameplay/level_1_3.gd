@@ -903,7 +903,7 @@ func _build_header_ui() -> void:
 	t_sub.add_theme_color_override("font_color", Color("#64748b"))
 	vb_lvl.add_child(t_sub)
 	var t_num = Label.new()
-	t_num.text = "3"
+	t_num.text = "1.3"
 	t_num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	t_num.add_theme_font_override("font", font_black)
 	t_num.add_theme_font_size_override("font_size", 16)

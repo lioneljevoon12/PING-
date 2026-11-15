@@ -1371,22 +1371,8 @@ func _on_pause_pressed() -> void:
 		pause_modal.open()
 
 func _on_back_pressed() -> void:
-	is_game_active = false
-	var act_yes = func():
-		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-	var act_no = func():
-		is_game_active = true
-		
-	game_dialog.setup({
-		"title": "KELUAR LEVEL?",
-		"message": "Apakah kamu yakin ingin keluar ke peta level? Progres saat ini belum tersimpan.",
-		"type": "konfirmasi",
-		"buttons": [
-			{ "text": "Keluar", "action": act_yes, "color": "orange" },
-			{ "text": "Lanjut Main", "action": act_no, "color": "green" }
-		]
-	})
-	game_dialog.open()
+	# Sama seperti level lain: tombol kembali membuka menu "PERMAINAN DIJEDA"
+	_on_pause_pressed()
 
 func _process(delta: float) -> void:
 	anim_pulse_time += delta
