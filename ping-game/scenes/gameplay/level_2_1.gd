@@ -662,6 +662,7 @@ func _build_header_ui() -> void:
 	sb_back.shadow_offset = Vector2(0, 2)
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
@@ -1510,10 +1511,10 @@ func _reposition_responsive() -> void:
 		var p_btn = header_ui.get_node_or_null("PauseBtn") as Control
 		
 		if back_b:
-			back_b.position = Vector2(24.0, 24.0)
+			back_b.position = Vector2(30.0, 24.0)
 			back_b.size = Vector2(52.0, 52.0)
-		if h_panel: h_panel.position = Vector2(90.0, 24.0)
-		if l_badge: l_badge.position = Vector2(240.0, 24.0)
+		if h_panel: h_panel.position = Vector2(106.0, 24.0)
+		if l_badge: l_badge.position = Vector2(256.0, 24.0)
 		if p_btn:
 			p_btn.position = Vector2(vp_sz.x - 76.0, 24.0)
 			p_btn.size = Vector2(52.0, 52.0)

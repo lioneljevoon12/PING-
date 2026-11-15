@@ -9,7 +9,7 @@ extends Control
 @onready var desk_nodes: Array[Control] = [%Desk1, %Desk2, %Desk3, %Desk4, %Desk5]
 @onready var character_mascot: TextureRect = %CharacterMascot
 
-@onready var back_btn: TextureButton = %BackButton
+@onready var back_btn: Button = %BackButton
 @onready var stage_card: PanelContainer = %StageCard
 @onready var level_progress_badge: PanelContainer = %LevelProgressBadge
 
@@ -680,6 +680,7 @@ func _start_selected_level() -> void:
 
 func _build_header_ui() -> void:
 	# Back Button
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(func():
 		play_synth_tone(493.88, 0.1)
 		get_tree().change_scene_to_file("res://scenes/dashboard.tscn")

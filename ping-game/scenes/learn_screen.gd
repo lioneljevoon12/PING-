@@ -10,6 +10,7 @@ extends Control
 func _ready() -> void:
 	# Back Button
 	if back_btn:
+		UiKit.style_back_button(back_btn)
 		back_btn.pressed.connect(func():
 			_play_sfx(493.88)
 			get_tree().change_scene_to_file("res://scenes/title_screen.tscn")

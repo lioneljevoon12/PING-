@@ -509,6 +509,7 @@ func _build_header_ui() -> void:
 	lbl_back.add_theme_color_override("font_color", Color("#4a2e2b"))
 	lbl_back.set_anchors_preset(Control.PRESET_FULL_RECT)
 	back_btn.add_child(lbl_back)
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.08)
 	header_ui.add_child(back_btn)

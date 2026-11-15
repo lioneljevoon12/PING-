@@ -212,6 +212,7 @@ func _setup_header_ui() -> void:
 	back_btn.add_theme_font_size_override("font_size", 24)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_on_back_pressed)
 	header_ui.add_child(back_btn)
 

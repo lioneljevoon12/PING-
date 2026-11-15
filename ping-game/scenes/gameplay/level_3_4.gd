@@ -631,12 +631,9 @@ func _build_header_ui() -> void:
 	add_child(header_ui)
 	
 	# Back Button
-	var back_btn = TextureButton.new()
-	back_btn.texture_normal = preload("res://art/ui-ux/levelpath/crisp_back.png")
-	back_btn.size = Vector2(64, 64)
+	var back_btn = Button.new()
 	back_btn.position = Vector2(30, 20)
-	back_btn.ignore_texture_size = true
-	back_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_on_pause_pressed)
 	header_ui.add_child(back_btn)
 	

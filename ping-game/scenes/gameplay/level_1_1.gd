@@ -874,35 +874,10 @@ func _build_header_ui() -> void:
 	add_child(header_ui)
 	
 	# 1. Back Button (<) - Big pink circular button (64x64)
-	var back_btn = TextureButton.new()
+	var back_btn = Button.new()
 	back_btn.name = "BackBtn"
 	back_btn.position = Vector2(30, 18)
-	back_btn.custom_minimum_size = Vector2(64, 64)
-	back_btn.size = Vector2(64, 64)
-	back_btn.pivot_offset = Vector2(32, 32)
-	var p_back = PanelContainer.new()
-	p_back.size = Vector2(64, 64)
-	p_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb_back = StyleBoxFlat.new()
-	sb_back.bg_color = Color("#fed0cf") # Soft pastel pink
-	sb_back.border_color = Color("#4a2e2b")
-	sb_back.set_border_width_all(3.5)
-	sb_back.set_corner_radius_all(32)
-	sb_back.shadow_color = Color(0.29, 0.18, 0.17, 0.22)
-	sb_back.shadow_size = 5
-	sb_back.shadow_offset = Vector2(0, 3)
-	p_back.add_theme_stylebox_override("panel", sb_back)
-	back_btn.add_child(p_back)
-	
-	var lbl_back = Label.new()
-	lbl_back.text = "<"
-	lbl_back.size = Vector2(64, 64)
-	lbl_back.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl_back.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl_back.add_theme_font_override("font", font_black)
-	lbl_back.add_theme_font_size_override("font_size", 28)
-	lbl_back.add_theme_color_override("font_color", Color("#4a2e2b"))
-	back_btn.add_child(lbl_back)
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.08)
 	header_ui.add_child(back_btn)

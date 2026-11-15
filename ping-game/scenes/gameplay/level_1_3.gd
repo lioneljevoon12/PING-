@@ -816,6 +816,7 @@ func _build_header_ui() -> void:
 	sb_back.shadow_offset = Vector2(0, 3)
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
@@ -1972,7 +1973,7 @@ func _reposition_responsive() -> void:
 		var pause_b = header_ui.get_node_or_null("PauseBtn")
 		
 		if back_b:
-			back_b.position = Vector2(40, 26)
+			back_b.position = Vector2(30, 26)
 		if hearts_p:
 			hearts_p.position = Vector2(110, 26)
 		if lvl_p:

@@ -599,6 +599,7 @@ func _build_header_ui() -> void:
 	back_btn.add_theme_stylebox_override("normal", sb_back)
 	back_btn.add_theme_color_override("font_color", Color("#4a2e2b"))
 	back_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UiKit.style_back_button(back_btn)
 	back_btn.pressed.connect(_open_pause_modal)
 	_setup_hover_scale(back_btn, 1.1)
 	header_ui.add_child(back_btn)
@@ -754,15 +755,15 @@ func _position_header_elements() -> void:
 	
 	var back_btn = header_ui.get_node_or_null("BackBtn") as Control
 	if back_btn:
-		back_btn.position = Vector2(25.0, top_y)
+		back_btn.position = Vector2(30.0, top_y)
 		back_btn.size = Vector2(52.0, 52.0)
 		
 	if hearts_panel:
-		hearts_panel.position = Vector2(90.0, top_y)
+		hearts_panel.position = Vector2(106.0, top_y)
 		
 	var level_badge = header_ui.get_node_or_null("LevelBadge") as Control
 	if level_badge:
-		level_badge.position = Vector2(235.0, top_y)
+		level_badge.position = Vector2(260.0, top_y)
 		
 	var pause_btn = header_ui.get_node_or_null("PauseBtn") as Control
 	if pause_btn:
