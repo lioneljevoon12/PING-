@@ -316,55 +316,62 @@ func _setup_room() -> void:
 	room_world.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(room_world)
 	
-	# Left Cabinet (Rak R-01 & Cable)
-	var cabinet = PanelContainer.new()
-	cabinet.position = Vector2(100, 260)
-	cabinet.size = Vector2(140, 250)
-	var sb_cab = StyleBoxFlat.new()
-	sb_cab.bg_color = Color("#c7d2fe")
-	sb_cab.border_color = Color("#4338ca")
-	sb_cab.set_border_width_all(3.5)
-	sb_cab.set_corner_radius_all(14)
-	cabinet.add_theme_stylebox_override("panel", sb_cab)
+	# Rak kiri (R-01 & kabel): sprite rak standar yang sama dengan stage lain
+	var cabinet = Control.new()
+	cabinet.position = Vector2(46, 232)
+	cabinet.size = Vector2(230, 296)
+	cabinet.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	room_world.add_child(cabinet)
-	obstacles.append(Rect2(cabinet.position, cabinet.size))
+	obstacles.append(Rect2(cabinet.position + Vector2(8, 10), cabinet.size - Vector2(16, 10)))
 	
-	var cab_vbox = VBoxContainer.new()
-	cab_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	cab_vbox.add_theme_constant_override("separation", 16)
-	cabinet.add_child(cab_vbox)
+	var rack_tex = TextureRect.new()
+	rack_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rack_tex.stretch_mode = TextureRect.STRETCH_SCALE
+	rack_tex.texture = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/rak-kabel.png")
+	rack_tex.size = cabinet.size
+	rack_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cabinet.add_child(rack_tex)
 	
-	# Top shelf router
-	var r_icon = TextureRect.new()
-	r_icon.texture = preload("res://art/assets/PING! Assets/asset-gameplay/stage2/router objects 1.png")
-	r_icon.custom_minimum_size = Vector2(80, 50)
-	r_icon.size = Vector2(80, 50)
-	r_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	r_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	cab_vbox.add_child(r_icon)
-	
-	# Shelf divider line
-	var div = ColorRect.new()
-	div.custom_minimum_size = Vector2(120, 2)
-	div.color = Color("#4338ca")
-	cab_vbox.add_child(div)
-	
-	# Bottom shelf cable
-	var c_icon = TextureRect.new()
-	c_icon.texture = tex_card_lan
-	c_icon.custom_minimum_size = Vector2(60, 40)
-	c_icon.size = Vector2(60, 40)
-	c_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	c_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	cab_vbox.add_child(c_icon)
-	
+	# Label pill di atas rak (seperti rak di stage lain)
+	var r_pill = PanelContainer.new()
+	r_pill.position = Vector2(65, -16)
+	r_pill.size = Vector2(100, 32)
+	var sb_pill = StyleBoxFlat.new()
+	sb_pill.bg_color = Color("#ffffff")
+	sb_pill.border_color = Color("#4a2e2b")
+	sb_pill.set_border_width_all(2.5)
+	sb_pill.set_corner_radius_all(12)
+	r_pill.add_theme_stylebox_override("panel", sb_pill)
+	r_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cabinet.add_child(r_pill)
 	var r_lbl = Label.new()
 	r_lbl.text = "R-01"
 	r_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	r_lbl.add_theme_font_override("font", font_bold)
-	r_lbl.add_theme_font_size_override("font_size", 12)
-	r_lbl.add_theme_color_override("font_color", Color("#1e1b4b"))
-	cab_vbox.add_child(r_lbl)
+	r_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	r_lbl.add_theme_font_override("font", font_black)
+	r_lbl.add_theme_font_size_override("font_size", 13)
+	r_lbl.add_theme_color_override("font_color", Color("#4a2e2b"))
+	r_pill.add_child(r_lbl)
+	
+	# Router di rak atas
+	var r_icon = TextureRect.new()
+	r_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	r_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	r_icon.texture = preload("res://art/assets/PING! Assets/asset-gameplay/stage2/router objects 1.png")
+	r_icon.size = Vector2(110, 68)
+	r_icon.position = Vector2(60, 62)
+	r_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cabinet.add_child(r_icon)
+	
+	# Kabel di rak tengah
+	var c_icon = TextureRect.new()
+	c_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	c_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	c_icon.texture = tex_card_lan
+	c_icon.size = Vector2(76, 52)
+	c_icon.position = Vector2(77, 168)
+	c_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cabinet.add_child(c_icon)
 	
 	# Light dashed boundary zone for Star Topology
 	var star_zone = Panel.new()

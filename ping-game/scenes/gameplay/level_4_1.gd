@@ -282,19 +282,14 @@ func _setup_rack_infrastructure() -> void:
 			show_toast("🗄️ Rak Infrastruktur: Router R-01, Switch SW-01, Patch Panel, dan Server aktif.")
 	)
 	
-	# Blue rack body
-	var rack_panel = Panel.new()
+	# Badan rak biru: sprite rak standar yang sama dengan stage lain
+	var rack_panel = TextureRect.new()
+	rack_panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rack_panel.stretch_mode = TextureRect.STRETCH_SCALE
+	rack_panel.texture = preload("res://art/assets/PING! Assets/asset-gameplay/stage1/1.1/rak-kabel.png")
 	rack_panel.position = Vector2.ZERO
 	rack_panel.size = Vector2(300, 440)
-	var sb_rack = StyleBoxFlat.new()
-	sb_rack.bg_color = Color("#8fa9dd")
-	sb_rack.border_color = Color("#4a2e2b")
-	sb_rack.set_border_width_all(3.5)
-	sb_rack.set_corner_radius_all(18)
-	sb_rack.shadow_color = Color(0, 0, 0, 0.22)
-	sb_rack.shadow_size = 8
-	sb_rack.shadow_offset = Vector2(0, 4)
-	rack_panel.add_theme_stylebox_override("panel", sb_rack)
+	rack_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rack_container.add_child(rack_panel)
 	
 	# Top Header Pill "Rak Infrastruktur"
