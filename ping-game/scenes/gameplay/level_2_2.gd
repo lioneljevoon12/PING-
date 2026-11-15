@@ -1401,25 +1401,12 @@ func _trigger_win() -> void:
 		add_child(game_dialog)
 		
 	var time_used = int(TIME_LIMIT - time_remaining)
-	var win_msg = "Luar biasa! Seluruh paket berhasil disaring dengan tepat sesuai aturan firewall!\n\n★ Rating: %d/3 Bintang\n⏱️ Waktu Selesai: %02d:%02d\n❤️ Sisa Nyawa: %d/3" % [
-		stars,
-		time_used / 60,
-		time_used % 60,
-		hearts
-	]
-	
 	var act_next = func():
 		get_tree().change_scene_to_file("res://scenes/gameplay/level_2_3.tscn")
 	var act_map = func():
 		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
-		
-	var btn_list: Array[Dictionary] = [
-		{ "text": "Lanjut ke Level 2.3", "action": act_next, "color": "green" },
-		{ "text": "Kembali ke Map", "action": act_map, "color": "blue" }
-	]
-	
-	game_dialog.setup_dialog("MISI BERHASIL!", win_msg, btn_list, "sukses")
-	game_dialog.open()
+	var time_str = "Waktu Selesai: %02d:%02d" % [time_used / 60, time_used % 60]
+	game_dialog.show_win("MISI BERHASIL!", "Luar biasa! Seluruh paket berhasil disaring dengan tepat sesuai aturan firewall!", stars, time_str, act_next, act_map, "LANJUT KE 2.3")
 
 func _trigger_game_over(reason: String) -> void:
 	is_game_active = false
@@ -1438,13 +1425,7 @@ func _trigger_game_over(reason: String) -> void:
 	var act_map = func():
 		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
 		
-	var btn_list: Array[Dictionary] = [
-		{ "text": "Coba Lagi", "action": act_retry, "color": "orange" },
-		{ "text": "Kembali ke Map", "action": act_map, "color": "blue" }
-	]
-	
-	game_dialog.setup_dialog("MISI GAGAL", reason, btn_list, "gagal")
-	game_dialog.open()
+	game_dialog.show_game_over(reason, act_retry, act_map)
 
 # --- TOAST NOTIFICATION ---
 func _build_toast_ui() -> void:

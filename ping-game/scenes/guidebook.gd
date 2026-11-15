@@ -79,6 +79,146 @@ var spreads: Array = [
 			"image_height": 0,
 			"body": "[b][color=#047857]Rentang IP Privat (Gratis untuk LAN):[/color][/b]\n• [b]Kelas A:[/b] 10.0.0.0 – 10.255.255.255\n• [b]Kelas B:[/b] 172.16.0.0 – 172.31.255.255\n• [b]Kelas C:[/b] 192.168.0.0 – 192.168.255.255\n\n[b][color=#b45309]Mekanisme NAT (Network Address Translation):[/color][/b]\nIP privat tidak dapat dirutekan langsung di Internet publik. Router menggunakan fitur [b]NAT[/b] untuk menerjemahkan banyak IP privat lokal ke satu IP publik resmi saat berkomunikasi ke luar jaringan."
 		}
+	},
+	{
+		"left": {
+			"title": "APA ITU JARINGAN KOMPUTER?",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Definisi Singkat:[/color][/b]\nJaringan komputer adalah kumpulan perangkat (komputer, ponsel, printer, server) yang saling terhubung agar bisa [b]bertukar data[/b] dan [b]berbagi sumber daya[/b].\n\n[b][color=#166534]Manfaat Jaringan:[/color][/b]\n• Berbagi file, printer, dan koneksi internet\n• Komunikasi cepat (surel, pesan, panggilan video)\n• Data terpusat sehingga mudah dicadangkan\n• Menghemat biaya perangkat dan perawatan\n\n[i][color=#4b5563]💡 Setiap hari kamu memakai jaringan: membuka video, bermain gim daring, hingga membayar lewat QRIS.[/color][/i]"
+		},
+		"right": {
+			"title": "ISTILAH DASAR",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#1e3a8a]Kata yang Sering Muncul:[/color][/b]\n• [b]Host / Node:[/b] perangkat apa pun yang terhubung ke jaringan\n• [b]Client:[/b] perangkat yang meminta layanan\n• [b]Server:[/b] perangkat yang menyediakan layanan\n• [b]Protokol:[/b] aturan bersama agar perangkat saling paham\n• [b]Paket:[/b] potongan kecil data yang dikirim lewat jaringan\n• [b]Topologi:[/b] bentuk susunan hubungan antar perangkat\n\n[i][color=#4b5563]💡 Analogi: server seperti dapur restoran, client seperti pelanggan, protokol seperti bahasa yang disepakati.[/color][/i]"
+		}
+	},
+	{
+		"left": {
+			"title": "SATUAN DATA & KECEPATAN",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Bit dan Byte:[/color][/b]\n• 1 Byte = 8 bit\n• 1 KB = 1.024 Byte\n• 1 MB = 1.024 KB\n• 1 GB = 1.024 MB\n\n[b][color=#b45309]Kecepatan Jaringan:[/color][/b]\n• Kecepatan jaringan ditulis dalam [b]bit[/b] per detik (bps, Kbps, Mbps, Gbps)\n• Ukuran file ditulis dalam [b]Byte[/b] (KB, MB, GB)\n• Unduhan 8 Mbps kira-kira ± 1 MB per detik\n\n[i][color=#4b5563]💡 Karena itu paket internet 100 Mbps tidak mengunduh 100 MB dalam 1 detik.[/color][/i]"
+		},
+		"right": {
+			"title": "BANDWIDTH, LATENCY, THROUGHPUT",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#166534]Tiga Ukuran Mutu Jaringan:[/color][/b]\n• [b]Bandwidth:[/b] kapasitas maksimum jalur, seperti lebar jalan raya\n• [b]Throughput:[/b] kecepatan nyata yang berhasil lewat saat ini\n• [b]Latency:[/b] waktu tunda perjalanan data (satuan milidetik, ms)\n• [b]Packet loss:[/b] persentase paket yang hilang di jalan\n\n[b][color=#6d28d9]Contoh Rasa:[/color][/b]\n• Video streaming butuh bandwidth besar\n• Gim daring butuh latency rendah\n• Panggilan suara tidak suka paket yang hilang\n\n[i][color=#4b5563]💡 Jalan lebar belum tentu lancar: bisa saja macet sehingga throughput turun.[/color][/i]"
+		}
+	},
+	{
+		"left": {
+			"title": "MEDIA TRANSMISI",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Jalur Pembawa Data:[/color][/b]\n• [b]Kabel UTP/STP:[/b] pasangan tembaga berpilin, murah dan umum di kantor\n• [b]Kabel Koaksial:[/b] dipakai untuk TV kabel dan sebagian internet rumah\n• [b]Serat Optik (Fiber):[/b] mengirim cahaya, cepat dan jauh, kebal gangguan listrik\n• [b]Nirkabel (Wi-Fi):[/b] gelombang radio, praktis tetapi lebih mudah terganggu\n\n[b][color=#b45309]Kategori Kabel UTP:[/color][/b]\n• Cat5e: umum untuk 1 Gbps\n• Cat6: lebih stabil untuk jarak dekat berkecepatan tinggi\n• Panjang maksimum segmen UTP ± 100 meter"
+		},
+		"right": {
+			"title": "KAPAN PAKAI APA?",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#166534]Memilih Media:[/color][/b]\n• Ruang kantor dan kelas: kabel UTP ke tiap meja\n• Antar gedung berjauhan: serat optik\n• Perangkat seluler: Wi-Fi atau data seluler\n• Area ramai gangguan listrik: kabel STP atau fiber\n\n[b][color=#6d28d9]Hal yang Perlu Diingat:[/color][/b]\n• Kabel yang ditekuk tajam bisa merusak kawat di dalamnya\n• Konektor longgar adalah penyebab gangguan yang sangat sering\n• Beri label kabel agar mudah ditelusuri\n\n[i][color=#4b5563]💡 Banyak masalah jaringan ternyata sederhana: kabel kendur atau salah colok.[/color][/i]"
+		}
+	},
+	{
+		"left": {
+			"title": "PERANGKAT JARINGAN LAIN",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Peran Perangkat:[/color][/b]\n• [b]NIC (Network Interface Card):[/b] kartu jaringan di tiap perangkat, tempat colokan kabel atau antena Wi-Fi\n• [b]Modem:[/b] menghubungkan jaringanmu ke penyedia internet (ISP)\n• [b]Router:[/b] menghubungkan beberapa jaringan dan menentukan jalur keluar-masuk\n• [b]Access Point:[/b] memancarkan sinyal Wi-Fi agar perangkat nirkabel bisa bergabung\n• [b]Repeater:[/b] menguatkan sinyal agar jangkauan lebih jauh\n• [b]Firewall:[/b] penyaring lalu lintas berdasarkan aturan keamanan"
+		},
+		"right": {
+			"title": "PERANGKAT DI RUMAH",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#166534]Router Wi-Fi Rumahan:[/color][/b]\nBiasanya satu kotak berisi beberapa fungsi sekaligus:\n• Router untuk mengatur lalu lintas\n• Access point untuk Wi-Fi\n• Beberapa colokan kabel untuk perangkat berkabel\n• Pengaman dasar (firewall sederhana)\n\n[b][color=#b45309]Membaca Lampu Indikator:[/color][/b]\n• Lampu hidup stabil: biasanya tersambung\n• Lampu berkedip: ada aliran data\n• Lampu mati: periksa kabel dan sumber daya\n\n[i][color=#4b5563]💡 Saat internet bermasalah, mulai dari yang paling mudah: kabel, lampu, lalu mulai ulang perangkat.[/color][/i]"
+		}
+	},
+	{
+		"left": {
+			"title": "MAC ADDRESS & IP ADDRESS",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Dua Jenis Alamat:[/color][/b]\n• [b]MAC Address:[/b] alamat fisik 48-bit yang tertanam di NIC, ditulis heksadesimal, mis. 00:1A:2B:3C:4D:5E\n• [b]IP Address:[/b] alamat logis yang diberikan untuk jaringan dan bisa berubah\n\n[b][color=#166534]Perbedaan Cara Pandang:[/color][/b]\n• MAC seperti nomor rangka kendaraan\n• IP seperti alamat rumah tempat kamu tinggal\n• MAC dipakai dalam satu jaringan lokal, IP dipakai untuk menjangkau jaringan lain\n\n[i][color=#4b5563]💡 Ponsel yang pindah dari rumah ke kafe biasanya ganti IP, tetapi MAC-nya tetap.[/color][/i]"
+		},
+		"right": {
+			"title": "ANATOMI ALAMAT IPv4",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#1e3a8a]Membaca Sebuah IPv4:[/color][/b]\n• Terdiri dari 4 bagian (oktet) dipisah titik, mis. 192.168.1.10\n• Tiap oktet bernilai 0 sampai 255 (8 bit)\n• Total 32 bit\n\n[b][color=#b45309]Subnet Mask:[/color][/b]\n• Menandai bagian mana dari alamat yang menunjukkan jaringan dan bagian mana menunjukkan perangkat\n• Dapat ditulis 255.255.255.0 atau notasi /24\n\n[b][color=#6d28d9]Alamat Khusus:[/color][/b]\n• 127.0.0.1 : loopback (alamat perangkat sendiri)\n• 169.254.x.x : alamat otomatis saat gagal mendapat IP\n\n[i][color=#4b5563]💡 Hitung dalam biner membantu memahami batas jaringan.[/color][/i]"
+		}
+	},
+	{
+		"left": {
+			"title": "DNS & DHCP (KONSEP)",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]DNS - Buku Telepon Internet:[/color][/b]\n• Manusia mudah mengingat nama (mis. situs.com), komputer memakai angka IP\n• DNS menerjemahkan nama domain menjadi alamat IP\n• Tanpa DNS kamu harus menghafal deretan angka\n\n[b][color=#166534]DHCP - Pembagi Alamat Otomatis:[/color][/b]\n• Memberi IP, subnet mask, dan gateway ke perangkat yang baru terhubung\n• Menghindari bentrok alamat karena dua perangkat memakai IP sama\n• Alamat bisa disewa untuk jangka waktu tertentu (lease)\n\n[i][color=#4b5563]💡 Gateway adalah 'pintu keluar' menuju jaringan lain, umumnya router.[/color][/i]"
+		},
+		"right": {
+			"title": "IPv6 SEKILAS",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#1e3a8a]Mengapa IPv6?[/color][/b]\nIPv4 hanya punya sekitar 4,3 miliar alamat, sementara perangkat terus bertambah.\n\n[b][color=#166534]Ciri IPv6:[/color][/b]\n• Panjang 128 bit, ditulis heksadesimal\n• Contoh: 2001:0db8:85a3:0000:0000:8a2e:0370:7334\n• Deretan nol berurutan boleh dipersingkat dengan ::\n• Jumlah alamat nyaris tak terbatas\n\n[b][color=#b45309]Hidup Berdampingan:[/color][/b]\nIPv4 dan IPv6 dipakai bersamaan selama masa peralihan (dual stack)."
+		}
+	},
+	{
+		"left": {
+			"title": "ALAT BANTU TROUBLESHOOTING",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#1e3a8a]Perintah Dasar Teknisi:[/color][/b]\n• [b]ping:[/b] menguji apakah perangkat lain bisa dijangkau dan berapa lama balasannya\n• [b]ipconfig / ifconfig:[/b] melihat IP, mask, dan gateway milik perangkatmu\n• [b]tracert / traceroute:[/b] menelusuri jalur menuju tujuan\n• [b]nslookup:[/b] menguji penerjemahan nama domain\n\n[b][color=#b45309]Urutan Berpikir:[/color][/b]\n1. Apakah kabel/Wi-Fi tersambung?\n2. Apakah perangkat punya alamat yang wajar?\n3. Apakah gateway bisa dijangkau?\n4. Apakah nama domain bisa diterjemahkan?\n\n[i][color=#4b5563]💡 Mulai dari lapisan paling bawah, naik pelan-pelan.[/color][/i]"
+		},
+		"right": {
+			"title": "KESELAMATAN & ETIKA TEKNISI",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#166534]Bekerja dengan Aman:[/color][/b]\n• Matikan daya sebelum menyentuh perangkat yang terbuka\n• Rapikan kabel agar tidak menjadi jebakan tersandung\n• Gunakan alat sesuai fungsinya (tang crimping, tester kabel)\n\n[b][color=#6d28d9]Bekerja dengan Rapi:[/color][/b]\n• Beri label pada kabel dan port\n• Catat perubahan konfigurasi\n• Simpan dokumentasi denah jaringan\n\n[b][color=#991b1b]Etika:[/color][/b]\n• Jangan mengakses data atau perangkat tanpa izin\n• Rahasiakan kata sandi yang kamu ketahui"
+		}
+	},
+	{
+		"left": {
+			"title": "KEAMANAN JARINGAN DASAR",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#991b1b]Ancaman Umum:[/color][/b]\n• [b]Phishing:[/b] pesan palsu yang memancing kamu memberikan data\n• [b]Malware:[/b] program berbahaya (virus, ransomware, spyware)\n• [b]Penyadapan:[/b] membaca data yang dikirim tanpa enkripsi\n• [b]Kata sandi lemah:[/b] mudah ditebak penyerang\n\n[b][color=#166534]Kebiasaan Baik:[/color][/b]\n• Kata sandi panjang dan unik, aktifkan verifikasi dua langkah\n• Perbarui sistem dan aplikasi secara rutin\n• Waspada Wi-Fi publik tanpa kata sandi\n• Cadangkan data penting\n\n[i][color=#4b5563]💡 Pengamanan terbaik adalah kebiasaan, bukan satu alat saja.[/color][/i]"
+		},
+		"right": {
+			"title": "ENKRIPSI, VPN, & FIREWALL",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#1e3a8a]Konsep Perlindungan:[/color][/b]\n• [b]Enkripsi:[/b] mengacak data sehingga hanya penerima berhak yang bisa membacanya\n• [b]VPN:[/b] terowongan terenkripsi lewat jaringan umum\n• [b]Firewall:[/b] penjaga gerbang yang mengikuti aturan izinkan atau tolak\n• [b]Autentikasi:[/b] membuktikan identitas (kata sandi, sidik jari, token)\n\n[b][color=#b45309]Lapisan Pertahanan:[/color][/b]\nKeamanan dibangun berlapis: perangkat, jaringan, aplikasi, dan manusia. Jika satu lapis bocor, lapis lain masih menahan."
+		}
+	},
+	{
+		"left": {
+			"title": "KAMUS MINI (A-M)",
+			"image": null,
+			"image_height": 0,
+			"desc": "• [b]ACK:[/b] tanda balasan bahwa data diterima\n• [b]Bandwidth:[/b] kapasitas jalur\n• [b]Broadcast:[/b] pesan untuk semua perangkat di satu jaringan\n• [b]Cache:[/b] tempat simpan sementara agar akses lebih cepat\n• [b]Domain:[/b] nama situs yang mudah diingat\n• [b]Enkripsi:[/b] pengacakan data demi keamanan\n• [b]Frame:[/b] unit data pada lapisan penghubung data\n• [b]Gateway:[/b] pintu menuju jaringan lain\n• [b]Host:[/b] perangkat yang terhubung\n• [b]ISP:[/b] penyedia layanan internet\n• [b]Latency:[/b] waktu tunda\n• [b]MAC:[/b] alamat fisik perangkat"
+		},
+		"right": {
+			"title": "KAMUS MINI (N-Z)",
+			"image": null,
+			"image_height": 0,
+			"body": "• [b]NAT:[/b] penerjemah alamat privat ke publik\n• [b]Node:[/b] titik pada jaringan\n• [b]Packet:[/b] paket data\n• [b]Ping:[/b] uji jangkauan perangkat\n• [b]Protokol:[/b] aturan komunikasi\n• [b]Router:[/b] penghubung antar jaringan\n• [b]SSID:[/b] nama jaringan Wi-Fi\n• [b]Subnet:[/b] pecahan dari satu jaringan besar\n• [b]Switch:[/b] penghubung perangkat dalam satu jaringan\n• [b]Throughput:[/b] kecepatan nyata\n• [b]Unicast:[/b] pesan untuk satu tujuan tertentu\n• [b]VPN:[/b] terowongan terenkripsi\n• [b]WAN:[/b] jaringan area luas"
+		}
+	},
+	{
+		"left": {
+			"title": "TIPS BERMAIN PING!",
+			"image": null,
+			"image_height": 0,
+			"desc": "[b][color=#166534]Strategi Menyelesaikan Level:[/color][/b]\n• Baca pop up pembuka dengan teliti, itu petunjuk tugasnya\n• Tekan tombol [b]?[/b] kuning kapan saja untuk melihat panduan level\n• Perhatikan label, warna, dan angka pada objek\n• Tiga hati adalah nyawamu, jadi jangan menebak asal\n• Waktu terus berjalan, tetapi ketelitian lebih utama\n\n[b][color=#b45309]Jika Buntu:[/color][/b]\n• Buka kembali buku panduan ini\n• Coba gunakan Mode Latihan tanpa batas waktu\n• Ulangi level, mengulang adalah cara belajar\n\n[i][color=#4b5563]💡 Bintang bergantung pada sisa nyawa, jadi teliti kunci bintang tiga.[/color][/i]"
+		},
+		"right": {
+			"title": "MENGAPA BELAJAR JARINGAN?",
+			"image": null,
+			"image_height": 0,
+			"body": "[b][color=#1e3a8a]Peluang Karier:[/color][/b]\n• Teknisi jaringan dan helpdesk\n• Administrator sistem\n• Insinyur jaringan\n• Analis keamanan siber\n• Teknisi komputasi awan (cloud)\n\n[b][color=#166534]Keterampilan yang Berguna:[/color][/b]\n• Berpikir runtut saat mencari sumber masalah\n• Teliti membaca angka dan konfigurasi\n• Terbiasa membuat dokumentasi\n• Komunikasi yang jelas dengan pengguna\n\n[i][color=#4b5563]💡 Sertifikasi seperti CCNA dan Network+ sering menjadi langkah lanjutan bagi yang tertarik.[/color][/i]"
+		}
 	}
 ]
 

@@ -59,13 +59,13 @@ static func make_help_button(parent: Node, pos: Vector2, on_press: Callable) -> 
 	b.name = "HelpBtn"
 	b.text = "?"
 	b.position = pos
-	b.size = Vector2(52, 52)
-	b.custom_minimum_size = Vector2(52, 52)
+	b.size = Vector2(64, 64)
+	b.custom_minimum_size = Vector2(64, 64)
 	var sb = StyleBoxFlat.new()
 	sb.bg_color = Color("#fef08a")
 	sb.border_color = Color("#4a2e2b")
 	sb.set_border_width_all(3)
-	sb.set_corner_radius_all(26)
+	sb.set_corner_radius_all(32)
 	sb.shadow_color = Color(0, 0, 0, 0.2)
 	sb.shadow_size = 4
 	sb.shadow_offset = Vector2(0, 2)
@@ -76,7 +76,7 @@ static func make_help_button(parent: Node, pos: Vector2, on_press: Callable) -> 
 	b.add_theme_stylebox_override("pressed", sbh)
 	b.add_theme_stylebox_override("focus", sb)
 	b.add_theme_font_override("font", FONT_BLACK)
-	b.add_theme_font_size_override("font_size", 24)
+	b.add_theme_font_size_override("font_size", 30)
 	b.add_theme_color_override("font_color", Color("#4a2e2b"))
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.tooltip_text = "Panduan bermain"
@@ -170,32 +170,7 @@ static func attach_help_button(header: Control, timer_node: Control, on_press: C
 	var place = func():
 		if not is_instance_valid(b) or not is_instance_valid(header):
 			return
-		var top: Node = timer_node
-		while top != null and top.get_parent() != header:
-			top = top.get_parent()
-		var x = 1100.0
-		var y = 24.0
-		if top is Control:
-			var tr = (top as Control).get_global_rect()
-			x = tr.position.x - 62.0
-			y = tr.position.y + (tr.size.y - 52.0) / 2.0
-		var moved = true
-		var guard = 0
-		while moved and guard < 6:
-			moved = false
-			guard += 1
-			var me = Rect2(x, y, 52, 52)
-			for ch in header.get_children():
-				if ch == b or ch == top or not (ch is Control) or not (ch as Control).visible:
-					continue
-				var cr = (ch as Control).get_global_rect()
-				if cr.size.x > 400.0 or cr.size.y > 200.0 or cr.size.x < 8.0:
-					continue
-				if cr.intersects(me):
-					x = cr.position.x - 62.0
-					moved = true
-					break
-		b.global_position = Vector2(x, y)
+		UiKit.normalize_header(header.get_parent())
 	tree.process_frame.connect(func(): tree.process_frame.connect(place, CONNECT_ONE_SHOT), CONNECT_ONE_SHOT)
 	header.get_viewport().size_changed.connect(func():
 		if not tree.process_frame.is_connected(place):

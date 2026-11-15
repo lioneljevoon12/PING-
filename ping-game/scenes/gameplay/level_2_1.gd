@@ -160,7 +160,7 @@ func _ready() -> void:
 	_build_win_gameover_modals()
 	_build_toast_ui()
 	
-	help_btn = TutorialOverlay.make_help_button(header_ui, Vector2(0, 20), _on_help_pressed)
+	help_btn = TutorialOverlay.attach_help_button(header_ui, timer_label, _on_help_pressed)
 	_reposition_responsive()
 	get_viewport().size_changed.connect(_reposition_responsive)
 	
@@ -1477,8 +1477,6 @@ func show_toast(msg: String, duration: float = 2.5) -> void:
 func _reposition_responsive() -> void:
 	var vp_sz = get_viewport_rect().size
 	var center_x = vp_sz.x / 2.0
-	if help_btn:
-		help_btn.position = Vector2(vp_sz.x - 300.0, 20.0)
 	
 	door_arch.position = Vector2(center_x - 160.0, 45.0)
 	potted_plant.position = Vector2(center_x + 180.0, 75.0)

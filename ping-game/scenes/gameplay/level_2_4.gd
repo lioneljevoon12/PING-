@@ -1856,13 +1856,7 @@ func _trigger_game_over(reason: String) -> void:
 	var act_map = func():
 		get_tree().change_scene_to_file("res://scenes/level_path.tscn")
 		
-	var btn_list: Array[Dictionary] = [
-		{ "text": "Coba Lagi", "action": act_retry, "color": "red" },
-		{ "text": "Kembali ke Map", "action": act_map, "color": "blue" }
-	]
-	
-	game_dialog.setup_dialog("MISI GAGAL", reason, btn_list, "fail")
-	game_dialog.open()
+	game_dialog.show_game_over(reason, act_retry, act_map)
 
 # --- TOAST UI ---
 func _build_toast_ui() -> void:
